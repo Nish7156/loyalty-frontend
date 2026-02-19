@@ -1,22 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { authApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 
 export function CustomerLoginPage() {
-  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (getCustomerTokenIfPresent()) {
-      navigate('/me', { replace: true });
-    }
-  }, [navigate]);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +35,9 @@ export function CustomerLoginPage() {
     try {
       const res = await authApi.customerLogin(phone.trim(), otp.trim());
       setCustomerToken(res.access_token);
-      navigate('/me', { replace: true });
+      setStep('phone');
+      setPhone('');
+      setOtp('');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid OTP');
     } finally {
@@ -51,7 +46,17 @@ export function CustomerLoginPage() {
   };
 
   if (getCustomerTokenIfPresent()) {
-    return null;
+    return (
+      <div className="max-w-md mx-auto pb-20">
+        <h1 className="text-xl font-bold mb-2 text-[var(--premium-cream)] tracking-tight">Welcome</h1>
+        <p className="text-[var(--premium-muted)] text-sm mb-6">You’re logged in. Scan a store QR to check in or view your profile.</p>
+        <div className="space-y-3">
+          <Link to="/me" className="block">
+            <Button fullWidth>My profile</Button>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

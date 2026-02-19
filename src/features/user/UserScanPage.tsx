@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 import type { CustomerProfile, Reward } from '../../lib/api';
+import { createBranchSocket } from '../../lib/socket';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 
@@ -22,6 +23,9 @@ export function UserScanPage() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
   const [currentPartnerId, setCurrentPartnerId] = useState<string | null>(null);
+  const [lastActivityId, setLastActivityId] = useState<string | null>(null);
+  const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
+  const socketRef = useRef<ReturnType<typeof createBranchSocket> | null>(null);
 
   const isLoggedIn = !!getCustomerTokenIfPresent();
   const displayPhone = profile?.customer?.phoneNumber ?? phone;
@@ -120,11 +124,13 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      await activityApi.checkIn({
+      const result = await activityApi.checkIn({
         branchId,
         phoneNumber: displayPhone,
         value: amount.trim() ? Number(amount) : undefined,
       });
+      setLastActivityId(result.id);
+      setCheckinStatus('PENDING');
       setStep('done');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Check-in failed');
@@ -162,6 +168,25 @@ export function UserScanPage() {
       .catch(() => {});
   }, [step, branchId, profile, currentPartnerId]);
 
+  useEffect(() => {
+    if (step !== 'done' || !branchId || !lastActivityId) return;
+    const socket = createBranchSocket(branchId);
+    socketRef.current = socket;
+    const handler = (payload: { id: string; status: string }) => {
+      if (payload.id !== lastActivityId) return;
+      setCheckinStatus(payload.status as 'APPROVED' | 'REJECTED');
+      if (payload.status === 'APPROVED' && getCustomerTokenIfPresent()) {
+        customersApi.getMyProfile().then(setProfile).catch(() => {});
+      }
+    };
+    socket.on('checkin_updated', handler);
+    return () => {
+      socket.off('checkin_updated', handler);
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [step, branchId, lastActivityId]);
+
   const partnerIdForBranch = profile?.storesVisited?.find((s) => s.branchId === branchId)?.partnerId ?? currentPartnerId;
   const activeRewardsForStore: Reward[] =
     profile?.customer?.rewards?.filter(
@@ -189,7 +214,10 @@ export function UserScanPage() {
         </div>
       )}
 
-      {step === 'phone' && branchId && (
+      {step === 'phone' && branchId && getCustomerTokenIfPresent() && (
+        <p className="text-[var(--premium-muted)]">Loading…</p>
+      )}
+      {step === 'phone' && branchId && !getCustomerTokenIfPresent() && (
         <form onSubmit={handlePhoneSubmit} className="space-y-4">
           <Input
             label="Phone"
@@ -280,10 +308,24 @@ export function UserScanPage() {
       )}
 
       {step === 'done' && (
-        <div className="bg-[var(--premium-card)] border border-emerald-700/50 rounded-xl p-4 text-center">
-          <p className="font-medium text-emerald-400">Check-in submitted!</p>
-          <p className="text-sm text-[var(--premium-muted)] mt-1">Staff will verify and approve.</p>
-          <Button className="mt-4" onClick={() => { setStep('checkin'); setAmount(''); setError(''); }}>
+        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4 text-center">
+          {checkinStatus === null || checkinStatus === 'PENDING' ? (
+            <>
+              <p className="font-medium text-emerald-400">Check-in submitted!</p>
+              <p className="text-sm text-[var(--premium-muted)] mt-1">Staff will verify and approve. Waiting for update…</p>
+            </>
+          ) : checkinStatus === 'APPROVED' ? (
+            <>
+              <p className="font-medium text-emerald-400">Approved!</p>
+              <p className="text-sm text-[var(--premium-muted)] mt-1">Your visit and points have been updated.</p>
+            </>
+          ) : (
+            <>
+              <p className="font-medium text-rose-400">Rejected</p>
+              <p className="text-sm text-[var(--premium-muted)] mt-1">Staff declined this check-in.</p>
+            </>
+          )}
+          <Button className="mt-4" onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
             Another check-in
           </Button>
         </div>
