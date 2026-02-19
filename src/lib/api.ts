@@ -96,8 +96,41 @@ export interface Reward {
   status: 'ACTIVE' | 'REDEEMED';
   expiryDate?: string;
   createdAt: string;
+  redeemedAt?: string;
+  redeemedBranchId?: string;
   customer?: Customer;
   partner?: Partner;
+  redeemedBranch?: Branch;
+}
+
+export interface HistoryActivity {
+  id: string;
+  customerId: string;
+  branchId: string;
+  staffId: string | null;
+  status: string;
+  value: number | null;
+  createdAt: string;
+  branch: Branch;
+  partner: Partner;
+}
+
+export interface HistoryRedeemedReward {
+  id: string;
+  customerId: string;
+  partnerId: string;
+  status: string;
+  expiryDate: string | null;
+  createdAt: string;
+  redeemedAt: string | null;
+  redeemedBranchId: string | null;
+  partner: Partner;
+  redeemedBranch: Branch | null;
+}
+
+export interface CustomerHistory {
+  activities: HistoryActivity[];
+  redeemedRewards: HistoryRedeemedReward[];
 }
 
 const CUSTOMER_TOKEN_KEY = 'customer_token';
@@ -227,6 +260,8 @@ export const customersApi = {
     api<CustomerProfile>(`/customers/phone/${encodeURIComponent(phoneNumber)}/profile`),
   getMyProfile: () =>
     api<CustomerProfile>('/customers/me/profile', {}, true),
+  getMyHistory: () =>
+    api<CustomerHistory>('/customers/me/history', {}, true),
   create: (body: { phoneNumber: string }) =>
     api<Customer>('/customers', { method: 'POST', body: JSON.stringify(body) }),
   register: (body: { branchId: string; phoneNumber: string; otp: string }) =>

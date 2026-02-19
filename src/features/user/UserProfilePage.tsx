@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
 import { createCustomerSocket } from '../../lib/socket';
-import type { CustomerProfile, Reward } from '../../lib/api';
+import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
 
@@ -13,9 +13,18 @@ function formatDate(s: string) {
   }
 }
 
+function formatDateTime(s: string) {
+  try {
+    return new Date(s).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  } catch {
+    return s;
+  }
+}
+
 export function UserProfilePage() {
   const [phone, setPhone] = useState(() => localStorage.getItem(PHONE_KEY) || '');
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
+  const [history, setHistory] = useState<CustomerHistory | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
@@ -25,11 +34,11 @@ export function UserProfilePage() {
     if (getCustomerTokenIfPresent()) {
       setLoading(true);
       setError('');
-      customersApi
-        .getMyProfile()
-        .then((p) => {
+      Promise.all([customersApi.getMyProfile(), customersApi.getMyHistory()])
+        .then(([p, h]) => {
           setProfile(p);
           setPhone(p.customer.phoneNumber);
+          setHistory(h);
           setLoadedByToken(true);
         })
         .catch(() => setLoading(false))
@@ -41,7 +50,10 @@ export function UserProfilePage() {
     setError('');
     customersApi
       .getProfile(phone)
-      .then(setProfile)
+      .then((p) => {
+        setProfile(p);
+        setHistory(null);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [phone]);
@@ -54,6 +66,7 @@ export function UserProfilePage() {
     const handler = () => {
       if (getCustomerTokenIfPresent()) {
         customersApi.getMyProfile().then(setProfile).catch(() => {});
+        customersApi.getMyHistory().then(setHistory).catch(() => {});
       } else {
         customersApi.getProfile(customerPhone).then(setProfile).catch(() => {});
       }
@@ -78,6 +91,7 @@ export function UserProfilePage() {
   const handleLogout = () => {
     clearCustomerToken();
     setProfile(null);
+    setHistory(null);
     setPhone('');
     setLoadedByToken(false);
   };
@@ -113,10 +127,15 @@ export function UserProfilePage() {
   const { customer, storesVisited } = profile;
   const rewards: Reward[] = customer.rewards ?? [];
 
+  const activeRewards = rewards.filter((r) => r.status === 'ACTIVE');
+  const redeemedFromHistory = history?.redeemedRewards ?? [];
+
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[var(--premium-cream)] tracking-tight">My Loyalty Card</h1>
+        <h1 className="text-xl font-bold text-[var(--premium-cream)] tracking-tight">
+          {loadedByToken ? "You're in the club" : 'My Loyalty Card'}
+        </h1>
         {loadedByToken && (
           <button type="button" onClick={handleLogout} className="text-sm text-[var(--premium-gold)] hover:underline">
             Log out
@@ -127,22 +146,90 @@ export function UserProfilePage() {
       <div className="bg-[var(--premium-surface)] border border-[var(--premium-border)] rounded-xl p-5 ring-1 ring-[var(--premium-gold)]/20">
         <p className="text-[var(--premium-muted)] text-sm">Member</p>
         <p className="font-mono text-lg tracking-wide text-[var(--premium-cream)]">{customer.phoneNumber}</p>
+        {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
+          <p className="text-[var(--premium-gold)]/90 text-sm mt-2">Thanks for being a loyal customer.</p>
+        )}
         <div className="mt-4 flex gap-6">
           <div>
             <p className="text-[var(--premium-muted)] text-xs">Stores visited</p>
             <p className="font-semibold text-[var(--premium-gold)]">{storesVisited.length}</p>
           </div>
           <div>
-            <p className="text-[var(--premium-muted)] text-xs">Rewards</p>
-            <p className="font-semibold text-[var(--premium-gold)]">{rewards.filter((r) => r.status === 'ACTIVE').length}</p>
+            <p className="text-[var(--premium-muted)] text-xs">Rewards to use</p>
+            <p className="font-semibold text-[var(--premium-gold)]">{activeRewards.length}</p>
           </div>
+          {redeemedFromHistory.length > 0 && (
+            <div>
+              <p className="text-[var(--premium-muted)] text-xs">Redeemed</p>
+              <p className="font-semibold text-[var(--premium-gold)]">{redeemedFromHistory.length}</p>
+            </div>
+          )}
         </div>
       </div>
 
+      {loadedByToken && history && (history.activities.length > 0 || history.redeemedRewards.length > 0) && (
+        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
+          <h2 className="font-semibold mb-1 text-[var(--premium-cream)]">Your history</h2>
+          <p className="text-[var(--premium-muted)] text-sm mb-3">Visits and rewards in one place.</p>
+          <ul className="space-y-3">
+            {[
+              ...history.activities.map((a) => ({
+                type: 'visit' as const,
+                date: a.createdAt,
+                store: a.partner?.businessName,
+                branch: a.branch?.branchName,
+              })),
+              ...history.redeemedRewards.map((r) => ({
+                type: 'redeem' as const,
+                date: r.redeemedAt ?? r.createdAt,
+                store: r.partner?.businessName,
+                branch: r.redeemedBranch?.branchName ?? null,
+              })),
+            ]
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .slice(0, 20)
+              .map((item, i) => (
+                <li key={item.type + item.date + i} className="flex items-start gap-3 py-2 border-b border-[var(--premium-border)] last:border-0">
+                  <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-[var(--premium-gold)]" />
+                  <div className="min-w-0">
+                    <p className="text-[var(--premium-cream)] font-medium">
+                      {item.type === 'visit' ? 'Visit' : 'Reward redeemed'} — {item.store}
+                    </p>
+                    {item.branch && (
+                      <p className="text-[var(--premium-muted)] text-sm">{item.branch}</p>
+                    )}
+                    <p className="text-[var(--premium-muted)] text-xs mt-0.5">{formatDateTime(item.date)}</p>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+
+      {loadedByToken && redeemedFromHistory.length > 0 && (
+        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
+          <h2 className="font-semibold mb-1 text-[var(--premium-cream)]">Rewards you've redeemed</h2>
+          <p className="text-[var(--premium-muted)] text-sm mb-3">Every reward you've claimed — store and date.</p>
+          <ul className="divide-y divide-[var(--premium-border)]">
+            {redeemedFromHistory.map((r) => (
+              <li key={r.id} className="py-3">
+                <p className="font-medium text-[var(--premium-cream)]">{r.partner?.businessName ?? 'Store'}</p>
+                {r.redeemedBranch && (
+                  <p className="text-[var(--premium-muted)] text-sm">{r.redeemedBranch.branchName}</p>
+                )}
+                <p className="text-[var(--premium-muted)] text-xs mt-1">
+                  Redeemed {r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
-        <h2 className="font-semibold mb-3 text-[var(--premium-cream)]">Stores I've visited</h2>
+        <h2 className="font-semibold mb-3 text-[var(--premium-cream)]">Stores you use</h2>
         {storesVisited.length === 0 ? (
-          <p className="text-[var(--premium-muted)] text-sm">No store visits yet. Scan a store QR to check in.</p>
+          <p className="text-[var(--premium-muted)] text-sm">No store visits yet. Scan a store QR to check in — your first visit counts.</p>
         ) : (
           <ul className="divide-y divide-[var(--premium-border)] space-y-2">
             {storesVisited.map((store) => {
@@ -186,7 +273,7 @@ export function UserProfilePage() {
       <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
         <h2 className="font-semibold mb-3 text-[var(--premium-cream)]">My rewards</h2>
         {rewards.length === 0 ? (
-          <p className="text-[var(--premium-muted)] text-sm">No rewards yet. Keep visiting to earn rewards.</p>
+          <p className="text-[var(--premium-muted)] text-sm">No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
         ) : (
           <ul className="divide-y divide-[var(--premium-border)]">
             {rewards.map((r) => (
