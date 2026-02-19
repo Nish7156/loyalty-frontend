@@ -22,12 +22,12 @@ export function AdminDashboard() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
       <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-2">Partners ({partners.length})</h2>
+        <h2 className="font-semibold mb-2">Stores ({partners.length})</h2>
         <ul className="divide-y">
           {partners.map((p) => (
             <li key={p.id} className="py-2 flex justify-between">
               <span>{p.businessName}</span>
-              <span className="text-gray-500">{p.industryType}</span>
+              <span className="text-gray-500 text-sm">{p.owner?.phone ?? ''}</span>
             </li>
           ))}
         </ul>

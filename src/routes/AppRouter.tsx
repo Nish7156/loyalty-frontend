@@ -17,6 +17,7 @@ const StaffPage = lazy(() => import('../features/store-owner/StaffPage').then((m
 const SellerDashboard = lazy(() => import('../features/seller/SellerDashboard').then((m) => ({ default: m.SellerDashboard })));
 const ApprovePage = lazy(() => import('../features/seller/ApprovePage').then((m) => ({ default: m.ApprovePage })));
 const SellerHistory = lazy(() => import('../features/seller/SellerHistory').then((m) => ({ default: m.SellerHistory })));
+const StoreQRPage = lazy(() => import('../features/seller/StoreQRPage').then((m) => ({ default: m.StoreQRPage })));
 
 function Fallback() {
   return (
@@ -45,6 +46,7 @@ export function AppRouter() {
             <Route path="dashboard" element={<SellerDashboard />} />
             <Route path="approve" element={<ApprovePage />} />
             <Route path="history" element={<SellerHistory />} />
+            <Route path="qr" element={<StoreQRPage />} />
           </Route>
         </Route>
 
@@ -59,7 +61,7 @@ export function AppRouter() {
         <Route element={<RoleGate allowedRoles={['SUPER_ADMIN']} />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="partners" element={<PartnersPage />} />
+            <Route path="stores" element={<PartnersPage />} />
           </Route>
         </Route>
 

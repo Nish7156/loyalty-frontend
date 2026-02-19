@@ -17,21 +17,25 @@ export function StaffPage() {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
   const [branchId, setBranchId] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const myPartners = auth.type === 'platform' ? partners.filter((p) => p.ownerId === auth.user.id) : partners;
   const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
+  // For platform (owner), backend already returns only their branches; use branches so staff list isn't empty if partners filter mismatches
+  const branchesForStaff = auth.type === 'platform' ? branches : myBranches;
+  const staffList = Array.isArray(staff) ? staff : [];
+  const myStaff = staffList.filter((s) => branchesForStaff.some((b) => b.id === s.branchId));
 
   const load = () => {
     setLoading(true);
+    setError('');
     Promise.all([partnersApi.list(), branchesApi.list(), staffApi.list()])
       .then(([p, b, s]) => {
-        setPartners(p);
-        setBranches(b);
-        setStaff(s);
-        if (!branchId && b.length) setBranchId(b[0].id);
+        setPartners(Array.isArray(p) ? p : []);
+        setBranches(Array.isArray(b) ? b : []);
+        setStaff(Array.isArray(s) ? s : []);
+        if (!branchId && Array.isArray(b) && b.length) setBranchId(b[0].id);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -44,10 +48,9 @@ export function StaffPage() {
     setSubmitting(true);
     setError('');
     try {
-      await staffApi.create({ name, phone, password, branchId });
+      await staffApi.create({ name, phone, branchId });
       setName('');
       setPhone('');
-      setPassword('');
       setShowForm(false);
       load();
     } catch (e) {
@@ -56,8 +59,6 @@ export function StaffPage() {
       setSubmitting(false);
     }
   };
-
-  const myStaff = staff.filter((s) => myBranches.some((b) => b.id === s.branchId));
 
   if (loading) return <p>Loading…</p>;
 
@@ -73,7 +74,7 @@ export function StaffPage() {
         <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-4 mb-4 max-w-md">
           <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <Input label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="mt-2" />
-          <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-2" />
+          <p className="text-xs text-gray-500 mt-1">Seller will log in using this phone via OTP.</p>
           <div className="mt-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Branch</label>
             <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" required>
@@ -102,7 +103,7 @@ export function StaffPage() {
               <tr key={s.id}>
                 <td className="px-4 py-2">{s.name}</td>
                 <td className="px-4 py-2">{s.phone}</td>
-                <td className="px-4 py-2">{branches.find((b) => b.id === s.branchId)?.branchName}</td>
+                <td className="px-4 py-2">{branchesForStaff.find((b) => b.id === s.branchId)?.branchName ?? s.branch?.branchName ?? '—'}</td>
               </tr>
             ))}
           </tbody>

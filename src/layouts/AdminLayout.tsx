@@ -27,10 +27,10 @@ export function AdminLayout() {
             Dashboard
           </Link>
           <Link
-            to="/admin/partners"
+            to="/admin/stores"
             className="block px-3 py-2 rounded hover:bg-gray-700"
           >
-            Partners
+            Stores
           </Link>
         </nav>
         <div className="p-2 border-t border-gray-700">

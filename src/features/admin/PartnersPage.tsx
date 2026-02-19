@@ -11,6 +11,7 @@ export function PartnersPage() {
   const [showForm, setShowForm] = useState(false);
   const [businessName, setBusinessName] = useState('');
   const [industryType, setIndustryType] = useState('F&B');
+  const [ownerPhone, setOwnerPhone] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const load = () => {
@@ -29,8 +30,9 @@ export function PartnersPage() {
     setSubmitting(true);
     setError('');
     try {
-      await partnersApi.create({ businessName, industryType });
+      await partnersApi.create({ businessName, industryType, ownerPhone });
       setBusinessName('');
+      setOwnerPhone('');
       setShowForm(false);
       load();
     } catch (e) {
@@ -44,16 +46,16 @@ export function PartnersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Partners</h1>
+      <h1 className="text-2xl font-bold mb-4">Stores</h1>
       {error && <p className="text-red-600 mb-2">{error}</p>}
       {!showForm ? (
         <Button onClick={() => setShowForm(true)} className="mb-4">
-          Add Partner
+          Add Store
         </Button>
       ) : (
         <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-4 mb-4 max-w-md">
           <Input
-            label="Business Name"
+            label="Store Name"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
             required
@@ -69,6 +71,18 @@ export function PartnersPage() {
               <option value="Salon">Salon</option>
               <option value="Fitness">Fitness</option>
             </select>
+          </div>
+          <div className="mt-2">
+            <Input
+              label="Owner Phone"
+              value={ownerPhone}
+              onChange={(e) => setOwnerPhone(e.target.value)}
+              placeholder="+15550001234"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              The owner will use this number to log in.
+            </p>
           </div>
           <div className="flex gap-2 mt-4">
             <Button type="submit" disabled={submitting}>
@@ -86,6 +100,7 @@ export function PartnersPage() {
             <tr>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Name</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Industry</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Owner Phone</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -93,6 +108,7 @@ export function PartnersPage() {
               <tr key={p.id}>
                 <td className="px-4 py-2">{p.businessName}</td>
                 <td className="px-4 py-2">{p.industryType}</td>
+                <td className="px-4 py-2">{p.owner?.phone ?? '—'}</td>
               </tr>
             ))}
           </tbody>

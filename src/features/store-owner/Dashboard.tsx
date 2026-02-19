@@ -32,7 +32,7 @@ export function OwnerDashboard() {
       <h1 className="text-2xl font-bold mb-4">Owner Dashboard</h1>
       <div className="grid gap-4 md:grid-cols-2">
         <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="font-semibold mb-2">My Businesses ({myPartners.length})</h2>
+          <h2 className="font-semibold mb-2">My Store</h2>
           <ul className="divide-y">
             {myPartners.map((p) => (
               <li key={p.id} className="py-2">{p.businessName} — {p.industryType}</li>

@@ -26,6 +26,7 @@ export interface Partner {
   businessName: string;
   industryType: string;
   ownerId: string;
+  owner?: { phone: string };
   branches?: Branch[];
 }
 
@@ -123,7 +124,7 @@ export const authApi = {
 export const partnersApi = {
   list: () => api<Partner[]>('/partners'),
   get: (id: string) => api<Partner & { branches?: Branch[] }>(`/partners/${id}`),
-  create: (body: { businessName: string; industryType: string; ownerId?: string }) =>
+  create: (body: { businessName: string; industryType: string; ownerPhone: string }) =>
     api<Partner>('/partners', { method: 'POST', body: JSON.stringify(body) }),
   update: (id: string, body: { businessName?: string; industryType?: string }) =>
     api<Partner>(`/partners/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
@@ -153,9 +154,9 @@ export const branchesApi = {
 export const staffApi = {
   list: () => api<Staff[]>('/staff'),
   get: (id: string) => api<Staff & { branch?: Branch }>(`/staff/${id}`),
-  create: (body: { name: string; phone: string; password: string; branchId: string }) =>
+  create: (body: { name: string; phone: string; branchId: string }) =>
     api<Staff>('/staff', { method: 'POST', body: JSON.stringify(body) }),
-  update: (id: string, body: { name?: string; phone?: string; password?: string }) =>
+  update: (id: string, body: { name?: string; phone?: string }) =>
     api<Staff>(`/staff/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: (id: string) => api<Staff>(`/staff/${id}`, { method: 'DELETE' }),
 };
@@ -182,10 +183,10 @@ export const activityApi = {
     requestLocation?: { lat: number; lng: number };
   }) =>
     api<Activity>('/activity/check-in', { method: 'POST', body: JSON.stringify(body) }),
-  updateStatus: (id: string, status: 'APPROVED' | 'REJECTED') =>
+  updateStatus: (id: string, status: 'APPROVED' | 'REJECTED', value?: number) =>
     api<Activity>(`/activity/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(value != null ? { status, value } : { status }),
     }),
 };
 

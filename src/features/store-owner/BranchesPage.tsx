@@ -5,30 +5,62 @@ import type { Partner } from '../../lib/api';
 import type { Branch } from '../../lib/api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { QRCodeSVG } from 'qrcode.react';
+
+type BranchWithDetails = Branch & { partner?: Partner; staff?: { id: string }[] };
 
 export function BranchesPage() {
   const { auth } = useAuth();
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [branches, setBranches] = useState<Branch[]>([]);
+  const [branches, setBranches] = useState<BranchWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [branchName, setBranchName] = useState('');
   const [partnerId, setPartnerId] = useState('');
+  const [cooldownHours, setCooldownHours] = useState(3);
   const [submitting, setSubmitting] = useState(false);
+  const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
+  const [editCooldown, setEditCooldown] = useState<number>(3);
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
-  const myPartners = auth.type === 'platform' ? partners.filter((p) => p.ownerId === auth.user.id) : partners;
+  // Only show partners owned by the current user so created branches appear in the list
+  const myPartners =
+    auth.type === 'platform'
+      ? partners.filter((p) => p.ownerId === auth.user.id)
+      : partners;
 
   const load = () => {
     setLoading(true);
+    setError('');
+    // Backend already filters branches by the logged-in owner
     Promise.all([partnersApi.list(), branchesApi.list()])
       .then(([p, b]) => {
-        setPartners(p);
-        setBranches(b);
-        if (!partnerId && p.length) setPartnerId(p[0].id);
+        setPartners(Array.isArray(p) ? p : []);
+        const list = Array.isArray(b) ? b : [];
+        // Show list immediately so newly created branch is visible
+        setBranches(list as BranchWithDetails[]);
+        if (auth.type === 'platform') {
+          const mine = (Array.isArray(p) ? p : []).filter((x) => x.ownerId === auth.user.id);
+          if (mine.length)
+            setPartnerId((prev) => (mine.some((m) => m.id === prev) ? prev : mine[0].id));
+        } else if (Array.isArray(p) && p.length) {
+          setPartnerId((prev) => (p.some((x) => x.id === prev) ? prev : p[0].id));
+        }
+        if (list.length === 0) {
+          setLoading(false);
+          return;
+        }
+        // Enrich with full details (partner + staff) in the background
+        Promise.all(list.map((br) => branchesApi.get(br.id)))
+          .then((details) => setBranches(details as BranchWithDetails[]))
+          .catch(() => { /* keep list from list() so new branch stays visible */ })
+          .finally(() => setLoading(false));
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
   };
 
   useEffect(() => load(), []);
@@ -38,8 +70,13 @@ export function BranchesPage() {
     setSubmitting(true);
     setError('');
     try {
-      await branchesApi.create({ branchName, partnerId });
+      await branchesApi.create({
+        branchName,
+        partnerId,
+        settings: { cooldownHours },
+      });
       setBranchName('');
+      setCooldownHours(3);
       setShowForm(false);
       load();
     } catch (e) {
@@ -51,6 +88,7 @@ export function BranchesPage() {
 
   if (loading) return <p>Loading…</p>;
 
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Branches</h1>
@@ -61,8 +99,11 @@ export function BranchesPage() {
         </Button>
       ) : (
         <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-4 mb-4 max-w-md">
+          {myPartners.length === 0 && (
+            <p className="text-amber-600 text-sm mb-2">Create a store (partner) first from the admin or dashboard.</p>
+          )}
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Partner</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Store</label>
             <select
               value={partnerId}
               onChange={(e) => setPartnerId(e.target.value)}
@@ -80,32 +121,121 @@ export function BranchesPage() {
             onChange={(e) => setBranchName(e.target.value)}
             required
           />
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cooldown (hours)</label>
+            <p className="text-xs text-gray-500 mb-1">Next check-in allowed after this many hours from last approved visit.</p>
+            <input
+              type="number"
+              min={1}
+              max={168}
+              value={cooldownHours}
+              onChange={(e) => setCooldownHours(Math.max(1, Math.min(168, Number(e.target.value) || 3)))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
           <div className="flex gap-2 mt-4">
             <Button type="submit" disabled={submitting}>Create</Button>
             <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
           </div>
         </form>
       )}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Branch</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Partner</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {branches
-              .filter((b) => myPartners.some((p) => p.id === b.partnerId))
-              .map((b) => (
-                <tr key={b.id}>
-                  <td className="px-4 py-2">{b.branchName}</td>
-                  <td className="px-4 py-2">{partners.find((p) => p.id === b.partnerId)?.businessName}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+      <div className="space-y-6">
+        {branches.map((b) => {
+          const settings = b.settings as { streakThreshold?: number; cooldownHours?: number } | undefined;
+          const location = b.location as { lat: number; lng: number } | undefined;
+          const staffCount = Array.isArray(b.staff) ? b.staff.length : 0;
+          const scanUrl = typeof window !== 'undefined' ? `${window.location.origin}/scan/${b.id}` : '';
+          const currentCooldown = settings?.cooldownHours ?? 3;
+          const isEditing = editingBranchId === b.id;
+          return (
+            <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+              <div className="p-4 flex flex-wrap gap-6">
+                <div className="flex-1 min-w-[200px]">
+                  <h2 className="font-semibold text-lg text-gray-900">{b.branchName}</h2>
+                  <p className="text-sm text-gray-500 mt-1">ID: {b.id}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    <strong>Store:</strong> {b.partner?.businessName ?? b.partnerId}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Staff:</strong> {staffCount}
+                  </p>
+                  <div className="mt-2 text-sm text-gray-600">
+                    <strong>Cooldown:</strong>{' '}
+                    {isEditing ? (
+                      <span className="inline-flex flex-wrap items-center gap-2 mt-1">
+                        <input
+                          type="number"
+                          min={1}
+                          max={168}
+                          value={editCooldown}
+                          onChange={(e) => setEditCooldown(Math.max(1, Math.min(168, Number(e.target.value) || 3)))}
+                          className="w-20 border border-gray-300 rounded px-2 py-1"
+                        />
+                        <span>hours (next check-in after last approved)</span>
+                        <Button
+                          className="text-sm px-2 py-1"
+                          disabled={editSubmitting}
+                          onClick={async () => {
+                            setEditSubmitting(true);
+                            setError('');
+                            try {
+                              await branchesApi.update(b.id, {
+                                settings: { ...settings, cooldownHours: editCooldown },
+                              });
+                              setEditingBranchId(null);
+                              load();
+                            } catch (e) {
+                              setError(e instanceof Error ? e.message : 'Failed to update');
+                            } finally {
+                              setEditSubmitting(false);
+                            }
+                          }}
+                        >
+                          Save
+                        </Button>
+                        <Button className="text-sm px-2 py-1" variant="secondary" onClick={() => setEditingBranchId(null)}>
+                          Cancel
+                        </Button>
+                      </span>
+                    ) : (
+                      <>
+                        <span>{currentCooldown}h — next check-in allowed after {currentCooldown} hours from last approved visit.</span>
+                        <Button
+                          variant="secondary"
+                          className="ml-2 text-sm px-2 py-1"
+                          onClick={() => {
+                            setEditingBranchId(b.id);
+                            setEditCooldown(currentCooldown);
+                          }}
+                        >
+                          Change
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                  {settings?.streakThreshold != null && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>Streak threshold:</strong> {settings.streakThreshold}
+                    </p>
+                  )}
+                  {location && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>Location:</strong> {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col items-center">
+                  <p className="text-xs text-gray-500 mb-2">Scan to check-in</p>
+                  <QRCodeSVG value={scanUrl} size={120} level="M" includeMargin />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
+      {branches.length === 0 && !showForm && (
+        <p className="text-gray-500">No branches yet.</p>
+      )}
     </div>
   );
 }
