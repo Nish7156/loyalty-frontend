@@ -34,7 +34,7 @@ export interface Branch {
   id: string;
   branchName: string;
   partnerId: string;
-  settings?: { streakThreshold?: number; cooldownHours?: number };
+  settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
   location?: { lat: number; lng: number };
   partner?: Partner;
   staff?: Staff[];
@@ -59,10 +59,18 @@ export interface StoreVisit {
   partnerName: string;
   visitCount: number;
   lastVisitAt: string;
+  rewardThreshold?: number;
+  rewardWindowDays?: number;
+  rewardDescription?: string;
+  streakCurrentCount?: number;
+  streakPeriodStartedAt?: string | null;
 }
 
 export interface CustomerProfile {
-  customer: Customer & { streaks?: { currentCount: number; partnerId: string; partner?: Partner }[]; rewards?: Reward[] };
+  customer: Customer & {
+    streaks?: { currentCount: number; partnerId: string; partner?: Partner; periodStartedAt?: string | null }[];
+    rewards?: Reward[];
+  };
   storesVisited: StoreVisit[];
 }
 
@@ -185,14 +193,14 @@ export const branchesApi = {
   create: (body: {
     branchName: string;
     partnerId: string;
-    settings?: { streakThreshold?: number; cooldownHours?: number };
+    settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
     location?: { lat: number; lng: number };
   }) => api<Branch>('/branches', { method: 'POST', body: JSON.stringify(body) }),
   update: (
     id: string,
     body: {
       branchName?: string;
-      settings?: { streakThreshold?: number; cooldownHours?: number };
+      settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
       location?: { lat: number; lng: number };
     }
   ) => api<Branch>(`/branches/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),

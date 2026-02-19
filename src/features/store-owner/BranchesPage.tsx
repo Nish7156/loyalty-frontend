@@ -19,9 +19,15 @@ export function BranchesPage() {
   const [branchName, setBranchName] = useState('');
   const [partnerId, setPartnerId] = useState('');
   const [cooldownHours, setCooldownHours] = useState(0);
+  const [streakThreshold, setStreakThreshold] = useState<number>(5);
+  const [rewardWindowDays, setRewardWindowDays] = useState<number>(30);
+  const [rewardDescription, setRewardDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
   const [editCooldown, setEditCooldown] = useState<number>(0);
+  const [editStreakThreshold, setEditStreakThreshold] = useState<number>(5);
+  const [editRewardWindowDays, setEditRewardWindowDays] = useState<number>(30);
+  const [editRewardDescription, setEditRewardDescription] = useState('');
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   // Only show partners owned by the current user so created branches appear in the list
@@ -73,10 +79,18 @@ export function BranchesPage() {
       await branchesApi.create({
         branchName,
         partnerId,
-        settings: { cooldownHours },
+        settings: {
+          cooldownHours,
+          streakThreshold,
+          rewardWindowDays,
+          rewardDescription: rewardDescription || undefined,
+        },
       });
       setBranchName('');
       setCooldownHours(0);
+      setStreakThreshold(5);
+      setRewardWindowDays(30);
+      setRewardDescription('');
       setShowForm(false);
       load();
     } catch (e) {
@@ -133,6 +147,38 @@ export function BranchesPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Reward: purchases needed</label>
+            <p className="text-xs text-gray-500 mb-1">Number of approved visits in the window to earn one reward.</p>
+            <input
+              type="number"
+              min={1}
+              value={streakThreshold}
+              onChange={(e) => setStreakThreshold(Math.max(1, Number(e.target.value) || 1))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Reward: window (days)</label>
+            <p className="text-xs text-gray-500 mb-1">Count purchases within this many days from the first purchase in the period.</p>
+            <input
+              type="number"
+              min={1}
+              value={rewardWindowDays}
+              onChange={(e) => setRewardWindowDays(Math.max(1, Number(e.target.value) || 1))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Reward description</label>
+            <input
+              type="text"
+              placeholder="e.g. 1 free family pack"
+              value={rewardDescription}
+              onChange={(e) => setRewardDescription(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
           <div className="flex gap-2 mt-4">
             <Button type="submit" disabled={submitting}>Create</Button>
             <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -141,11 +187,19 @@ export function BranchesPage() {
       )}
       <div className="space-y-6">
         {branches.map((b) => {
-          const settings = b.settings as { streakThreshold?: number; cooldownHours?: number } | undefined;
+          const settings = b.settings as {
+            streakThreshold?: number;
+            cooldownHours?: number;
+            rewardWindowDays?: number;
+            rewardDescription?: string;
+          } | undefined;
           const location = b.location as { lat: number; lng: number } | undefined;
           const staffCount = Array.isArray(b.staff) ? b.staff.length : 0;
           const scanUrl = typeof window !== 'undefined' ? `${window.location.origin}/scan/${b.id}` : '';
           const currentCooldown = settings?.cooldownHours ?? 0;
+          const currentThreshold = settings?.streakThreshold ?? 5;
+          const currentWindowDays = settings?.rewardWindowDays ?? 30;
+          const currentRewardDesc = settings?.rewardDescription ?? '';
           const isEditing = editingBranchId === b.id;
           return (
             <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
@@ -180,7 +234,13 @@ export function BranchesPage() {
                             setError('');
                             try {
                               await branchesApi.update(b.id, {
-                                settings: { ...settings, cooldownHours: editCooldown },
+                                settings: {
+                                  ...settings,
+                                  cooldownHours: editCooldown,
+                                  streakThreshold: editStreakThreshold,
+                                  rewardWindowDays: editRewardWindowDays,
+                                  rewardDescription: editRewardDescription || undefined,
+                                },
                               });
                               setEditingBranchId(null);
                               load();
@@ -206,6 +266,9 @@ export function BranchesPage() {
                           onClick={() => {
                             setEditingBranchId(b.id);
                             setEditCooldown(currentCooldown);
+                            setEditStreakThreshold(currentThreshold);
+                            setEditRewardWindowDays(currentWindowDays);
+                            setEditRewardDescription(currentRewardDesc);
                           }}
                         >
                           Change
@@ -213,11 +276,56 @@ export function BranchesPage() {
                       </>
                     )}
                   </div>
-                  {settings?.streakThreshold != null && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      <strong>Streak threshold:</strong> {settings.streakThreshold}
-                    </p>
-                  )}
+                  <div className="mt-2 text-sm text-gray-600">
+                    <strong>Reward rule:</strong>{' '}
+                    {isEditing ? (
+                      <span className="block mt-1">
+                        <span className="inline-flex flex-wrap items-center gap-2">
+                        <span>Purchases needed:</span>
+                        <input
+                          type="number"
+                          min={1}
+                          value={editStreakThreshold}
+                          onChange={(e) => setEditStreakThreshold(Math.max(1, Number(e.target.value) || 1))}
+                          className="w-16 border border-gray-300 rounded px-2 py-1"
+                        />
+                        <span>within</span>
+                        <input
+                          type="number"
+                          min={1}
+                          value={editRewardWindowDays}
+                          onChange={(e) => setEditRewardWindowDays(Math.max(1, Number(e.target.value) || 1))}
+                          className="w-16 border border-gray-300 rounded px-2 py-1"
+                        />
+                        <span>days. Description:</span>
+                        <input
+                          type="text"
+                          placeholder="e.g. 1 free family pack"
+                          value={editRewardDescription}
+                          onChange={(e) => setEditRewardDescription(e.target.value)}
+                          className="flex-1 min-w-[120px] border border-gray-300 rounded px-2 py-1"
+                        />
+                        </span>
+                      </span>
+                    ) : (
+                      <>
+                        <span>{currentThreshold} purchases in {currentWindowDays} days → {currentRewardDesc || 'Free reward'}</span>
+                        <Button
+                          variant="secondary"
+                          className="ml-2 text-sm px-2 py-1"
+                          onClick={() => {
+                            setEditingBranchId(b.id);
+                            setEditCooldown(currentCooldown);
+                            setEditStreakThreshold(currentThreshold);
+                            setEditRewardWindowDays(currentWindowDays);
+                            setEditRewardDescription(currentRewardDesc);
+                          }}
+                        >
+                          Change
+                        </Button>
+                      </>
+                    )}
+                  </div>
                   {location && (
                     <p className="text-sm text-gray-600 mt-1">
                       <strong>Location:</strong> {location.lat.toFixed(4)}, {location.lng.toFixed(4)}

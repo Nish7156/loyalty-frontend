@@ -114,10 +114,6 @@ export function UserProfilePage() {
   const rewards: Reward[] = customer.rewards ?? [];
   const streaks = customer.streaks ?? [];
 
-  const pointsByPartner = new Map<string, number>();
-  for (const s of streaks) {
-    pointsByPartner.set(s.partnerId, s.currentCount ?? 0);
-  }
 
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8">
@@ -151,23 +147,40 @@ export function UserProfilePage() {
           <p className="text-[var(--premium-muted)] text-sm">No store visits yet. Scan a store QR to check in.</p>
         ) : (
           <ul className="divide-y divide-[var(--premium-border)] space-y-2">
-            {storesVisited.map((store) => (
-              <li key={store.branchId} className="py-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium text-[var(--premium-cream)]">{store.partnerName}</p>
-                    <p className="text-[var(--premium-muted)] text-sm">{store.branchName}</p>
+            {storesVisited.map((store) => {
+              const threshold = store.rewardThreshold ?? 5;
+              const windowDays = store.rewardWindowDays ?? 30;
+              const description = store.rewardDescription || 'Free reward';
+              const current = store.streakCurrentCount ?? 0;
+              const periodStart = store.streakPeriodStartedAt;
+              return (
+                <li key={store.branchId} className="py-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-[var(--premium-cream)]">{store.partnerName}</p>
+                      <p className="text-[var(--premium-muted)] text-sm">{store.branchName}</p>
+                      {(threshold > 0 && windowDays > 0) && (
+                        <p className="text-[var(--premium-muted)] text-xs mt-1">
+                          {threshold} purchases in {windowDays} days → {description}
+                        </p>
+                      )}
+                      {periodStart && (
+                        <p className="text-[var(--premium-muted)] text-xs">Period started: {formatDate(periodStart)}</p>
+                      )}
+                    </div>
+                    <div className="text-right text-sm">
+                      <p className="text-[var(--premium-muted)]">{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
+                      <p className="text-[var(--premium-muted)]">Last: {formatDate(store.lastVisitAt)}</p>
+                      {(threshold > 0) && (
+                        <p className="font-medium text-[var(--premium-gold)]">
+                          {current}/{threshold}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right text-sm">
-                    <p className="text-[var(--premium-muted)]">{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
-                    <p className="text-[var(--premium-muted)]">Last: {formatDate(store.lastVisitAt)}</p>
-                    <p className="font-medium text-[var(--premium-gold)]">
-                      {pointsByPartner.get(store.partnerId) ?? 0} pts
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
