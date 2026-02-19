@@ -41,15 +41,13 @@ export function OwnerDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
-
-  const myPartners = auth.type === 'platform' ? partners.filter((p) => p.ownerId === auth.user.id) : partners;
-  const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
-  const myBranchIds = new Set(myBranches.map((b) => b.id));
-  const myPartnerIds = new Set(myPartners.map((p) => p.id));
-
   const customerStats = useMemo((): CustomerStoreStats[] => {
+    const myPartners = auth?.type === 'platform' && auth?.user?.id
+      ? partners.filter((p) => p.ownerId === auth.user!.id)
+      : partners;
+    const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
+    const myBranchIds = new Set(myBranches.map((b) => b.id));
+    const myPartnerIds = new Set(myPartners.map((p) => p.id));
     const myActivities = activities.filter(
       (a) => myBranchIds.has(a.branchId) && a.status === 'APPROVED'
     );
@@ -97,7 +95,7 @@ export function OwnerDashboard() {
     }
 
     return Array.from(byPhone.values()).sort((a, b) => (b.lastVisitAt ?? '').localeCompare(a.lastVisitAt ?? ''));
-  }, [activities, rewards, branches, partners, auth.type, auth.type === 'platform' ? auth.user?.id : null]);
+  }, [activities, rewards, branches, partners, auth?.type, auth?.type === 'platform' ? auth?.user?.id : null]);
 
   const thisMonth = toMonthKey(new Date());
   const lastMonth = (() => {
@@ -105,6 +103,12 @@ export function OwnerDashboard() {
     d.setMonth(d.getMonth() - 1);
     return toMonthKey(d);
   })();
+
+  if (loading) return <p>Loading…</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
+
+  const myPartners = auth?.type === 'platform' && auth?.user?.id ? partners.filter((p) => p.ownerId === auth.user!.id) : partners;
+  const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
 
   return (
     <div>
