@@ -112,8 +112,6 @@ export function UserProfilePage() {
 
   const { customer, storesVisited } = profile;
   const rewards: Reward[] = customer.rewards ?? [];
-  const streaks = customer.streaks ?? [];
-
 
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8">
