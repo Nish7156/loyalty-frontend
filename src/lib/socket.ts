@@ -9,3 +9,11 @@ export function createBranchSocket(branchId: string): Socket {
     transports: ['websocket', 'polling'],
   });
 }
+
+export function createCustomerSocket(customerId: string): Socket {
+  return io(WS_URL, {
+    query: { customerId },
+    path: '/socket.io',
+    transports: ['websocket', 'polling'],
+  });
+}

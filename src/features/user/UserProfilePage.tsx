@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
+import { createCustomerSocket } from '../../lib/socket';
 import type { CustomerProfile, Reward } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
@@ -18,6 +19,7 @@ export function UserProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
+  const socketRef = useRef<ReturnType<typeof createCustomerSocket> | null>(null);
 
   useEffect(() => {
     if (getCustomerTokenIfPresent()) {
@@ -43,6 +45,26 @@ export function UserProfilePage() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [phone]);
+
+  useEffect(() => {
+    const customerPhone = profile?.customer?.phoneNumber;
+    if (!customerPhone) return;
+    const socket = createCustomerSocket(customerPhone);
+    socketRef.current = socket;
+    const handler = () => {
+      if (getCustomerTokenIfPresent()) {
+        customersApi.getMyProfile().then(setProfile).catch(() => {});
+      } else {
+        customersApi.getProfile(customerPhone).then(setProfile).catch(() => {});
+      }
+    };
+    socket.on('checkin_updated', handler);
+    return () => {
+      socket.off('checkin_updated', handler);
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [profile?.customer?.phoneNumber]);
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
