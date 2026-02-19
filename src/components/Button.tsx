@@ -12,12 +12,12 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const base = 'px-4 py-2 rounded-lg font-medium transition disabled:opacity-50';
+  const base = 'px-4 py-2.5 rounded-xl font-medium transition disabled:opacity-50';
   const variants: Record<string, string> = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
-    ghost: 'bg-transparent hover:bg-gray-100',
+    primary: 'bg-[var(--premium-gold)] text-[var(--premium-bg)] hover:opacity-90',
+    secondary: 'bg-[var(--premium-card)] text-[var(--premium-cream)] border border-[var(--premium-border)] hover:bg-[var(--premium-border)]',
+    danger: 'bg-rose-600 text-white hover:bg-rose-700',
+    ghost: 'bg-transparent text-[var(--premium-muted)] hover:bg-[var(--premium-card)] hover:text-[var(--premium-cream)]',
   };
   return (
     <button

@@ -52,6 +52,20 @@ export interface Customer {
   phoneNumber: string;
 }
 
+export interface StoreVisit {
+  branchId: string;
+  branchName: string;
+  partnerId: string;
+  partnerName: string;
+  visitCount: number;
+  lastVisitAt: string;
+}
+
+export interface CustomerProfile {
+  customer: Customer & { streaks?: { currentCount: number; partnerId: string; partner?: Partner }[]; rewards?: Reward[] };
+  storesVisited: StoreVisit[];
+}
+
 export interface Activity {
   id: string;
   customerId: string;
@@ -78,8 +92,26 @@ export interface Reward {
   partner?: Partner;
 }
 
+const CUSTOMER_TOKEN_KEY = 'customer_token';
+
 function getToken(): string | null {
   return localStorage.getItem('access_token');
+}
+
+function getCustomerToken(): string | null {
+  return localStorage.getItem(CUSTOMER_TOKEN_KEY);
+}
+
+export function setCustomerToken(token: string): void {
+  localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+}
+
+export function clearCustomerToken(): void {
+  localStorage.removeItem(CUSTOMER_TOKEN_KEY);
+}
+
+export function getCustomerTokenIfPresent(): string | null {
+  return getCustomerToken();
 }
 
 function getAuthHeader(): string | null {
@@ -87,16 +119,22 @@ function getAuthHeader(): string | null {
   return t ? `Bearer ${t}` : null;
 }
 
+function getCustomerAuthHeader(): string | null {
+  const t = getCustomerToken();
+  return t ? `Bearer ${t}` : null;
+}
+
 export async function api<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  useCustomerToken = false
 ): Promise<T> {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  const auth = getAuthHeader();
+  const auth = useCustomerToken ? getCustomerAuthHeader() : getAuthHeader();
   if (auth) headers['Authorization'] = auth;
 
   const res = await fetch(url, { ...options, headers });
@@ -108,6 +146,11 @@ export async function api<T>(
   return res.json();
 }
 
+export interface CustomerLoginResponse {
+  access_token: string;
+  customer: { phone: string };
+}
+
 export const authApi = {
   sendOtp: (phone: string) =>
     api<{ success: true; otp?: string }>('/auth/send-otp', {
@@ -116,6 +159,11 @@ export const authApi = {
     }),
   login: (phone: string, otp: string) =>
     api<LoginResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ phone, otp }),
+    }),
+  customerLogin: (phone: string, otp: string) =>
+    api<CustomerLoginResponse>('/auth/customer-login', {
       method: 'POST',
       body: JSON.stringify({ phone, otp }),
     }),
@@ -167,10 +215,14 @@ export const customersApi = {
     api<Customer & { streaks?: unknown[]; rewards?: Reward[] }>(`/customers/${encodeURIComponent(phoneNumber)}`),
   getByPhone: (phoneNumber: string) =>
     api<Customer & { streaks?: unknown[]; rewards?: Reward[] }>(`/customers/phone/${encodeURIComponent(phoneNumber)}`),
+  getProfile: (phoneNumber: string) =>
+    api<CustomerProfile>(`/customers/phone/${encodeURIComponent(phoneNumber)}/profile`),
+  getMyProfile: () =>
+    api<CustomerProfile>('/customers/me/profile', {}, true),
   create: (body: { phoneNumber: string }) =>
     api<Customer>('/customers', { method: 'POST', body: JSON.stringify(body) }),
   register: (body: { branchId: string; phoneNumber: string; otp: string }) =>
-    api<Customer>('/customers/register', { method: 'POST', body: JSON.stringify(body) }),
+    api<CustomerLoginResponse>('/customers/register', { method: 'POST', body: JSON.stringify(body) }),
 };
 
 export const activityApi = {
@@ -196,5 +248,5 @@ export const rewardsApi = {
   byCustomer: (customerId: string) =>
     api<Reward[]>(`/rewards/customer/${encodeURIComponent(customerId)}`),
   redeem: (id: string) =>
-    api<Reward>(`/rewards/${id}/redeem`, { method: 'PATCH' }),
+    api<Reward>(`/rewards/${id}/redeem`, { method: 'PATCH' }, true),
 };

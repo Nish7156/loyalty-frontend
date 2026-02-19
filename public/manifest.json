@@ -1,0 +1,10 @@
+{
+  "name": "Loyalty",
+  "short_name": "Loyalty",
+  "description": "Store check-in and rewards",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#0c0a09",
+  "orientation": "portrait-primary"
+}

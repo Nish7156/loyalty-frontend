@@ -1,10 +1,36 @@
 @import "tailwindcss";
 
+:root {
+  --premium-bg: #0c0a09;
+  --premium-surface: #1c1917;
+  --premium-card: #292524;
+  --premium-border: #44403c;
+  --premium-muted: #a8a29e;
+  --premium-gold: #d4a853;
+  --premium-gold-dim: #b45309;
+  --premium-cream: #fafaf9;
+  --premium-cream-dim: #f5f5f4;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #f5f5f4;
+  color: #1c1917;
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
 }

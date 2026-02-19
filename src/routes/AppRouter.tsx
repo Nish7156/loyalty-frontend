@@ -6,6 +6,7 @@ import { SellerLayout } from '../layouts/SellerLayout';
 import { OwnerLayout } from '../layouts/OwnerLayout';
 import { UserLayout } from '../layouts/UserLayout';
 import { LoginPage } from '../features/auth/LoginPage';
+import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
 import { UserProfilePage } from '../features/user/UserProfilePage';
 
@@ -33,11 +34,11 @@ export function AppRouter() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/staff-login" element={<Navigate to="/login" replace />} />
-        <Route path="/scan/:storeId" element={<UserScanPage />} />
-        <Route path="/scan" element={<UserScanPage />} />
 
         <Route path="/" element={<UserLayout />}>
-          <Route index element={<Navigate to="/scan" replace />} />
+          <Route index element={<CustomerLoginPage />} />
+          <Route path="scan" element={<Navigate to="/" replace />} />
+          <Route path="scan/:storeId" element={<UserScanPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 
