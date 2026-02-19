@@ -18,10 +18,10 @@ export function BranchesPage() {
   const [showForm, setShowForm] = useState(false);
   const [branchName, setBranchName] = useState('');
   const [partnerId, setPartnerId] = useState('');
-  const [cooldownHours, setCooldownHours] = useState(3);
+  const [cooldownHours, setCooldownHours] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
-  const [editCooldown, setEditCooldown] = useState<number>(3);
+  const [editCooldown, setEditCooldown] = useState<number>(0);
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   // Only show partners owned by the current user so created branches appear in the list
@@ -76,7 +76,7 @@ export function BranchesPage() {
         settings: { cooldownHours },
       });
       setBranchName('');
-      setCooldownHours(3);
+      setCooldownHours(0);
       setShowForm(false);
       load();
     } catch (e) {
@@ -123,13 +123,13 @@ export function BranchesPage() {
           />
           <div className="mt-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Cooldown (hours)</label>
-            <p className="text-xs text-gray-500 mb-1">Next check-in allowed after this many hours from last approved visit.</p>
+            <p className="text-xs text-gray-500 mb-1">0 = no cooldown. Max 48 (2 days). Next check-in allowed after this many hours from last approved visit.</p>
             <input
               type="number"
-              min={1}
-              max={168}
+              min={0}
+              max={48}
               value={cooldownHours}
-              onChange={(e) => setCooldownHours(Math.max(1, Math.min(168, Number(e.target.value) || 3)))}
+              onChange={(e) => setCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
@@ -145,7 +145,7 @@ export function BranchesPage() {
           const location = b.location as { lat: number; lng: number } | undefined;
           const staffCount = Array.isArray(b.staff) ? b.staff.length : 0;
           const scanUrl = typeof window !== 'undefined' ? `${window.location.origin}/scan/${b.id}` : '';
-          const currentCooldown = settings?.cooldownHours ?? 3;
+          const currentCooldown = settings?.cooldownHours ?? 0;
           const isEditing = editingBranchId === b.id;
           return (
             <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
@@ -165,13 +165,13 @@ export function BranchesPage() {
                       <span className="inline-flex flex-wrap items-center gap-2 mt-1">
                         <input
                           type="number"
-                          min={1}
-                          max={168}
+                          min={0}
+                          max={48}
                           value={editCooldown}
-                          onChange={(e) => setEditCooldown(Math.max(1, Math.min(168, Number(e.target.value) || 3)))}
+                          onChange={(e) => setEditCooldown(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
                           className="w-20 border border-gray-300 rounded px-2 py-1"
                         />
-                        <span>hours (next check-in after last approved)</span>
+                        <span>hours (0 = no cooldown, max 2 days)</span>
                         <Button
                           className="text-sm px-2 py-1"
                           disabled={editSubmitting}
@@ -199,7 +199,7 @@ export function BranchesPage() {
                       </span>
                     ) : (
                       <>
-                        <span>{currentCooldown}h — next check-in allowed after {currentCooldown} hours from last approved visit.</span>
+                        <span>{currentCooldown === 0 ? 'No cooldown' : `${currentCooldown}h — next check-in allowed after ${currentCooldown} hours from last approved visit.`}</span>
                         <Button
                           variant="secondary"
                           className="ml-2 text-sm px-2 py-1"
