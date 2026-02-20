@@ -55,9 +55,9 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow p-6">
-        <h1 className="text-xl font-bold text-center mb-6">Login</h1>
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-gray-100 p-3 sm:p-4">
+      <div className="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6">
+        <h1 className="text-lg font-bold text-center mb-4 sm:text-xl sm:mb-6">Login</h1>
 
         {step === 'phone' ? (
           <form onSubmit={handleSendOtp} className="space-y-4">

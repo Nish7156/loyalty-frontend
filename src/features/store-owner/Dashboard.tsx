@@ -104,68 +104,80 @@ export function OwnerDashboard() {
     return toMonthKey(d);
   })();
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (loading) return <p className="text-sm md:text-base p-2">Loading…</p>;
+  if (error) return <p className="text-red-600 text-sm md:text-base p-2">{error}</p>;
 
   const myPartners = auth?.type === 'platform' && auth?.user?.id ? partners.filter((p) => p.ownerId === auth.user!.id) : partners;
   const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Owner Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols-2 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="font-semibold mb-2">My Store</h2>
-          <ul className="divide-y">
+    <div className="min-w-0">
+      <h1 className="text-lg font-bold mb-3 md:text-2xl md:mb-4">Owner Dashboard</h1>
+      <div className="grid gap-3 md:grid-cols-2 md:gap-4 mb-4 md:mb-6">
+        <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
+          <h2 className="font-semibold mb-2 text-sm md:text-base">My Store</h2>
+          <ul className="divide-y divide-gray-100">
             {myPartners.map((p) => (
-              <li key={p.id} className="py-2">{p.businessName} — {p.industryType}</li>
+              <li key={p.id} className="py-2 text-sm md:text-base truncate">{p.businessName} — {p.industryType}</li>
             ))}
           </ul>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="font-semibold mb-2">Branches ({myBranches.length})</h2>
-          <ul className="divide-y">
+        <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
+          <h2 className="font-semibold mb-2 text-sm md:text-base">Branches ({myBranches.length})</h2>
+          <ul className="divide-y divide-gray-100">
             {myBranches.map((b) => (
-              <li key={b.id} className="py-2">{b.branchName}</li>
+              <li key={b.id} className="py-2 text-sm md:text-base truncate">{b.branchName}</li>
             ))}
           </ul>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="font-semibold mb-3">Customers at my store(s)</h2>
+      <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
+        <h2 className="font-semibold mb-3 text-sm md:text-base">Customers at my store(s)</h2>
         {customerStats.length === 0 ? (
-          <p className="text-gray-500">No customer activity yet.</p>
+          <p className="text-gray-500 text-sm">No customer activity yet.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="py-2 pr-4">User (phone)</th>
-                  <th className="py-2 pr-4">Visits</th>
-                  <th className="py-2 pr-4">This month paid</th>
-                  <th className="py-2 pr-4">Last month paid</th>
-                  <th className="py-2 pr-4">Total paid</th>
-                  <th className="py-2 pr-4">Active rewards</th>
-                  <th className="py-2 pr-4">Redeemed</th>
-                  <th className="py-2">Last visit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {customerStats.map((s) => (
-                  <tr key={s.phone} className="border-b border-gray-100">
-                    <td className="py-2 pr-4 font-medium">{s.phone}</td>
-                    <td className="py-2 pr-4">{s.visitCount}</td>
-                    <td className="py-2 pr-4">{s.monthlyPaid[thisMonth] ?? 0}</td>
-                    <td className="py-2 pr-4">{s.monthlyPaid[lastMonth] ?? 0}</td>
-                    <td className="py-2 pr-4">{s.totalPaid}</td>
-                    <td className="py-2 pr-4">{s.activeRewards}</td>
-                    <td className="py-2 pr-4">{s.redeemedRewards}</td>
-                    <td className="py-2">{s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}</td>
+          <>
+            <div className="hidden md:block overflow-x-auto -mx-1">
+              <table className="w-full text-sm min-w-[640px]">
+                <thead>
+                  <tr className="border-b text-left">
+                    <th className="py-2 pr-4">User (phone)</th>
+                    <th className="py-2 pr-4">Visits</th>
+                    <th className="py-2 pr-4">This month paid</th>
+                    <th className="py-2 pr-4">Last month paid</th>
+                    <th className="py-2 pr-4">Total paid</th>
+                    <th className="py-2 pr-4">Active rewards</th>
+                    <th className="py-2 pr-4">Redeemed</th>
+                    <th className="py-2">Last visit</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {customerStats.map((s) => (
+                    <tr key={s.phone} className="border-b border-gray-100">
+                      <td className="py-2 pr-4 font-medium">{s.phone}</td>
+                      <td className="py-2 pr-4">{s.visitCount}</td>
+                      <td className="py-2 pr-4">{s.monthlyPaid[thisMonth] ?? 0}</td>
+                      <td className="py-2 pr-4">{s.monthlyPaid[lastMonth] ?? 0}</td>
+                      <td className="py-2 pr-4">{s.totalPaid}</td>
+                      <td className="py-2 pr-4">{s.activeRewards}</td>
+                      <td className="py-2 pr-4">{s.redeemedRewards}</td>
+                      <td className="py-2">{s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ul className="md:hidden space-y-3">
+              {customerStats.map((s) => (
+                <li key={s.phone} className="border border-gray-200 rounded-lg p-3 text-sm">
+                  <p className="font-medium truncate">{s.phone}</p>
+                  <p className="text-gray-600 mt-1">Visits: {s.visitCount} · This month: {s.monthlyPaid[thisMonth] ?? 0} · Last month: {s.monthlyPaid[lastMonth] ?? 0}</p>
+                  <p className="text-gray-600">Total: {s.totalPaid} · Active: {s.activeRewards} · Redeemed: {s.redeemedRewards}</p>
+                  <p className="text-gray-500 text-xs mt-1">Last visit: {s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}</p>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
     </div>

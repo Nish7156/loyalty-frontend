@@ -202,13 +202,13 @@ export function UserScanPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto pb-20">
-      <h1 className="text-xl font-bold mb-4 text-[var(--premium-cream)] tracking-tight">Store Check-in</h1>
+    <div className="max-w-md mx-auto pb-20 w-full min-w-0">
+      <h1 className="text-lg font-bold mb-3 sm:mb-4 text-[var(--premium-cream)] tracking-tight sm:text-xl">Store Check-in</h1>
 
       {isLoggedIn && (
-        <div className="flex items-center justify-between mb-4 p-3 bg-[var(--premium-surface)] rounded-xl border border-[var(--premium-border)]">
-          <p className="text-sm text-[var(--premium-muted)]">Signed in as {displayPhone}</p>
-          <button type="button" onClick={handleLogout} className="text-sm text-[var(--premium-gold)] hover:underline">
+        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-[var(--premium-surface)] rounded-xl border border-[var(--premium-border)] min-w-0">
+          <p className="text-xs sm:text-sm text-[var(--premium-muted)] truncate min-w-0">Signed in as {displayPhone}</p>
+          <button type="button" onClick={handleLogout} className="text-sm text-[var(--premium-gold)] hover:underline shrink-0 min-h-[44px] flex items-center touch-manipulation">
             Log out
           </button>
         </div>

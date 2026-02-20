@@ -100,19 +100,19 @@ export function BranchesPage() {
     }
   };
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p className="text-sm md:text-base p-2">Loading…</p>;
 
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Branches</h1>
-      {error && <p className="text-red-600 mb-2">{error}</p>}
+    <div className="min-w-0">
+      <h1 className="text-lg font-bold mb-3 md:text-2xl md:mb-4">Branches</h1>
+      {error && <p className="text-red-600 mb-2 text-sm">{error}</p>}
       {!showForm ? (
-        <Button onClick={() => setShowForm(true)} className="mb-4">
+        <Button onClick={() => setShowForm(true)} className="mb-3 md:mb-4 min-h-[44px] w-full sm:w-auto">
           Add Branch
         </Button>
       ) : (
-        <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-4 mb-4 max-w-md">
+        <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-3 mb-3 md:p-4 md:mb-4 max-w-md w-full">
           {myPartners.length === 0 && (
             <p className="text-amber-600 text-sm mb-2">Create a store (partner) first from the admin or dashboard.</p>
           )}
@@ -179,13 +179,13 @@ export function BranchesPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
-          <div className="flex gap-2 mt-4">
-            <Button type="submit" disabled={submitting}>Create</Button>
-            <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Button type="submit" disabled={submitting} className="min-h-[44px] flex-1 sm:flex-none">Create</Button>
+            <Button type="button" variant="secondary" onClick={() => setShowForm(false)} className="min-h-[44px] flex-1 sm:flex-none">Cancel</Button>
           </div>
         </form>
       )}
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {branches.map((b) => {
           const settings = b.settings as {
             streakThreshold?: number;
@@ -202,9 +202,9 @@ export function BranchesPage() {
           const currentRewardDesc = settings?.rewardDescription ?? '';
           const isEditing = editingBranchId === b.id;
           return (
-            <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-              <div className="p-4 flex flex-wrap gap-6">
-                <div className="flex-1 min-w-[200px]">
+            <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200 min-w-0">
+              <div className="p-3 md:p-4 flex flex-col md:flex-row flex-wrap gap-4 md:gap-6">
+                <div className="flex-1 min-w-0">
                   <h2 className="font-semibold text-lg text-gray-900">{b.branchName}</h2>
                   <p className="text-sm text-gray-500 mt-1">ID: {b.id}</p>
                   <p className="text-sm text-gray-600 mt-1">
@@ -332,9 +332,9 @@ export function BranchesPage() {
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center shrink-0">
                   <p className="text-xs text-gray-500 mb-2">Scan to check-in</p>
-                  <QRCodeSVG value={scanUrl} size={120} level="M" includeMargin />
+                  <QRCodeSVG value={scanUrl} size={120} level="M" includeMargin className="max-w-full h-auto" />
                 </div>
               </div>
             </div>

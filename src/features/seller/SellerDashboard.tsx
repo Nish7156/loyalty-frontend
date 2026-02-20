@@ -78,19 +78,19 @@ export function SellerDashboard() {
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-4">Pending Check-ins</h1>
+    <div className="min-w-0">
+      <h1 className="text-lg font-bold mb-3 md:text-xl md:mb-4">Pending Check-ins</h1>
       {activities.length === 0 ? (
-        <p className="text-gray-500">No pending check-ins.</p>
+        <p className="text-gray-500 text-sm">No pending check-ins.</p>
       ) : (
         <ul className="space-y-2">
           {activities.map((a) => (
-            <li key={a.id} className="bg-white rounded-lg shadow p-3 flex justify-between items-center">
-              <div>
-                <span className="font-medium">{a.customerId}</span>
-                {a.value != null && <span className="text-gray-500 ml-2">${Number(a.value).toFixed(2)}</span>}
+            <li key={a.id} className="bg-white rounded-lg shadow p-3 flex flex-wrap justify-between items-center gap-2 min-w-0">
+              <div className="min-w-0">
+                <span className="font-medium text-sm md:text-base block truncate">{a.customerId}</span>
+                {a.value != null && <span className="text-gray-500 text-xs md:text-sm">${Number(a.value).toFixed(2)}</span>}
               </div>
-              <Link to={`/seller/approve?id=${a.id}`} className="text-blue-600 text-sm">
+              <Link to={`/seller/approve?id=${a.id}`} className="text-blue-600 text-sm shrink-0 min-h-[44px] flex items-center justify-end touch-manipulation">
                 Approve →
               </Link>
             </li>

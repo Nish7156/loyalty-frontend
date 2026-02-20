@@ -18,6 +18,7 @@ body {
   min-height: 100dvh;
   background-color: #f5f5f4;
   color: #1c1917;
+  overflow-x: hidden;
 }
 
 #root {
@@ -33,4 +34,14 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0);
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 768px) {
+  .safe-area-pb {
+    padding-bottom: 0.5rem;
+  }
 }

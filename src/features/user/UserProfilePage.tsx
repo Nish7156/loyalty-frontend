@@ -102,17 +102,17 @@ export function UserProfilePage() {
 
   if (!phone && !profile) {
     return (
-      <div className="max-w-md mx-auto">
-        <h1 className="text-xl font-bold mb-4 text-[var(--premium-cream)] tracking-tight">My Loyalty Card</h1>
+      <div className="max-w-md mx-auto w-full min-w-0">
+        <h1 className="text-lg font-bold mb-4 text-[var(--premium-cream)] tracking-tight sm:text-xl">My Loyalty Card</h1>
         <form onSubmit={handlePhoneSubmit} className="space-y-4">
           <input
             name="phone"
             type="tel"
             placeholder="+15551234567"
-            className="w-full border border-[var(--premium-border)] rounded-xl px-3 py-2.5 bg-[var(--premium-card)] text-[var(--premium-cream)] placeholder-[var(--premium-muted)] focus:ring-2 focus:ring-[var(--premium-gold)] focus:border-[var(--premium-gold)]"
+            className="w-full min-h-[44px] border border-[var(--premium-border)] rounded-xl px-3 py-2.5 bg-[var(--premium-card)] text-[var(--premium-cream)] placeholder-[var(--premium-muted)] focus:ring-2 focus:ring-[var(--premium-gold)] focus:border-[var(--premium-gold)]"
             required
           />
-          <button type="submit" className="w-full px-4 py-2.5 bg-[var(--premium-gold)] text-[var(--premium-bg)] font-medium rounded-xl hover:opacity-90">
+          <button type="submit" className="w-full min-h-[44px] px-4 py-2.5 bg-[var(--premium-gold)] text-[var(--premium-bg)] font-medium rounded-xl hover:opacity-90 touch-manipulation">
             Load my profile
           </button>
         </form>
@@ -131,9 +131,9 @@ export function UserProfilePage() {
   const redeemedFromHistory = history?.redeemedRewards ?? [];
 
   return (
-    <div className="max-w-md mx-auto space-y-6 pb-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[var(--premium-cream)] tracking-tight">
+    <div className="max-w-md mx-auto space-y-4 sm:space-y-6 pb-8 w-full min-w-0">
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <h1 className="text-lg font-bold text-[var(--premium-cream)] tracking-tight truncate sm:text-xl">
           {loadedByToken ? "You're in the club" : 'My Loyalty Card'}
         </h1>
         {loadedByToken && (
@@ -143,13 +143,13 @@ export function UserProfilePage() {
         )}
       </div>
 
-      <div className="bg-[var(--premium-surface)] border border-[var(--premium-border)] rounded-xl p-5 ring-1 ring-[var(--premium-gold)]/20">
+      <div className="bg-[var(--premium-surface)] border border-[var(--premium-border)] rounded-xl p-4 sm:p-5 ring-1 ring-[var(--premium-gold)]/20 min-w-0">
         <p className="text-[var(--premium-muted)] text-sm">Member</p>
-        <p className="font-mono text-lg tracking-wide text-[var(--premium-cream)]">{customer.phoneNumber}</p>
+        <p className="font-mono text-base sm:text-lg tracking-wide text-[var(--premium-cream)] break-all">{customer.phoneNumber}</p>
         {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
           <p className="text-[var(--premium-gold)]/90 text-sm mt-2">Thanks for being a loyal customer.</p>
         )}
-        <div className="mt-4 flex gap-6">
+        <div className="mt-4 flex flex-wrap gap-4 sm:gap-6">
           <div>
             <p className="text-[var(--premium-muted)] text-xs">Stores visited</p>
             <p className="font-semibold text-[var(--premium-gold)]">{storesVisited.length}</p>

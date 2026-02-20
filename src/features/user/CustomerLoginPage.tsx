@@ -47,12 +47,12 @@ export function CustomerLoginPage() {
 
   if (getCustomerTokenIfPresent()) {
     return (
-      <div className="max-w-md mx-auto pb-20">
-        <h1 className="text-xl font-bold mb-2 text-[var(--premium-cream)] tracking-tight">Welcome</h1>
+      <div className="max-w-md mx-auto pb-20 w-full min-w-0 px-0">
+        <h1 className="text-lg font-bold mb-2 text-[var(--premium-cream)] tracking-tight sm:text-xl">Welcome</h1>
         <p className="text-[var(--premium-muted)] text-sm mb-6">You’re logged in. Scan a store QR to check in or view your profile.</p>
         <div className="space-y-3">
           <Link to="/me" className="block">
-            <Button fullWidth>My profile</Button>
+            <Button fullWidth className="min-h-[44px]">My profile</Button>
           </Link>
         </div>
       </div>
@@ -60,8 +60,8 @@ export function CustomerLoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto pb-20">
-      <h1 className="text-xl font-bold mb-2 text-[var(--premium-cream)] tracking-tight">Login or Register</h1>
+    <div className="max-w-md mx-auto pb-20 w-full min-w-0 px-0">
+      <h1 className="text-lg font-bold mb-2 text-[var(--premium-cream)] tracking-tight sm:text-xl">Login or Register</h1>
       <p className="text-[var(--premium-muted)] text-sm mb-6">Enter your phone number to continue.</p>
 
       {step === 'phone' && (

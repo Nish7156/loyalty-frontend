@@ -29,23 +29,23 @@ export function SellerHistory() {
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-4">History</h1>
+    <div className="min-w-0">
+      <h1 className="text-lg font-bold mb-3 md:text-xl md:mb-4">History</h1>
       {activities.length === 0 ? (
-        <p className="text-gray-500">No history yet.</p>
+        <p className="text-gray-500 text-sm">No history yet.</p>
       ) : (
         <ul className="space-y-2">
           {activities.map((a) => (
-            <li key={a.id} className="bg-white rounded-lg shadow p-3 flex justify-between items-center">
-              <div>
-                <span className="font-medium">{a.customerId}</span>
-                {a.value != null && <span className="text-gray-500 ml-2">${Number(a.value).toFixed(2)}</span>}
+            <li key={a.id} className="bg-white rounded-lg shadow p-3 flex flex-wrap justify-between items-center gap-2 min-w-0">
+              <div className="min-w-0">
+                <span className="font-medium text-sm md:text-base block truncate">{a.customerId}</span>
+                {a.value != null && <span className="text-gray-500 text-xs md:text-sm">${Number(a.value).toFixed(2)}</span>}
                 <p className="text-xs text-gray-400 mt-0.5">
                   {new Date(a.createdAt).toLocaleString()}
                 </p>
               </div>
               <span
-                className={`text-sm font-medium px-2 py-0.5 rounded ${
+                className={`text-xs sm:text-sm font-medium px-2 py-1 rounded shrink-0 ${
                   a.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`}
               >
