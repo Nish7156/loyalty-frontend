@@ -180,6 +180,10 @@ export async function api<T>(
 
   const res = await fetch(url, { ...options, headers });
   if (!res.ok) {
+    if (useCustomerToken && (res.status === 401 || res.status === 404)) {
+      clearCustomerToken();
+      window.location.replace('/');
+    }
     const err = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(err.message || `HTTP ${res.status}`);
   }
