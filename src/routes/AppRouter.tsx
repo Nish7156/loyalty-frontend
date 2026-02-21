@@ -9,6 +9,7 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
 import { UserProfilePage } from '../features/user/UserProfilePage';
+import { UserHistoryPage } from '../features/user/UserHistoryPage';
 
 const AdminDashboard = lazy(() => import('../features/admin/Dashboard').then((m) => ({ default: m.AdminDashboard })));
 const PartnersPage = lazy(() => import('../features/admin/PartnersPage').then((m) => ({ default: m.PartnersPage })));
@@ -39,6 +40,7 @@ export function AppRouter() {
           <Route index element={<CustomerLoginPage />} />
           <Route path="scan" element={<Navigate to="/" replace />} />
           <Route path="scan/:storeId" element={<UserScanPage />} />
+          <Route path="history" element={<UserHistoryPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 

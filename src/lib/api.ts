@@ -193,10 +193,10 @@ export interface CustomerLoginResponse {
 }
 
 export const authApi = {
-  sendOtp: (phone: string) =>
+  sendOtp: (phone: string, code?: string) =>
     api<{ success: true; otp?: string }>('/auth/send-otp', {
       method: 'POST',
-      body: JSON.stringify({ phone }),
+      body: JSON.stringify({ phone, ...(code != null && { code }) }),
     }),
   login: (phone: string, otp: string) =>
     api<LoginResponse>('/auth/login', {

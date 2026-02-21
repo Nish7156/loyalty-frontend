@@ -97,31 +97,48 @@ export function UserProfilePage() {
   };
 
   if (getCustomerTokenIfPresent() && loading && !profile) {
-    return <p className="p-4 text-[var(--premium-muted)]">Loading…</p>;
+    return (
+      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
+        <p className="text-white/70 text-sm">Loading…</p>
+      </div>
+    );
   }
 
   if (!phone && !profile) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0">
-        <h1 className="text-lg font-bold mb-4 text-[var(--premium-cream)] tracking-tight sm:text-xl">My Loyalty Card</h1>
-        <form onSubmit={handlePhoneSubmit} className="space-y-4">
+      <div className="max-w-md mx-auto w-full min-w-0 py-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">
+          My Loyalty Card
+        </h1>
+        <p className="text-white/60 text-sm mb-6">Enter your phone to view your profile and rewards.</p>
+        <form onSubmit={handlePhoneSubmit} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]">
+          <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
           <input
             name="phone"
             type="tel"
             placeholder="+15551234567"
-            className="w-full min-h-[44px] border border-[var(--premium-border)] rounded-xl px-3 py-2.5 bg-[var(--premium-card)] text-[var(--premium-cream)] placeholder-[var(--premium-muted)] focus:ring-2 focus:ring-[var(--premium-gold)] focus:border-[var(--premium-gold)]"
+            className="w-full min-h-[48px] border border-white/20 rounded-xl px-4 py-3 bg-black/30 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition"
             required
           />
-          <button type="submit" className="w-full min-h-[44px] px-4 py-2.5 bg-[var(--premium-gold)] text-[var(--premium-bg)] font-medium rounded-xl hover:opacity-90 touch-manipulation">
-            Load my profile
+          <button
+            type="submit"
+            className="w-full min-h-[48px] mt-4 rounded-xl border border-white/40 text-white font-medium hover:bg-white/10 transition touch-manipulation"
+          >
+            Explore
           </button>
         </form>
       </div>
     );
   }
 
-  if (loading) return <p className="text-[var(--premium-muted)]">Loading…</p>;
-  if (error) return <p className="text-rose-400">{error}</p>;
+  if (loading) {
+    return (
+      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
+        <p className="text-white/70 text-sm">Loading…</p>
+      </div>
+    );
+  }
+  if (error) return <p className="text-rose-400 text-sm">{error}</p>;
   if (!profile) return null;
 
   const { customer, storesVisited } = profile;
@@ -130,47 +147,55 @@ export function UserProfilePage() {
   const activeRewards = rewards.filter((r) => r.status === 'ACTIVE');
   const redeemedFromHistory = history?.redeemedRewards ?? [];
 
+  const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]';
+  const sectionTitleClass = 'text-base font-semibold bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent mb-1';
+  const descClass = 'text-white/60 text-sm';
+
   return (
-    <div className="max-w-md mx-auto space-y-4 sm:space-y-6 pb-8 w-full min-w-0">
-      <div className="flex items-center justify-between gap-2 min-w-0">
-        <h1 className="text-lg font-bold text-[var(--premium-cream)] tracking-tight truncate sm:text-xl">
+    <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
+      <div className="flex items-center justify-between gap-3 min-w-0">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent">
           {loadedByToken ? "You're in the club" : 'My Loyalty Card'}
         </h1>
         {loadedByToken && (
-          <button type="button" onClick={handleLogout} className="text-sm text-[var(--premium-gold)] hover:underline">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="shrink-0 min-h-[44px] px-4 rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition touch-manipulation"
+          >
             Log out
           </button>
         )}
       </div>
 
-      <div className="bg-[var(--premium-surface)] border border-[var(--premium-border)] rounded-xl p-4 sm:p-5 ring-1 ring-[var(--premium-gold)]/20 min-w-0">
-        <p className="text-[var(--premium-muted)] text-sm">Member</p>
-        <p className="font-mono text-base sm:text-lg tracking-wide text-[var(--premium-cream)] break-all">{customer.phoneNumber}</p>
+      <div className={cardClass}>
+        <p className={descClass}>Member</p>
+        <p className="font-mono text-base sm:text-lg tracking-wide text-white break-all mt-0.5">{customer.phoneNumber}</p>
         {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
-          <p className="text-[var(--premium-gold)]/90 text-sm mt-2">Thanks for being a loyal customer.</p>
+          <p className="text-cyan-300/90 text-sm mt-2">Thanks for being a loyal customer.</p>
         )}
-        <div className="mt-4 flex flex-wrap gap-4 sm:gap-6">
+        <div className="mt-5 flex flex-wrap gap-6 sm:gap-8">
           <div>
-            <p className="text-[var(--premium-muted)] text-xs">Stores visited</p>
-            <p className="font-semibold text-[var(--premium-gold)]">{storesVisited.length}</p>
+            <p className={descClass}>Stores visited</p>
+            <p className="font-semibold text-white mt-0.5">{storesVisited.length}</p>
           </div>
           <div>
-            <p className="text-[var(--premium-muted)] text-xs">Rewards to use</p>
-            <p className="font-semibold text-[var(--premium-gold)]">{activeRewards.length}</p>
+            <p className={descClass}>Rewards to use</p>
+            <p className="font-semibold text-white mt-0.5">{activeRewards.length}</p>
           </div>
           {redeemedFromHistory.length > 0 && (
             <div>
-              <p className="text-[var(--premium-muted)] text-xs">Redeemed</p>
-              <p className="font-semibold text-[var(--premium-gold)]">{redeemedFromHistory.length}</p>
+              <p className={descClass}>Redeemed</p>
+              <p className="font-semibold text-white mt-0.5">{redeemedFromHistory.length}</p>
             </div>
           )}
         </div>
       </div>
 
       {loadedByToken && history && (history.activities.length > 0 || history.redeemedRewards.length > 0) && (
-        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
-          <h2 className="font-semibold mb-1 text-[var(--premium-cream)]">Your history</h2>
-          <p className="text-[var(--premium-muted)] text-sm mb-3">Visits and rewards in one place.</p>
+        <div className={cardClass}>
+          <h2 className={sectionTitleClass}>Your history</h2>
+          <p className={`${descClass} mb-4`}>Visits and rewards in one place.</p>
           <ul className="space-y-3">
             {[
               ...history.activities.map((a) => ({
@@ -189,16 +214,16 @@ export function UserProfilePage() {
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .slice(0, 20)
               .map((item, i) => (
-                <li key={item.type + item.date + i} className="flex items-start gap-3 py-2 border-b border-[var(--premium-border)] last:border-0">
-                  <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-[var(--premium-gold)]" />
+                <li key={item.type + item.date + i} className="flex items-start gap-3 py-2.5 border-b border-white/10 last:border-0">
+                  <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
                   <div className="min-w-0">
-                    <p className="text-[var(--premium-cream)] font-medium">
+                    <p className="text-white font-medium">
                       {item.type === 'visit' ? 'Visit' : 'Reward redeemed'} — {item.store}
                     </p>
                     {item.branch && (
-                      <p className="text-[var(--premium-muted)] text-sm">{item.branch}</p>
+                      <p className={`${descClass} mt-0.5`}>{item.branch}</p>
                     )}
-                    <p className="text-[var(--premium-muted)] text-xs mt-0.5">{formatDateTime(item.date)}</p>
+                    <p className="text-white/50 text-xs mt-0.5">{formatDateTime(item.date)}</p>
                   </div>
                 </li>
               ))}
@@ -207,17 +232,17 @@ export function UserProfilePage() {
       )}
 
       {loadedByToken && redeemedFromHistory.length > 0 && (
-        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
-          <h2 className="font-semibold mb-1 text-[var(--premium-cream)]">Rewards you've redeemed</h2>
-          <p className="text-[var(--premium-muted)] text-sm mb-3">Every reward you've claimed — store and date.</p>
-          <ul className="divide-y divide-[var(--premium-border)]">
+        <div className={cardClass}>
+          <h2 className={sectionTitleClass}>Rewards you've redeemed</h2>
+          <p className={`${descClass} mb-4`}>Every reward you've claimed — store and date.</p>
+          <ul className="divide-y divide-white/10">
             {redeemedFromHistory.map((r) => (
               <li key={r.id} className="py-3">
-                <p className="font-medium text-[var(--premium-cream)]">{r.partner?.businessName ?? 'Store'}</p>
+                <p className="font-medium text-white">{r.partner?.businessName ?? 'Store'}</p>
                 {r.redeemedBranch && (
-                  <p className="text-[var(--premium-muted)] text-sm">{r.redeemedBranch.branchName}</p>
+                  <p className={`${descClass} mt-0.5`}>{r.redeemedBranch.branchName}</p>
                 )}
-                <p className="text-[var(--premium-muted)] text-xs mt-1">
+                <p className="text-white/50 text-xs mt-1">
                   Redeemed {r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}
                 </p>
               </li>
@@ -226,12 +251,12 @@ export function UserProfilePage() {
         </div>
       )}
 
-      <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
-        <h2 className="font-semibold mb-3 text-[var(--premium-cream)]">Stores you use</h2>
+      <div className={cardClass}>
+        <h2 className={`${sectionTitleClass} mb-3`}>Stores you use</h2>
         {storesVisited.length === 0 ? (
-          <p className="text-[var(--premium-muted)] text-sm">No store visits yet. Scan a store QR to check in — your first visit counts.</p>
+          <p className={descClass}>No store visits yet. Scan a store QR to check in — your first visit counts.</p>
         ) : (
-          <ul className="divide-y divide-[var(--premium-border)] space-y-2">
+          <ul className="divide-y divide-white/10 space-y-2">
             {storesVisited.map((store) => {
               const threshold = store.rewardThreshold ?? 5;
               const windowDays = store.rewardWindowDays ?? 30;
@@ -239,25 +264,25 @@ export function UserProfilePage() {
               const current = store.streakCurrentCount ?? 0;
               const periodStart = store.streakPeriodStartedAt;
               return (
-                <li key={store.branchId} className="py-2">
+                <li key={store.branchId} className="py-2.5">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-[var(--premium-cream)]">{store.partnerName}</p>
-                      <p className="text-[var(--premium-muted)] text-sm">{store.branchName}</p>
+                      <p className="font-medium text-white">{store.partnerName}</p>
+                      <p className={`${descClass} mt-0.5`}>{store.branchName}</p>
                       {(threshold > 0 && windowDays > 0) && (
-                        <p className="text-[var(--premium-muted)] text-xs mt-1">
+                        <p className="text-white/50 text-xs mt-1">
                           {threshold} purchases in {windowDays} days → {description}
                         </p>
                       )}
                       {periodStart && (
-                        <p className="text-[var(--premium-muted)] text-xs">Period started: {formatDate(periodStart)}</p>
+                        <p className="text-white/50 text-xs mt-0.5">Period started: {formatDate(periodStart)}</p>
                       )}
                     </div>
                     <div className="text-right text-sm">
-                      <p className="text-[var(--premium-muted)]">{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
-                      <p className="text-[var(--premium-muted)]">Last: {formatDate(store.lastVisitAt)}</p>
+                      <p className={descClass}>{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
+                      <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
                       {(threshold > 0) && (
-                        <p className="font-medium text-[var(--premium-gold)]">
+                        <p className="font-medium text-cyan-300 mt-0.5">
                           {current}/{threshold}
                         </p>
                       )}
@@ -270,20 +295,20 @@ export function UserProfilePage() {
         )}
       </div>
 
-      <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4">
-        <h2 className="font-semibold mb-3 text-[var(--premium-cream)]">My rewards</h2>
+      <div className={cardClass}>
+        <h2 className={`${sectionTitleClass} mb-3`}>My rewards</h2>
         {rewards.length === 0 ? (
-          <p className="text-[var(--premium-muted)] text-sm">No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
+          <p className={descClass}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
         ) : (
-          <ul className="divide-y divide-[var(--premium-border)]">
+          <ul className="divide-y divide-white/10">
             {rewards.map((r) => (
-              <li key={r.id} className="py-2">
+              <li key={r.id} className="py-2.5">
                 <div className="flex justify-between">
-                  <span className="capitalize text-[var(--premium-cream)]">{r.status.toLowerCase()}</span>
-                  <span className="text-[var(--premium-muted)]">{r.partner?.businessName}</span>
+                  <span className="capitalize text-white">{r.status.toLowerCase()}</span>
+                  <span className={descClass}>{r.partner?.businessName}</span>
                 </div>
                 {r.expiryDate && (
-                  <p className="text-[var(--premium-muted)] text-sm mt-0.5">Expires {formatDate(r.expiryDate)}</p>
+                  <p className="text-white/50 text-sm mt-0.5">Expires {formatDate(r.expiryDate)}</p>
                 )}
               </li>
             ))}

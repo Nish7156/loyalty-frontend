@@ -4,10 +4,13 @@ import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustome
 import type { CustomerProfile, Reward } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
 import { Button } from '../../components/Button';
-import { Input } from '../../components/Input';
 
 type Step = 'phone' | 'otp' | 'checkin' | 'done';
 type OtpMode = 'register' | 'customerLogin';
+
+function generateMpin(): string {
+  return String(1000 + Math.floor(Math.random() * 9000));
+}
 
 export function UserScanPage() {
   const { storeId } = useParams<{ storeId: string }>();
@@ -15,6 +18,7 @@ export function UserScanPage() {
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  const [mpin, setMpin] = useState('');
   const [otpMode, setOtpMode] = useState<OtpMode>('register');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
@@ -63,10 +67,13 @@ export function UserScanPage() {
       setStep('checkin');
     } catch {
       try {
-        await authApi.sendOtp(phone.trim());
+        const pin = generateMpin();
+        setMpin(pin);
+        await authApi.sendOtp(phone.trim(), pin);
         setOtpMode('register');
         setStep('otp');
         setOtp('');
+        // OTP (SMS) send – uncomment when ready: await authApi.sendOtp(phone.trim());
       } catch {
         setOtpMode('register');
         setStep('otp');
@@ -82,10 +89,13 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      await authApi.sendOtp(phone.trim());
+      const pin = generateMpin();
+      setMpin(pin);
+      await authApi.sendOtp(phone.trim(), pin);
       setOtpMode('customerLogin');
       setStep('otp');
       setOtp('');
+      // OTP (SMS) send – uncomment when ready: await authApi.sendOtp(phone.trim());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not send OTP');
     } finally {
@@ -196,86 +206,96 @@ export function UserScanPage() {
   if (profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] px-4">
-        <p className="text-[var(--premium-muted)]">Loading…</p>
+        <p className="text-white/60 text-sm">Loading…</p>
       </div>
     );
   }
 
+  const cardClass = 'rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]';
+  const inputClass = 'w-full min-h-[48px] rounded-xl border border-white/20 bg-black/30 px-4 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition';
+  const btnPrimary = 'w-full min-h-[48px] rounded-xl border border-white/40 text-white font-medium hover:bg-white/10 transition disabled:opacity-50';
+
   return (
     <div className="max-w-md mx-auto pb-20 w-full min-w-0">
-      <h1 className="text-lg font-bold mb-3 sm:mb-4 text-[var(--premium-cream)] tracking-tight sm:text-xl">Store Check-in</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">Store Check-in</h1>
 
       {isLoggedIn && (
-        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-[var(--premium-surface)] rounded-xl border border-[var(--premium-border)] min-w-0">
-          <p className="text-xs sm:text-sm text-[var(--premium-muted)] truncate min-w-0">Signed in as {displayPhone}</p>
-          <button type="button" onClick={handleLogout} className="text-sm text-[var(--premium-gold)] hover:underline shrink-0 min-h-[44px] flex items-center touch-manipulation">
+        <div className="flex items-center justify-between gap-2 mb-4 p-4 rounded-2xl border border-white/10 bg-white/[0.04] min-w-0">
+          <p className="text-xs sm:text-sm text-white/60 truncate min-w-0">Signed in as {displayPhone}</p>
+          <button type="button" onClick={handleLogout} className="text-sm text-cyan-400 font-medium shrink-0 min-h-[44px] flex items-center hover:text-cyan-300 transition touch-manipulation">
             Log out
           </button>
         </div>
       )}
 
       {step === 'phone' && branchId && getCustomerTokenIfPresent() && (
-        <p className="text-[var(--premium-muted)]">Loading…</p>
+        <p className="text-white/60 text-sm">Loading…</p>
       )}
       {step === 'phone' && branchId && !getCustomerTokenIfPresent() && (
-        <form onSubmit={handlePhoneSubmit} className="space-y-4">
-          <Input
-            label="Phone"
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+15551234567"
-            required
-            autoComplete="tel"
-          />
-          {error && <p className="text-rose-400 text-sm">{error}</p>}
-          <Button type="submit" fullWidth disabled={loading}>
-            {loading ? 'Checking…' : 'Continue'}
-          </Button>
+        <form onSubmit={handlePhoneSubmit} className="space-y-5">
+          <div className={cardClass}>
+            <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+15551234567"
+              required
+              autoComplete="tel"
+              className={inputClass}
+            />
+            {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
+            <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
+              {loading ? 'Checking…' : 'Continue'}
+            </button>
+          </div>
         </form>
       )}
 
       {step === 'otp' && branchId && (
-        <form onSubmit={handleOtpSubmit} className="space-y-4">
-          <p className="text-sm text-[var(--premium-muted)]">
-            {otpMode === 'customerLogin' ? 'Enter OTP to stay logged in.' : 'New here! OTP sent to '}
-            {otpMode === 'register' && <strong>{phone}</strong>}
-          </p>
-          <Input
-            label="OTP"
-            type="text"
-            inputMode="numeric"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="1111"
-            required
-            autoComplete="one-time-code"
-          />
-          {error && <p className="text-rose-400 text-sm">{error}</p>}
-          <Button type="submit" fullWidth disabled={loading}>
-            {loading ? 'Verifying…' : otpMode === 'customerLogin' ? 'Log in' : 'Verify & Register'}
-          </Button>
-          <Button type="button" variant="ghost" fullWidth onClick={() => { setStep('phone'); setError(''); }}>
-            Change number
-          </Button>
+        <form onSubmit={handleOtpSubmit} className="space-y-5">
+          <div className={cardClass}>
+            <p className="text-sm text-white/60 mb-1">Your 4-digit MPIN</p>
+            <p className="text-2xl font-mono font-bold text-cyan-300 tracking-[0.4em] mb-4">{mpin}</p>
+            <label className="block text-sm font-medium text-white/70 mb-2">Enter MPIN</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              placeholder="0000"
+              required
+              autoComplete="one-time-code"
+              className={`${inputClass} text-center text-lg tracking-widest`}
+            />
+            {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
+            <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
+              {loading ? 'Verifying…' : 'Send'}
+            </button>
+            <button type="button" onClick={() => { setStep('phone'); setError(''); }} className="w-full mt-2 min-h-[44px] rounded-xl text-white/50 text-sm font-medium hover:text-white/80 hover:bg-white/5 transition">
+              Change number
+            </button>
+          </div>
         </form>
       )}
 
       {step === 'checkin' && (
         <>
-          <p className="text-[var(--premium-muted)] mb-3">Check-in as {displayPhone}</p>
+          <p className="text-white/60 text-sm mb-4">Check-in as {displayPhone}</p>
           {activeRewardsForStore.length > 0 && (
-            <div className="bg-[var(--premium-card)] border border-[var(--premium-gold-dim)] rounded-xl p-4 mb-4">
-              <h2 className="font-semibold text-[var(--premium-gold)] mb-2">Use a reward</h2>
-              <ul className="space-y-2">
+            <div className={`${cardClass} mb-4 border-cyan-500/30`}>
+              <h2 className="font-semibold bg-gradient-to-r from-cyan-300 to-cyan-200/80 bg-clip-text text-transparent mb-3">Use a reward</h2>
+              <ul className="space-y-3">
                 {activeRewardsForStore.map((r) => (
-                  <li key={r.id} className="flex items-center justify-between">
-                    <span className="text-sm text-[var(--premium-cream)]">{r.partner?.businessName}</span>
+                  <li key={r.id} className="flex items-center justify-between gap-2">
+                    <span className="text-sm text-white truncate">{r.partner?.businessName}</span>
                     <Button
                       type="button"
                       variant="secondary"
                       disabled={!!redeemingId}
                       onClick={() => handleRedeem(r.id)}
+                      className="shrink-0 rounded-xl border border-white/30 hover:bg-white/10"
                     >
                       {redeemingId === r.id ? 'Redeeming…' : 'Use reward'}
                     </Button>
@@ -284,23 +304,26 @@ export function UserScanPage() {
               </ul>
             </div>
           )}
-          <form onSubmit={handleCheckIn} className="space-y-4">
-            <Input
-              label="Amount"
-              type="number"
-              step="0.01"
-              min="0"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-            />
-            {error && <p className="text-rose-400 text-sm">{error}</p>}
-            <Button type="submit" fullWidth disabled={loading}>
-              {loading ? 'Submitting…' : 'Submit check-in'}
-            </Button>
+          <form onSubmit={handleCheckIn} className="space-y-5">
+            <div className={cardClass}>
+              <label className="block text-sm font-medium text-white/70 mb-2">Amount</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                className={inputClass}
+              />
+              {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
+              <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
+                {loading ? 'Submitting…' : 'Submit check-in'}
+              </button>
+            </div>
           </form>
           {!isLoggedIn && (
-            <button type="button" onClick={handleStayLoggedIn} className="w-full text-sm text-[var(--premium-gold)] mt-2 hover:underline">
+            <button type="button" onClick={handleStayLoggedIn} className="w-full text-sm text-cyan-400 font-medium mt-2 hover:text-cyan-300 transition">
               Stay logged in for next time
             </button>
           )}
@@ -308,26 +331,26 @@ export function UserScanPage() {
       )}
 
       {step === 'done' && (
-        <div className="bg-[var(--premium-card)] border border-[var(--premium-border)] rounded-xl p-4 text-center">
+        <div className={`${cardClass} text-center`}>
           {checkinStatus === null || checkinStatus === 'PENDING' ? (
             <>
-              <p className="font-medium text-emerald-400">Check-in submitted!</p>
-              <p className="text-sm text-[var(--premium-muted)] mt-1">Staff will verify and approve. Waiting for update…</p>
+              <p className="font-semibold text-emerald-400">Check-in submitted!</p>
+              <p className="text-sm text-white/60 mt-1">Staff will verify and approve. Waiting for update…</p>
             </>
           ) : checkinStatus === 'APPROVED' ? (
             <>
-              <p className="font-medium text-emerald-400">Approved!</p>
-              <p className="text-sm text-[var(--premium-muted)] mt-1">Your visit and points have been updated.</p>
+              <p className="font-semibold text-emerald-400">Approved!</p>
+              <p className="text-sm text-white/60 mt-1">Your visit and points have been updated.</p>
             </>
           ) : (
             <>
-              <p className="font-medium text-rose-400">Rejected</p>
-              <p className="text-sm text-[var(--premium-muted)] mt-1">Staff declined this check-in.</p>
+              <p className="font-semibold text-rose-400">Rejected</p>
+              <p className="text-sm text-white/60 mt-1">Staff declined this check-in.</p>
             </>
           )}
-          <Button className="mt-4" onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
+          <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
             Another check-in
-          </Button>
+          </button>
         </div>
       )}
     </div>
