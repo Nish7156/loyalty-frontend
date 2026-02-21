@@ -5,11 +5,13 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { SellerLayout } from '../layouts/SellerLayout';
 import { OwnerLayout } from '../layouts/OwnerLayout';
 import { UserLayout } from '../layouts/UserLayout';
+import { Loader } from '../components/Loader';
 import { LoginPage } from '../features/auth/LoginPage';
 import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
 import { UserProfilePage } from '../features/user/UserProfilePage';
 import { UserHistoryPage } from '../features/user/UserHistoryPage';
+import { UserRewardsPage } from '../features/user/UserRewardsPage';
 
 const AdminDashboard = lazy(() => import('../features/admin/Dashboard').then((m) => ({ default: m.AdminDashboard })));
 const PartnersPage = lazy(() => import('../features/admin/PartnersPage').then((m) => ({ default: m.PartnersPage })));
@@ -23,8 +25,8 @@ const StoreQRPage = lazy(() => import('../features/seller/StoreQRPage').then((m)
 
 function Fallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p>Loading…</p>
+    <div className="min-h-screen min-h-dvh flex items-center justify-center bg-[var(--premium-bg)]">
+      <Loader message="Loading…" />
     </div>
   );
 }
@@ -41,6 +43,7 @@ export function AppRouter() {
           <Route path="scan" element={<Navigate to="/" replace />} />
           <Route path="scan/:storeId" element={<UserScanPage />} />
           <Route path="history" element={<UserHistoryPage />} />
+          <Route path="rewards" element={<UserRewardsPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
 import { createCustomerSocket } from '../../lib/socket';
+import { Loader } from '../../components/Loader';
 import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
@@ -91,7 +92,7 @@ export function UserProfilePage() {
   if (getCustomerTokenIfPresent() && loading && !profile) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <p className="text-white/70 text-sm animate-pulse-soft">Loading…</p>
+        <Loader message="Loading your profile…" />
       </div>
     );
   }
@@ -126,7 +127,7 @@ export function UserProfilePage() {
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <p className="text-white/70 text-sm animate-pulse-soft">Loading…</p>
+        <Loader message="Loading…" />
       </div>
     );
   }
@@ -184,78 +185,59 @@ export function UserProfilePage() {
         </div>
       </div>
 
-      <div className={`${cardClass} stagger-2`}>
-        <h2 className={`${sectionTitleClass} mb-3`}>Stores you use</h2>
-        {storesVisited.length === 0 ? (
+      <h2 className={`${sectionTitleClass} opacity-0 animate-fade-in-up stagger-2`}>Stores you use</h2>
+      {storesVisited.length === 0 ? (
+        <div className={`${cardClass} stagger-2`}>
           <p className={descClass}>No store visits yet. Scan a store QR to check in — your first visit counts.</p>
-        ) : (
-          <ul className="divide-y divide-white/10 space-y-2">
-            {storesVisited.map((store) => {
-              const threshold = store.rewardThreshold ?? 5;
-              const windowDays = store.rewardWindowDays ?? 30;
-              const description = store.rewardDescription || 'Free reward';
-              const current = store.streakCurrentCount ?? 0;
-              const periodStart = store.streakPeriodStartedAt;
-              return (
-                <li key={store.branchId} className="py-2.5 transition-colors duration-200 rounded-xl hover:bg-white/[0.03] -mx-2 px-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-white">{store.partnerName}</p>
-                      <p className={`${descClass} mt-0.5`}>{store.branchName}</p>
-                      {(threshold > 0 && windowDays > 0) && (
-                        <p className="text-white/50 text-xs mt-1">
-                          {threshold} purchases in {windowDays} days → {description}
-                        </p>
-                      )}
-                      {periodStart && (
-                        <p className="text-white/50 text-xs mt-0.5">Period started: {formatDate(periodStart)}</p>
-                      )}
-                      {(threshold > 0) && (
-                        <div className="mt-2 h-1.5 w-full max-w-[120px] rounded-full bg-white/10 overflow-hidden">
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {storesVisited.map((store, index) => {
+            const threshold = store.rewardThreshold ?? 5;
+            const windowDays = store.rewardWindowDays ?? 30;
+            const description = store.rewardDescription || 'Free reward';
+            const current = store.streakCurrentCount ?? 0;
+            const periodStart = store.streakPeriodStartedAt;
+            return (
+              <div
+                key={store.branchId}
+                className={`${cardClass} stagger-2`}
+                style={{ animationDelay: `${0.19 + index * 0.08}s` }}
+              >
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-white text-lg truncate">{store.partnerName}</p>
+                    <p className={`${descClass} mt-0.5 truncate`}>{store.branchName}</p>
+                    {(threshold > 0 && windowDays > 0) && (
+                      <p className="text-white/50 text-xs mt-1.5">
+                        {threshold} purchases in {windowDays} days → {description}
+                      </p>
+                    )}
+                    {periodStart && (
+                      <p className="text-white/50 text-xs mt-0.5">Period started: {formatDate(periodStart)}</p>
+                    )}
+                    {(threshold > 0) && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <div className="h-2 flex-1 max-w-[140px] rounded-full bg-white/10 overflow-hidden">
                           <div
                             className="h-full rounded-full bg-cyan-400/90 animate-progress-fill"
                             style={{ width: `${Math.min(100, (current / threshold) * 100)}%` }}
                           />
                         </div>
-                      )}
-                    </div>
-                    <div className="text-right text-sm">
-                      <p className={descClass}>{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
-                      <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
-                      {(threshold > 0) && (
-                        <p className="font-medium text-cyan-300 mt-0.5">
-                          {current}/{threshold}
-                        </p>
-                      )}
-                    </div>
+                        <span className="text-cyan-300 font-medium text-sm tabular-nums">{current}/{threshold}</span>
+                      </div>
+                    )}
                   </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
-
-      <div className={`${cardClass} stagger-3`}>
-        <h2 className={`${sectionTitleClass} mb-3`}>My rewards</h2>
-        {rewards.length === 0 ? (
-          <p className={descClass}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
-        ) : (
-          <ul className="divide-y divide-white/10">
-            {rewards.map((r) => (
-              <li key={r.id} className="py-2.5 rounded-xl hover:bg-white/[0.03] -mx-2 px-2 transition-colors duration-200">
-                <div className="flex justify-between">
-                  <span className="capitalize text-white">{r.status.toLowerCase()}</span>
-                  <span className={descClass}>{r.partner?.businessName}</span>
+                  <div className="text-right text-sm shrink-0">
+                    <p className={descClass}>{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
+                    <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
+                  </div>
                 </div>
-                {r.expiryDate && (
-                  <p className="text-white/50 text-sm mt-0.5">Expires {formatDate(r.expiryDate)}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

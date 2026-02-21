@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { customersApi, getCustomerTokenIfPresent } from '../../lib/api';
+import { Loader } from '../../components/Loader';
 import type { CustomerHistory, HistoryActivity, HistoryRedeemedReward } from '../../lib/api';
 
 function formatDateTime(s: string) {
@@ -123,7 +124,7 @@ export function UserHistoryPage() {
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <p className="text-white/60 text-sm">Loading history…</p>
+        <Loader message="Loading history…" />
       </div>
     );
   }

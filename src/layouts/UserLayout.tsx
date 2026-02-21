@@ -4,19 +4,22 @@ export function UserLayout() {
   const location = useLocation();
   const isMe = location.pathname === '/me';
   const isHistory = location.pathname === '/history';
+  const isRewards = location.pathname === '/rewards';
 
   return (
     <div className="flex flex-col min-h-screen min-h-[100dvh] bg-[var(--premium-bg)] text-white safe-area">
       <header className="bg-white/[0.06] backdrop-blur-md border-b border-white/10 px-4 py-3 md:px-5 flex justify-center items-center safe-area-top shrink-0 transition-shadow duration-200">
-        <span className="font-semibold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent tracking-tight text-base md:text-lg">Loyalty</span>
+        <span className="font-bold text-base md:text-lg tracking-tight bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-teal-300 bg-left hover:bg-right transition-[background-position] duration-500 select-none">
+          Loyalty
+        </span>
       </header>
       <main className="flex-1 overflow-auto p-4 pb-8 md:p-5 min-w-0">
         <Outlet />
       </main>
-      <nav className="bg-white/[0.06] backdrop-blur-md border-t border-white/10 flex justify-center items-center gap-1 py-2 safe-area-bottom">
+      <nav className="bg-white/[0.06] backdrop-blur-md border-t border-white/10 flex justify-center items-center gap-1 py-2 px-1 safe-area-bottom">
         <Link
           to="/history"
-          className={`nav-tab flex flex-col items-center gap-1 py-3 px-6 rounded-2xl min-w-[72px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 ${
+          className={`nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 flex-1 max-w-[100px] ${
             isHistory ? 'text-cyan-400 bg-white/10 ring-1 ring-cyan-400/20' : 'text-white/50 hover:text-white/80 hover:bg-white/5'
           }`}
         >
@@ -26,8 +29,19 @@ export function UserLayout() {
           <span className="text-xs font-medium">History</span>
         </Link>
         <Link
+          to="/rewards"
+          className={`nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 flex-1 max-w-[100px] ${
+            isRewards ? 'text-cyan-400 bg-white/10 ring-1 ring-cyan-400/20' : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+          }`}
+        >
+          <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span className="text-xs font-medium">Rewards</span>
+        </Link>
+        <Link
           to="/me"
-          className={`nav-tab flex flex-col items-center gap-1 py-3 px-6 rounded-2xl min-w-[72px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 ${
+          className={`nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 flex-1 max-w-[100px] ${
             isMe ? 'text-cyan-400 bg-white/10 ring-1 ring-cyan-400/20' : 'text-white/50 hover:text-white/80 hover:bg-white/5'
           }`}
         >
