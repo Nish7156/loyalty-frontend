@@ -6,15 +6,11 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = 'loyalty_pwa_install_dismissed';
-const DISMISS_DAYS = 7;
+const DELAY_MS = 45 * 1000;
 
-function wasDismissedRecently(): boolean {
+function wasDismissed(): boolean {
   try {
-    const raw = localStorage.getItem(DISMISS_KEY);
-    if (!raw) return false;
-    const t = parseInt(raw, 10);
-    if (Number.isNaN(t)) return false;
-    return Date.now() - t < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    return localStorage.getItem(DISMISS_KEY) === '1';
   } catch {
     return false;
   }
@@ -22,7 +18,7 @@ function wasDismissedRecently(): boolean {
 
 function setDismissed(): void {
   try {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    localStorage.setItem(DISMISS_KEY, '1');
   } catch {}
 }
 
@@ -40,12 +36,17 @@ export function PWAInstallPrompt() {
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
       setInstallEvent(e as BeforeInstallPromptEvent);
-      if (!wasDismissedRecently()) setShowBanner(true);
     };
 
     window.addEventListener('beforeinstallprompt', onBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
   }, []);
+
+  useEffect(() => {
+    if (isStandalone || wasDismissed() || !installEvent) return;
+    const t = setTimeout(() => setShowBanner(true), DELAY_MS);
+    return () => clearTimeout(t);
+  }, [installEvent, isStandalone]);
 
   const handleInstall = async () => {
     if (!installEvent) return;

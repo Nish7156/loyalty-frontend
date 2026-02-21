@@ -30,6 +30,7 @@ export function UserScanPage() {
   const [currentPartnerId, setCurrentPartnerId] = useState<string | null>(null);
   const [lastActivityId, setLastActivityId] = useState<string | null>(null);
   const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const socketRef = useRef<ReturnType<typeof createBranchSocket> | null>(null);
 
   const isLoggedIn = !!getCustomerTokenIfPresent();
@@ -165,6 +166,7 @@ export function UserScanPage() {
   };
 
   const handleLogout = () => {
+    setShowLogoutConfirm(false);
     clearCustomerToken();
     setProfile(null);
     setPhone('');
@@ -223,7 +225,7 @@ export function UserScanPage() {
       {isLoggedIn && (
         <div className="flex items-center justify-between gap-2 mb-4 p-4 rounded-2xl border border-white/10 bg-white/[0.04] min-w-0">
           <p className="text-xs sm:text-sm text-white/60 truncate min-w-0">Signed in as {displayPhone}</p>
-          <button type="button" onClick={handleLogout} className="text-sm text-cyan-400 font-medium shrink-0 min-h-[44px] flex items-center hover:text-cyan-300 transition touch-manipulation">
+          <button type="button" onClick={() => setShowLogoutConfirm(true)} className="text-sm text-cyan-400 font-medium shrink-0 min-h-[44px] flex items-center hover:text-cyan-300 transition touch-manipulation">
             Log out
           </button>
         </div>
@@ -354,6 +356,31 @@ export function UserScanPage() {
           <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
             Another check-in
           </button>
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Confirm logout">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowLogoutConfirm(false)} />
+          <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-[var(--premium-surface)] p-6 shadow-xl animate-scale-in">
+            <p className="text-white font-medium text-center mb-5">Are you sure you want to log out?</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 min-h-[44px] rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition btn-interactive"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-1 min-h-[44px] rounded-xl bg-rose-500/90 text-white text-sm font-semibold hover:bg-rose-400 transition btn-interactive"
+              >
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

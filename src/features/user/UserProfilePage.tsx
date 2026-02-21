@@ -21,6 +21,7 @@ export function UserProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const socketRef = useRef<ReturnType<typeof createCustomerSocket> | null>(null);
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export function UserProfilePage() {
   };
 
   const handleLogout = () => {
+    setShowLogoutConfirm(false);
     clearCustomerToken();
     setProfile(null);
     setHistory(null);
@@ -153,7 +155,7 @@ export function UserProfilePage() {
         {loadedByToken && (
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => setShowLogoutConfirm(true)}
             className="shrink-0 min-h-[44px] px-4 rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition-all duration-200 touch-manipulation btn-interactive"
           >
             Log out
@@ -236,6 +238,31 @@ export function UserProfilePage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Confirm logout">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowLogoutConfirm(false)} />
+          <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-[var(--premium-surface)] p-6 shadow-xl animate-scale-in">
+            <p className="text-white font-medium text-center mb-5">Are you sure you want to log out?</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 min-h-[44px] rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition btn-interactive"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-1 min-h-[44px] rounded-xl bg-rose-500/90 text-white text-sm font-semibold hover:bg-rose-400 transition btn-interactive"
+              >
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
