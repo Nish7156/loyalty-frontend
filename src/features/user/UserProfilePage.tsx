@@ -91,30 +91,30 @@ export function UserProfilePage() {
   if (getCustomerTokenIfPresent() && loading && !profile) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <p className="text-white/70 text-sm">Loading…</p>
+        <p className="text-white/70 text-sm animate-pulse-soft">Loading…</p>
       </div>
     );
   }
 
   if (!phone && !profile) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 py-8">
+      <div className="max-w-md mx-auto w-full min-w-0 py-8 opacity-0 animate-fade-in-up">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">
           My Loyalty Card
         </h1>
         <p className="text-white/60 text-sm mb-6">Enter your phone to view your profile and rewards.</p>
-        <form onSubmit={handlePhoneSubmit} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]">
+        <form onSubmit={handlePhoneSubmit} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale">
           <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
           <input
             name="phone"
             type="tel"
             placeholder="+15551234567"
-            className="w-full min-h-[48px] border border-white/20 rounded-xl px-4 py-3 bg-black/30 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition"
+            className="w-full min-h-[48px] border border-white/20 rounded-xl px-4 py-3 bg-black/30 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition-all duration-200"
             required
           />
           <button
             type="submit"
-            className="w-full min-h-[48px] mt-4 rounded-xl border border-white/40 text-white font-medium hover:bg-white/10 transition touch-manipulation"
+            className="w-full min-h-[48px] mt-4 rounded-xl border border-white/40 text-white font-medium hover:bg-white/10 transition-all duration-200 touch-manipulation btn-interactive"
           >
             Explore
           </button>
@@ -126,7 +126,7 @@ export function UserProfilePage() {
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <p className="text-white/70 text-sm">Loading…</p>
+        <p className="text-white/70 text-sm animate-pulse-soft">Loading…</p>
       </div>
     );
   }
@@ -139,13 +139,13 @@ export function UserProfilePage() {
   const activeRewards = rewards.filter((r) => r.status === 'ACTIVE');
   const redeemedFromHistory = history?.redeemedRewards ?? [];
 
-  const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]';
+  const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale opacity-0 animate-fade-in-up';
   const sectionTitleClass = 'text-base font-semibold bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent mb-1';
   const descClass = 'text-white/60 text-sm';
 
   return (
     <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
-      <div className="flex items-center justify-between gap-3 min-w-0">
+      <div className="flex items-center justify-between gap-3 min-w-0 opacity-0 animate-fade-in-up">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent">
           {loadedByToken ? "You're in the club" : 'My Loyalty Card'}
         </h1>
@@ -153,14 +153,14 @@ export function UserProfilePage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="shrink-0 min-h-[44px] px-4 rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition touch-manipulation"
+            className="shrink-0 min-h-[44px] px-4 rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition-all duration-200 touch-manipulation btn-interactive"
           >
             Log out
           </button>
         )}
       </div>
 
-      <div className={cardClass}>
+      <div className={`${cardClass} stagger-1`}>
         <p className={descClass}>Member</p>
         <p className="font-mono text-base sm:text-lg tracking-wide text-white break-all mt-0.5">{customer.phoneNumber}</p>
         {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
@@ -184,7 +184,7 @@ export function UserProfilePage() {
         </div>
       </div>
 
-      <div className={cardClass}>
+      <div className={`${cardClass} stagger-2`}>
         <h2 className={`${sectionTitleClass} mb-3`}>Stores you use</h2>
         {storesVisited.length === 0 ? (
           <p className={descClass}>No store visits yet. Scan a store QR to check in — your first visit counts.</p>
@@ -197,7 +197,7 @@ export function UserProfilePage() {
               const current = store.streakCurrentCount ?? 0;
               const periodStart = store.streakPeriodStartedAt;
               return (
-                <li key={store.branchId} className="py-2.5">
+                <li key={store.branchId} className="py-2.5 transition-colors duration-200 rounded-xl hover:bg-white/[0.03] -mx-2 px-2">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-white">{store.partnerName}</p>
@@ -209,6 +209,14 @@ export function UserProfilePage() {
                       )}
                       {periodStart && (
                         <p className="text-white/50 text-xs mt-0.5">Period started: {formatDate(periodStart)}</p>
+                      )}
+                      {(threshold > 0) && (
+                        <div className="mt-2 h-1.5 w-full max-w-[120px] rounded-full bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-cyan-400/90 animate-progress-fill"
+                            style={{ width: `${Math.min(100, (current / threshold) * 100)}%` }}
+                          />
+                        </div>
                       )}
                     </div>
                     <div className="text-right text-sm">
@@ -228,14 +236,14 @@ export function UserProfilePage() {
         )}
       </div>
 
-      <div className={cardClass}>
+      <div className={`${cardClass} stagger-3`}>
         <h2 className={`${sectionTitleClass} mb-3`}>My rewards</h2>
         {rewards.length === 0 ? (
           <p className={descClass}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
         ) : (
           <ul className="divide-y divide-white/10">
             {rewards.map((r) => (
-              <li key={r.id} className="py-2.5">
+              <li key={r.id} className="py-2.5 rounded-xl hover:bg-white/[0.03] -mx-2 px-2 transition-colors duration-200">
                 <div className="flex justify-between">
                   <span className="capitalize text-white">{r.status.toLowerCase()}</span>
                   <span className={descClass}>{r.partner?.businessName}</span>
