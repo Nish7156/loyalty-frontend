@@ -63,26 +63,31 @@ export function PWAInstallPrompt() {
   if (isStandalone || !showBanner || !installEvent) return null;
 
   return (
-    <div className="fixed bottom-20 left-3 right-3 z-10 mx-auto max-w-md animate-fade-in-up" role="dialog" aria-label="Install app">
-      <div className="rounded-2xl border border-cyan-400/30 bg-[var(--premium-surface)] px-4 py-3 shadow-lg backdrop-blur-md flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-white/90 uppercase tracking-wide shrink-0">
-          Install Loyalty App
-        </p>
-        <div className="flex gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white/80 transition"
-          >
-            Not Now
-          </button>
-          <button
-            type="button"
-            onClick={handleInstall}
-            className="px-3 py-1.5 rounded-lg bg-cyan-400/90 text-black text-xs font-semibold uppercase tracking-wide hover:bg-cyan-300 transition btn-interactive"
-          >
-            Install
-          </button>
+    <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Install app">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" onClick={handleDismiss} />
+      <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-[var(--premium-surface)] p-6 shadow-xl animate-scale-in">
+        <div className="flex flex-col items-center text-center gap-4">
+          <img src="/icon-192.png" alt="" className="h-16 w-16 rounded-2xl object-contain" />
+          <div>
+            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Install Loyalty</h3>
+            <p className="text-white/60 text-sm mt-1">Add to your home screen for a better experience.</p>
+          </div>
+          <div className="flex w-full gap-3">
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="flex-1 min-h-[44px] rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition btn-interactive"
+            >
+              Not Now
+            </button>
+            <button
+              type="button"
+              onClick={handleInstall}
+              className="flex-1 min-h-[44px] rounded-xl bg-cyan-400/90 text-black text-sm font-semibold uppercase tracking-wide hover:bg-cyan-300 transition btn-interactive"
+            >
+              Install
+            </button>
+          </div>
         </div>
       </div>
     </div>

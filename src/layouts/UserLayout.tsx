@@ -11,7 +11,9 @@ export function UserLayout() {
     <div className="flex flex-col min-h-screen min-h-[100dvh] bg-[var(--premium-bg)] text-white safe-area">
       <header className="relative bg-white/[0.06] backdrop-blur-md border-b border-white/10 h-12 md:h-14 shrink-0 safe-area-top">
         <div className="absolute inset-0 flex items-center justify-center">
-          <img src="/logo.png" alt="Loyalty" className="pointer-events-auto h-8 w-8 md:h-9 md:w-9 object-contain select-none" />
+          <span className="pointer-events-auto font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-teal-300 bg-left hover:bg-right transition-[background-position] duration-500 select-none">
+            Loyalty
+          </span>
         </div>
       </header>
       <main className="flex-1 overflow-auto p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize">
