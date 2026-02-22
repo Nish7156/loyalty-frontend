@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { activityApi } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
 import type { Activity } from '../../lib/api';
-import { Link } from 'react-router-dom';
+import { Button } from '../../components/Button';
 
 function normalizeActivity(p: unknown): Activity {
   const a = p as Record<string, unknown>;
@@ -20,6 +20,7 @@ function normalizeActivity(p: unknown): Activity {
     branch: a.branch as Activity['branch'],
     staff: a.staff as Activity['staff'],
     locationFlagDistant: a.locationFlagDistant as boolean | undefined,
+    customerName: a.customerName != null ? String(a.customerName) : undefined,
   };
 }
 
@@ -28,6 +29,8 @@ export function SellerDashboard() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [amountOverrides, setAmountOverrides] = useState<Record<string, string>>({});
 
   const branchId = auth.type === 'staff' ? auth.staff.branchId : '';
 
@@ -74,27 +77,84 @@ export function SellerDashboard() {
     };
   }, [branchId]);
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
+  const handleStatus = useCallback(async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    setSubmittingId(id);
+    setError('');
+    try {
+      const a = activities.find((x) => x.id === id);
+      const amountStr = amountOverrides[id]?.trim();
+      const value = status === 'APPROVED'
+        ? (amountStr ? Number(amountStr) : a?.value != null ? Number(a.value) : undefined)
+        : undefined;
+      await activityApi.updateStatus(id, status, value);
+      setActivities((prev) => prev.filter((x) => x.id !== id));
+      setAmountOverrides((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed');
+    } finally {
+      setSubmittingId(null);
+    }
+  }, [activities, amountOverrides]);
+
+  if (loading) return <p className="text-gray-600">Loading…</p>;
+  if (error) return <p className="text-red-600 text-sm mb-2">{error}</p>;
 
   return (
     <div className="min-w-0">
       <h1 className="text-lg font-bold mb-3 md:text-xl md:mb-4">Pending Check-ins</h1>
+      <p className="text-gray-500 text-sm mb-4">Approve or reject in one tap. Optionally edit amount before approving.</p>
       {activities.length === 0 ? (
         <p className="text-gray-500 text-sm">No pending check-ins.</p>
       ) : (
-        <ul className="space-y-2">
-          {activities.map((a) => (
-            <li key={a.id} className="bg-white rounded-lg shadow p-3 flex flex-wrap justify-between items-center gap-2 min-w-0">
-              <div className="min-w-0">
-                <span className="font-medium text-sm md:text-base block truncate">{a.customerId}</span>
-                {a.value != null && <span className="text-gray-500 text-xs md:text-sm">${Number(a.value).toFixed(2)}</span>}
-              </div>
-              <Link to={`/seller/approve?id=${a.id}`} className="text-blue-600 text-sm shrink-0 min-h-[44px] flex items-center justify-end touch-manipulation">
-                Approve →
-              </Link>
-            </li>
-          ))}
+        <ul className="space-y-4">
+          {activities.map((a) => {
+            const requestedAmount = a.value != null ? Number(a.value) : null;
+            const override = amountOverrides[a.id] ?? (requestedAmount != null ? String(requestedAmount) : '');
+            const isSubmitting = submittingId === a.id;
+            return (
+              <li key={a.id} className="bg-white rounded-xl shadow border border-gray-100 p-4 min-w-0">
+                <div className="flex flex-col gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{a.customerId}</p>
+                    {a.customerName && <p className="text-gray-600 text-sm mt-0.5">{a.customerName}</p>}
+                    {requestedAmount != null && (
+                      <p className="text-gray-500 text-xs mt-1">Requested: ${requestedAmount.toFixed(2)}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={override}
+                      onChange={(e) => setAmountOverrides((prev) => ({ ...prev, [a.id]: e.target.value }))}
+                      placeholder="Amount"
+                      className="w-24 min-h-[44px] rounded-lg border border-gray-300 px-3 text-sm"
+                    />
+                    <Button
+                      onClick={() => handleStatus(a.id, 'APPROVED')}
+                      disabled={isSubmitting}
+                      className="min-h-[44px] flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
+                    >
+                      {isSubmitting ? '…' : 'Approve'}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleStatus(a.id, 'REJECTED')}
+                      disabled={isSubmitting}
+                      className="min-h-[44px] flex-1 sm:flex-none"
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
