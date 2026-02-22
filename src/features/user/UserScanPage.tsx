@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 import type { CustomerProfile, Reward } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
@@ -15,6 +16,7 @@ function generateMpin(): string {
 
 export function UserScanPage() {
   const { storeId } = useParams<{ storeId: string }>();
+  const navigate = useNavigate();
   const branchId = storeId || '';
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
@@ -199,6 +201,32 @@ export function UserScanPage() {
       socketRef.current = null;
     };
   }, [step, branchId, lastActivityId]);
+
+  useEffect(() => {
+    if (checkinStatus !== 'APPROVED') return;
+    const duration = 2500;
+    const end = Date.now() + duration;
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#22d3ee', '#2dd4bf', '#fafafa'],
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#22d3ee', '#2dd4bf', '#fafafa'],
+      });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+    const t = setTimeout(() => navigate('/me', { replace: true }), 2200);
+    return () => clearTimeout(t);
+  }, [checkinStatus, navigate]);
 
   const partnerIdForBranch = profile?.storesVisited?.find((s) => s.branchId === branchId)?.partnerId ?? currentPartnerId;
   const activeRewardsForStore: Reward[] =

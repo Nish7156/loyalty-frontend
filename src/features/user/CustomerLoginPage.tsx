@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 
 function generateMpin(): string {
@@ -7,6 +7,7 @@ function generateMpin(): string {
 }
 
 export function CustomerLoginPage() {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
@@ -41,9 +42,7 @@ export function CustomerLoginPage() {
     try {
       const res = await authApi.customerLogin(phone.trim(), otp.trim());
       setCustomerToken(res.access_token);
-      setStep('phone');
-      setPhone('');
-      setOtp('');
+      navigate('/me', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid OTP');
     } finally {
