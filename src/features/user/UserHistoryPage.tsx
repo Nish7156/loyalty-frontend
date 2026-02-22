@@ -96,30 +96,10 @@ export function UserHistoryPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const isLoggedIn = !!getCustomerTokenIfPresent();
   const cardClass = 'rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]';
   const sectionTitleClass = 'text-sm font-semibold text-white/90 uppercase tracking-wider mb-2';
   const descClass = 'text-white/60 text-sm';
   const itemClass = 'flex items-start gap-3 py-2.5 border-b border-white/10 last:border-0';
-
-  if (!isLoggedIn) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">
-          History
-        </h1>
-        <p className="text-white/60 text-sm mb-6">Log in to see your visits and rewards history.</p>
-        <div className={cardClass}>
-          <Link
-            to="/"
-            className="flex w-full min-h-[48px] rounded-xl border border-white/40 text-white font-medium items-center justify-center hover:bg-white/10 transition"
-          >
-            Log in
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

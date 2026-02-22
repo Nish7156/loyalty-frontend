@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { customersApi, getCustomerTokenIfPresent } from '../../lib/api';
 import { Loader } from '../../components/Loader';
 import type { CustomerProfile, Reward } from '../../lib/api';
@@ -31,29 +30,9 @@ export function UserRewardsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const isLoggedIn = !!getCustomerTokenIfPresent();
   const rewards: Reward[] = profile?.customer?.rewards ?? [];
   const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale opacity-0 animate-fade-in-up';
   const descClass = 'text-white/60 text-sm';
-
-  if (!isLoggedIn) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0 py-8 opacity-0 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">
-          Rewards
-        </h1>
-        <p className="text-white/60 text-sm mb-6">Log in to see your rewards.</p>
-        <div className={`${cardClass} stagger-1`}>
-          <Link
-            to="/"
-            className="flex w-full min-h-[48px] rounded-xl border border-white/40 text-white font-medium items-center justify-center hover:bg-white/10 transition-all duration-200 btn-interactive"
-          >
-            Log in
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
