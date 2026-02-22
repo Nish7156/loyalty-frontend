@@ -1,11 +1,22 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { getCustomerTokenIfPresent } from '../lib/api';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
+/** Centralized customer auth: only show login at / when logged out; once logged in, never ask again on /me, /history, /rewards. */
 export function UserLayout() {
   const location = useLocation();
-  const isMe = location.pathname === '/me';
-  const isHistory = location.pathname === '/history';
-  const isRewards = location.pathname === '/rewards';
+  const pathname = location.pathname;
+  const hasToken = !!getCustomerTokenIfPresent();
+  const isMe = pathname === '/me';
+  const isHistory = pathname === '/history';
+  const isRewards = pathname === '/rewards';
+
+  if (!hasToken && pathname !== '/' && pathname !== '/scan' && !pathname.startsWith('/scan/')) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+  if (hasToken && pathname === '/') {
+    return <Navigate to="/me" replace />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen min-h-[100dvh] bg-[var(--premium-bg)] text-white safe-area">

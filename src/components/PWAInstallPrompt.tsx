@@ -5,22 +5,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-const DISMISS_KEY = 'loyalty_pwa_install_dismissed';
-const DELAY_MS = 45 * 1000;
-
-function wasDismissed(): boolean {
-  try {
-    return localStorage.getItem(DISMISS_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function setDismissed(): void {
-  try {
-    localStorage.setItem(DISMISS_KEY, '1');
-  } catch {}
-}
+const DELAY_MS = 40 * 1000;
 
 export function PWAInstallPrompt() {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
@@ -43,10 +28,10 @@ export function PWAInstallPrompt() {
   }, []);
 
   useEffect(() => {
-    if (isStandalone || wasDismissed() || !installEvent) return;
+    if (isStandalone || !installEvent || showBanner) return;
     const t = setTimeout(() => setShowBanner(true), DELAY_MS);
     return () => clearTimeout(t);
-  }, [installEvent, isStandalone]);
+  }, [installEvent, isStandalone, showBanner]);
 
   const handleInstall = async () => {
     if (!installEvent) return;
@@ -58,7 +43,6 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowBanner(false);
-    setDismissed();
   };
 
   if (isStandalone || !showBanner || !installEvent) return null;

@@ -10,10 +10,6 @@ import { Loader } from '../../components/Loader';
 type Step = 'phone' | 'otp' | 'checkin' | 'done';
 type OtpMode = 'register' | 'customerLogin';
 
-function generateMpin(): string {
-  return String(1000 + Math.floor(Math.random() * 9000));
-}
-
 export function UserScanPage() {
   const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
@@ -23,6 +19,7 @@ export function UserScanPage() {
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
   const [otpMode, setOtpMode] = useState<OtpMode>('register');
+  const [registerName, setRegisterName] = useState('');
   const [amount, setAmount] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [error, setError] = useState('');
@@ -38,6 +35,7 @@ export function UserScanPage() {
 
   const isLoggedIn = !!getCustomerTokenIfPresent();
   const displayPhone = profile?.customer?.phoneNumber ?? phone;
+  const displayName = profile?.customer?.name?.trim() || customerName.trim() || displayPhone;
 
   useEffect(() => {
     const token = getCustomerTokenIfPresent();
@@ -49,6 +47,9 @@ export function UserScanPage() {
           setProfile(p);
           setPhone(p.customer.phoneNumber);
           setStep('checkin');
+          if (p.customer.name?.trim() && !customerName.trim()) {
+            setCustomerName(p.customer.name.trim());
+          }
           const store = p.storesVisited?.find((s) => s.branchId === branchId);
           setCurrentPartnerId(store?.partnerId ?? null);
         })
@@ -72,17 +73,17 @@ export function UserScanPage() {
       setStep('checkin');
     } catch {
       try {
-        const pin = generateMpin();
-        setMpin(pin);
-        await authApi.sendOtp(phone.trim(), pin);
+        const res = await authApi.sendOtp(phone.trim());
+        setMpin(res.otp ?? '');
         setOtpMode('register');
         setStep('otp');
         setOtp('');
-        // OTP (SMS) send – uncomment when ready: await authApi.sendOtp(phone.trim());
+        setRegisterName('');
       } catch {
         setOtpMode('register');
         setStep('otp');
         setOtp('');
+        setRegisterName('');
       }
     } finally {
       setLoading(false);
@@ -94,13 +95,11 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      const pin = generateMpin();
-      setMpin(pin);
-      await authApi.sendOtp(phone.trim(), pin);
+      const res = await authApi.sendOtp(phone.trim());
+      setMpin(res.otp ?? '');
       setOtpMode('customerLogin');
       setStep('otp');
       setOtp('');
-      // OTP (SMS) send – uncomment when ready: await authApi.sendOtp(phone.trim());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not send OTP');
     } finally {
@@ -110,6 +109,17 @@ export function UserScanPage() {
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (otpMode === 'register') {
+      const nameTrimmed = registerName.trim();
+      if (nameTrimmed.length < 2) {
+        setError('Please enter your name (at least 2 characters)');
+        return;
+      }
+      if (nameTrimmed.length > 200) {
+        setError('Name must be at most 200 characters');
+        return;
+      }
+    }
     setError('');
     setLoading(true);
     try {
@@ -122,9 +132,16 @@ export function UserScanPage() {
         setProfile(p);
         setStep('checkin');
       } else {
-        const res = await customersApi.register({ branchId, phoneNumber: phone.trim(), otp: otp.trim() });
+        const nameToSave = registerName.trim().slice(0, 200);
+        const res = await customersApi.register({
+          branchId,
+          phoneNumber: phone.trim(),
+          name: nameToSave,
+          otp: otp.trim(),
+        });
         setCustomerToken(res.access_token);
         setPhone(res.customer.phone);
+        setCustomerName(nameToSave);
         setStep('checkin');
       }
     } catch (e) {
@@ -291,9 +308,27 @@ export function UserScanPage() {
       {step === 'otp' && branchId && (
         <form onSubmit={handleOtpSubmit} className="space-y-5">
           <div className={cardClass}>
-            <p className="text-sm text-white/60 mb-1">Your 4-digit MPIN</p>
-            <p className="text-2xl font-mono font-bold text-cyan-300 tracking-[0.4em] mb-4">{mpin}</p>
-            <label className="block text-sm font-medium text-white/70 mb-2">Enter MPIN</label>
+            {otpMode === 'register' && (
+              <div className="mb-4">
+                <label htmlFor="register-name" className="block text-sm font-medium text-white/70 mb-2">Your name</label>
+                <input
+                  id="register-name"
+                  type="text"
+                  value={registerName}
+                  onChange={(e) => setRegisterName(e.target.value.slice(0, 200))}
+                  placeholder="e.g. Jane Doe"
+                  required
+                  autoComplete="name"
+                  className={`${inputClass} w-full`}
+                  minLength={2}
+                  maxLength={200}
+                />
+                <p className="text-xs text-white/50 mt-1">2–200 characters. This is how the store will see you.</p>
+              </div>
+            )}
+            <p className="text-sm text-white/60 mb-1">Your 4-digit verification code</p>
+            {mpin && <p className="text-2xl font-mono font-bold text-cyan-300 tracking-[0.4em] mb-4">{mpin}</p>}
+            <label className="block text-sm font-medium text-white/70 mb-2">Enter code</label>
             <input
               type="text"
               inputMode="numeric"
@@ -307,7 +342,7 @@ export function UserScanPage() {
             />
             {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
             <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
-              {loading ? 'Verifying…' : 'Send'}
+              {loading ? 'Verifying…' : otpMode === 'register' ? 'Complete registration' : 'Verify'}
             </button>
             <button type="button" onClick={() => { setStep('phone'); setError(''); }} className="w-full mt-2 min-h-[44px] rounded-xl text-white/50 text-sm font-medium hover:text-white/80 hover:bg-white/5 transition">
               Change number
@@ -318,7 +353,7 @@ export function UserScanPage() {
 
       {step === 'checkin' && (
         <>
-          <p className="text-white/60 text-sm mb-4">Check-in as {displayPhone}</p>
+          <p className="text-white/60 text-sm mb-4">Check-in as {displayName}</p>
           {activeRewardsForStore.length > 0 && (
             <div className={`${cardClass} mb-4 border-cyan-500/30`}>
               <h2 className="font-semibold bg-gradient-to-r from-cyan-300 to-cyan-200/80 bg-clip-text text-transparent mb-3">Use a reward</h2>

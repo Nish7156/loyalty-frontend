@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 
-function generateMpin(): string {
-  return String(1000 + Math.floor(Math.random() * 9000));
-}
-
 export function CustomerLoginPage() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
@@ -21,12 +17,10 @@ export function CustomerLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const pin = generateMpin();
-      setMpin(pin);
-      await authApi.sendOtp(phone.trim(), pin);
+      const res = await authApi.sendOtp(phone.trim());
+      setMpin(res.otp ?? '');
       setStep('otp');
       setOtp('');
-      // OTP (SMS) send – uncomment when ready: await authApi.sendOtp(phone.trim());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not send OTP');
     } finally {
@@ -97,9 +91,9 @@ export function CustomerLoginPage() {
       {step === 'otp' && (
         <form onSubmit={handleOtpSubmit} className="space-y-5">
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]">
-            <p className="text-sm text-white/60 mb-1">Your 4-digit MPIN</p>
-            <p className="text-2xl font-mono font-bold text-cyan-300 tracking-[0.4em] mb-4">{mpin}</p>
-            <label className="block text-sm font-medium text-white/70 mb-2">Enter MPIN</label>
+            <p className="text-sm text-white/60 mb-1">Your 4-digit verification code</p>
+            {mpin && <p className="text-2xl font-mono font-bold text-cyan-300 tracking-[0.4em] mb-4">{mpin}</p>}
+            <label className="block text-sm font-medium text-white/70 mb-2">Enter code</label>
             <input
               type="text"
               inputMode="numeric"

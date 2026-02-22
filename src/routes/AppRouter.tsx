@@ -6,8 +6,6 @@ import { SellerLayout } from '../layouts/SellerLayout';
 import { OwnerLayout } from '../layouts/OwnerLayout';
 import { UserLayout } from '../layouts/UserLayout';
 import { Loader } from '../components/Loader';
-import { CustomerGuard } from '../components/CustomerGuard';
-import { getCustomerTokenIfPresent } from '../lib/api';
 import { LoginPage } from '../features/auth/LoginPage';
 import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
@@ -41,11 +39,11 @@ export function AppRouter() {
         <Route path="/staff-login" element={<Navigate to="/login" replace />} />
 
         <Route path="/" element={<UserLayout />}>
-          <Route index element={getCustomerTokenIfPresent() ? <Navigate to="/me" replace /> : <CustomerLoginPage />} />
+          <Route index element={<CustomerLoginPage />} />
           <Route path="scan" element={<Navigate to="/" replace />} />
           <Route path="scan/:storeId" element={<UserScanPage />} />
-          <Route path="history" element={<CustomerGuard><UserHistoryPage /></CustomerGuard>} />
-          <Route path="rewards" element={<CustomerGuard><UserRewardsPage /></CustomerGuard>} />
+          <Route path="history" element={<UserHistoryPage />} />
+          <Route path="rewards" element={<UserRewardsPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 

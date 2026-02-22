@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { customersApi, getCustomerTokenIfPresent } from '../../lib/api';
+import { customersApi } from '../../lib/api';
 import { Loader } from '../../components/Loader';
 import type { CustomerHistory, HistoryActivity, HistoryRedeemedReward } from '../../lib/api';
 
@@ -82,10 +82,6 @@ export function UserHistoryPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!getCustomerTokenIfPresent()) {
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError('');
     customersApi

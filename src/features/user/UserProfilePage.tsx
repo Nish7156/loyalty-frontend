@@ -187,7 +187,10 @@ export function UserProfilePage() {
         </div>
       </div>
 
-      <h2 className={`${sectionTitleClass} opacity-0 animate-fade-in-up stagger-2`}>Stores you use</h2>
+      <div className="opacity-0 animate-fade-in-up stagger-2">
+        <h2 className={sectionTitleClass}>Stores you use</h2>
+        <p className="text-white/50 text-sm mt-0.5">Your progress and what you win at each store.</p>
+      </div>
       {storesVisited.length === 0 ? (
         <div className={`${cardClass} stagger-2`}>
           <p className={descClass}>No store visits yet. Scan a store QR to check in — your first visit counts.</p>
@@ -200,6 +203,8 @@ export function UserProfilePage() {
             const description = store.rewardDescription || 'Free reward';
             const current = store.streakCurrentCount ?? 0;
             const periodStart = store.streakPeriodStartedAt;
+            const progressPct = threshold > 0 ? Math.min(100, (current / threshold) * 100) : 0;
+            const isComplete = threshold > 0 && current >= threshold;
             return (
               <div
                 key={store.branchId}
@@ -210,31 +215,39 @@ export function UserProfilePage() {
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-white text-lg truncate">{store.partnerName}</p>
                     <p className={`${descClass} mt-0.5 truncate`}>{store.branchName}</p>
-                    {(threshold > 0 && windowDays > 0) && (
-                      <p className="text-white/50 text-xs mt-1.5">
-                        {threshold} purchases in {windowDays} days → {description}
-                      </p>
-                    )}
-                    {periodStart && (
-                      <p className="text-white/50 text-xs mt-0.5">Period started: {formatDate(periodStart)}</p>
-                    )}
-                    {(threshold > 0) && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <div className="h-2 flex-1 max-w-[140px] rounded-full bg-white/10 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-cyan-400/90 animate-progress-fill"
-                            style={{ width: `${Math.min(100, (current / threshold) * 100)}%` }}
-                          />
-                        </div>
-                        <span className="text-cyan-300 font-medium text-sm tabular-nums">{current}/{threshold}</span>
-                      </div>
-                    )}
                   </div>
                   <div className="text-right text-sm shrink-0">
                     <p className={descClass}>{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
                     <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
                   </div>
                 </div>
+                {(threshold > 0 && windowDays > 0) && (
+                  <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 animate-reward-glow">
+                    <p className="text-xs font-medium uppercase tracking-wider text-cyan-300/90 mb-1">You win when you complete</p>
+                    <p className="text-sm text-white/90 font-medium">
+                      {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
+                    </p>
+                    <p className="mt-1.5 text-base font-semibold bg-gradient-to-r from-cyan-200 to-cyan-400/90 bg-clip-text text-transparent">
+                      → {description}
+                    </p>
+                  </div>
+                )}
+                {periodStart && (
+                  <p className="text-white/50 text-xs mt-2">Period started: {formatDate(periodStart)}</p>
+                )}
+                {(threshold > 0) && (
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="h-2.5 flex-1 max-w-[180px] rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 animate-progress-fill transition-[width] duration-500"
+                        style={{ width: `${progressPct}%` }}
+                      />
+                    </div>
+                    <span className={`font-semibold text-sm tabular-nums ${isComplete ? 'text-emerald-400' : 'text-cyan-300'}`}>
+                      {current}/{threshold}
+                    </span>
+                  </div>
+                )}
               </div>
             );
           })}

@@ -50,6 +50,7 @@ export interface Staff {
 
 export interface Customer {
   phoneNumber: string;
+  name?: string | null;
 }
 
 export interface StoreVisit {
@@ -270,7 +271,7 @@ export const customersApi = {
     api<CustomerHistory>('/customers/me/history', {}, true),
   create: (body: { phoneNumber: string }) =>
     api<Customer>('/customers', { method: 'POST', body: JSON.stringify(body) }),
-  register: (body: { branchId: string; phoneNumber: string; otp: string }) =>
+  register: (body: { branchId: string; phoneNumber: string; name: string; otp: string }) =>
     api<CustomerLoginResponse>('/customers/register', { method: 'POST', body: JSON.stringify(body) }),
 };
 
