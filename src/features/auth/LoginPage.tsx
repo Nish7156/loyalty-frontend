@@ -64,7 +64,7 @@ export function LoginPage() {
             <Input
               label="Phone"
               type="tel"
-              placeholder="+15550000000"
+              placeholder="+91 98765 43210"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required

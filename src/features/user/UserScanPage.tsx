@@ -27,6 +27,7 @@ export function UserScanPage() {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const [lastRedeemedCode, setLastRedeemedCode] = useState<string | null>(null);
   const [currentPartnerId, setCurrentPartnerId] = useState<string | null>(null);
   const [lastActivityId, setLastActivityId] = useState<string | null>(null);
   const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
@@ -176,10 +177,12 @@ export function UserScanPage() {
   const handleRedeem = async (rewardId: string) => {
     setRedeemingId(rewardId);
     setError('');
+    setLastRedeemedCode(null);
     try {
-      await rewardsApi.redeem(rewardId);
+      const redeemed = await rewardsApi.redeem(rewardId);
       const p = await customersApi.getMyProfile();
       setProfile(p);
+      if (redeemed.redemptionCode) setLastRedeemedCode(redeemed.redemptionCode);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Redeem failed');
     } finally {
@@ -292,7 +295,7 @@ export function UserScanPage() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+15551234567"
+              placeholder="+91 98765 43210"
               required
               autoComplete="tel"
               className={inputClass}
@@ -371,6 +374,16 @@ export function UserScanPage() {
             }
             return null;
           })()}
+          {lastRedeemedCode && (
+            <div className={`${cardClass} mb-4 border-emerald-500/40 bg-emerald-500/10`}>
+              <p className="text-sm text-white/80 mb-1">Your reward code — show this to staff</p>
+              <p className="text-2xl font-mono font-bold tracking-[0.3em] text-emerald-300">{lastRedeemedCode}</p>
+              <p className="text-xs text-white/50 mt-2">Staff will enter this code to mark your reward as given.</p>
+              <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm text-cyan-400 font-medium hover:text-cyan-300">
+                Dismiss
+              </button>
+            </div>
+          )}
           {activeRewardsForStore.length > 0 && (
             <div className={`${cardClass} mb-4 border-cyan-500/30`}>
               <h2 className="font-semibold bg-gradient-to-r from-cyan-300 to-cyan-200/80 bg-clip-text text-transparent mb-3">Use a reward</h2>

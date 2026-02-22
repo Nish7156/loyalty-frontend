@@ -77,7 +77,7 @@ export function PartnersPage() {
               label="Owner Phone"
               value={ownerPhone}
               onChange={(e) => setOwnerPhone(e.target.value)}
-              placeholder="+15550001234"
+              placeholder="+91 98765 43210"
               required
             />
             <p className="text-xs text-gray-500 mt-1">

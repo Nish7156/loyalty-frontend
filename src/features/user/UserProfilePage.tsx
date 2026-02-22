@@ -111,7 +111,7 @@ export function UserProfilePage() {
           <input
             name="phone"
             type="tel"
-            placeholder="+15551234567"
+            placeholder="+91 98765 43210"
             className="w-full min-h-[48px] border border-white/20 rounded-xl px-4 py-3 bg-black/30 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition-all duration-200"
             required
           />

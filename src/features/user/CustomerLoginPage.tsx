@@ -71,7 +71,7 @@ export function CustomerLoginPage() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+15551234567"
+              placeholder="+91 98765 43210"
               required
               autoComplete="tel"
               className="w-full min-h-[48px] rounded-xl border border-white/20 bg-black/30 px-4 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition"

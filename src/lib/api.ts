@@ -100,6 +100,8 @@ export interface Reward {
   createdAt: string;
   redeemedAt?: string;
   redeemedBranchId?: string;
+  redemptionCode?: string | null;
+  redemptionCompletedAt?: string | null;
   customer?: Customer;
   partner?: Partner;
   redeemedBranch?: Branch;
@@ -300,4 +302,11 @@ export const rewardsApi = {
     api<Reward[]>(`/rewards/customer/${encodeURIComponent(customerId)}`),
   redeem: (id: string) =>
     api<Reward>(`/rewards/${id}/redeem`, { method: 'PATCH' }, true),
+  pendingRedemptions: () =>
+    api<Reward[]>('/rewards/pending-redemptions'),
+  completeByCode: (code: string) =>
+    api<Reward>('/rewards/complete-by-code', {
+      method: 'POST',
+      body: JSON.stringify({ code: code.trim().toUpperCase() }),
+    }),
 };
