@@ -32,6 +32,7 @@ export function UserScanPage() {
   const [lastActivityId, setLastActivityId] = useState<string | null>(null);
   const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [minCheckInAmount, setMinCheckInAmount] = useState<number | null>(null);
   const socketRef = useRef<ReturnType<typeof createBranchSocket> | null>(null);
 
   const isLoggedIn = !!getCustomerTokenIfPresent();
@@ -155,6 +156,11 @@ export function UserScanPage() {
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const amountNum = amount.trim() ? Number(amount) : undefined;
+    if (minCheckInAmount != null && minCheckInAmount > 0 && (amountNum == null || amountNum < minCheckInAmount)) {
+      setError(`Minimum amount for this store is ${minCheckInAmount}. Enter at least ${minCheckInAmount} or leave amount empty.`);
+      return;
+    }
     setLoading(true);
     try {
       const nameStr = (profile?.customer?.name ?? '').trim().slice(0, 200);
@@ -162,7 +168,7 @@ export function UserScanPage() {
         branchId,
         phoneNumber: displayPhone,
         ...(nameStr ? { customerName: nameStr } : {}),
-        value: amount.trim() ? Number(amount) : undefined,
+        value: amountNum,
       });
       setLastActivityId(result.id);
       setCheckinStatus('PENDING');
@@ -199,12 +205,16 @@ export function UserScanPage() {
   };
 
   useEffect(() => {
-    if (step !== 'checkin' || !branchId || !profile || currentPartnerId != null) return;
+    if (step !== 'checkin' || !branchId || !profile) return;
     branchesApi
       .get(branchId)
-      .then((b) => setCurrentPartnerId(b.partnerId))
+      .then((b) => {
+        setCurrentPartnerId(b.partnerId);
+        const min = (b.settings as { minCheckInAmount?: number } | undefined)?.minCheckInAmount;
+        setMinCheckInAmount(min != null && typeof min === 'number' && min >= 0 ? min : null);
+      })
       .catch(() => {});
-  }, [step, branchId, profile, currentPartnerId]);
+  }, [step, branchId, profile]);
 
   useEffect(() => {
     if (step !== 'done' || !branchId || !lastActivityId) return;
@@ -411,12 +421,15 @@ export function UserScanPage() {
               <input
                 type="number"
                 step="0.01"
-                min="0"
+                min={minCheckInAmount ?? 0}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
                 className={inputClass}
               />
+              {minCheckInAmount != null && minCheckInAmount > 0 && (
+                <p className="text-white/50 text-xs mt-1">Minimum amount for this store: {minCheckInAmount}. Below that, check-in won&apos;t be accepted.</p>
+              )}
               {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
               <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
                 {loading ? 'Submitting…' : 'Submit check-in'}

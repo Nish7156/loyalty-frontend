@@ -23,6 +23,7 @@ export function BranchesPage() {
   const [streakThreshold, setStreakThreshold] = useState<number>(5);
   const [rewardWindowDays, setRewardWindowDays] = useState<number>(30);
   const [rewardDescription, setRewardDescription] = useState('');
+  const [minCheckInAmount, setMinCheckInAmount] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
   const [editCooldownHours, setEditCooldownHours] = useState<number>(0);
@@ -30,6 +31,7 @@ export function BranchesPage() {
   const [editStreakThreshold, setEditStreakThreshold] = useState<number>(5);
   const [editRewardWindowDays, setEditRewardWindowDays] = useState<number>(30);
   const [editRewardDescription, setEditRewardDescription] = useState('');
+  const [editMinCheckInAmount, setEditMinCheckInAmount] = useState<string>('');
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   // Only show partners owned by the current user so created branches appear in the list
@@ -78,6 +80,7 @@ export function BranchesPage() {
     setSubmitting(true);
     setError('');
     try {
+      const minAmount = minCheckInAmount.trim() ? Number(minCheckInAmount) : undefined;
       await branchesApi.create({
         branchName,
         partnerId,
@@ -86,6 +89,7 @@ export function BranchesPage() {
           streakThreshold,
           rewardWindowDays,
           rewardDescription: rewardDescription || undefined,
+          ...(minAmount != null && !Number.isNaN(minAmount) && minAmount >= 0 ? { minCheckInAmount: minAmount } : {}),
         },
       });
       setBranchName('');
@@ -94,6 +98,7 @@ export function BranchesPage() {
       setStreakThreshold(5);
       setRewardWindowDays(30);
       setRewardDescription('');
+      setMinCheckInAmount('');
       setShowForm(false);
       load();
     } catch (e) {
@@ -194,6 +199,19 @@ export function BranchesPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Min check-in amount</label>
+            <p className="text-xs text-gray-500 mb-1">User cannot submit a check-in with amount below this. Leave empty for no minimum.</p>
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="e.g. 100"
+              value={minCheckInAmount}
+              onChange={(e) => setMinCheckInAmount(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
           <div className="flex flex-wrap gap-2 mt-4">
             <Button type="submit" disabled={submitting} className="min-h-[44px] flex-1 sm:flex-none">Create</Button>
             <Button type="button" variant="secondary" onClick={() => setShowForm(false)} className="min-h-[44px] flex-1 sm:flex-none">Cancel</Button>
@@ -208,6 +226,7 @@ export function BranchesPage() {
             cooldownMinutes?: number;
             rewardWindowDays?: number;
             rewardDescription?: string;
+            minCheckInAmount?: number;
           } | undefined;
           const location = b.location as { lat: number; lng: number } | undefined;
           const staffCount = Array.isArray(b.staff) ? b.staff.length : 0;
@@ -225,6 +244,7 @@ export function BranchesPage() {
           const currentThreshold = settings?.streakThreshold ?? 5;
           const currentWindowDays = settings?.rewardWindowDays ?? 30;
           const currentRewardDesc = settings?.rewardDescription ?? '';
+          const currentMinAmount = settings?.minCheckInAmount;
           const isEditing = editingBranchId === b.id;
           return (
             <div key={b.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200 min-w-0">
@@ -267,6 +287,7 @@ export function BranchesPage() {
                             setEditSubmitting(true);
                             setError('');
                             try {
+                              const minAmountVal = editMinCheckInAmount.trim() ? Number(editMinCheckInAmount) : undefined;
                               await branchesApi.update(b.id, {
                                 settings: {
                                   ...settings,
@@ -274,6 +295,7 @@ export function BranchesPage() {
                                   streakThreshold: editStreakThreshold,
                                   rewardWindowDays: editRewardWindowDays,
                                   rewardDescription: editRewardDescription || undefined,
+                                  minCheckInAmount: minAmountVal != null && !Number.isNaN(minAmountVal) && minAmountVal >= 0 ? minAmountVal : undefined,
                                 },
                               });
                               setEditingBranchId(null);
@@ -304,6 +326,7 @@ export function BranchesPage() {
                             setEditStreakThreshold(currentThreshold);
                             setEditRewardWindowDays(currentWindowDays);
                             setEditRewardDescription(currentRewardDesc);
+                            setEditMinCheckInAmount(currentMinAmount != null ? String(currentMinAmount) : '');
                           }}
                         >
                           Change
@@ -355,11 +378,31 @@ export function BranchesPage() {
                             setEditStreakThreshold(currentThreshold);
                             setEditRewardWindowDays(currentWindowDays);
                             setEditRewardDescription(currentRewardDesc);
+                            setEditMinCheckInAmount(currentMinAmount != null ? String(currentMinAmount) : '');
                           }}
                         >
                           Change
                         </Button>
                       </>
+                    )}
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600">
+                    <strong>Min check-in amount:</strong>{' '}
+                    {isEditing ? (
+                      <span className="inline-flex flex-wrap items-center gap-2 mt-1">
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          placeholder="No minimum"
+                          value={editMinCheckInAmount}
+                          onChange={(e) => setEditMinCheckInAmount(e.target.value)}
+                          className="w-24 border border-gray-300 rounded px-2 py-1"
+                        />
+                        <span className="text-gray-500">(user cannot enter amount below this; empty = no minimum)</span>
+                      </span>
+                    ) : (
+                      currentMinAmount != null && currentMinAmount > 0 ? `${currentMinAmount}` : 'No minimum'
                     )}
                   </div>
                   {location && (
