@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { customersApi } from '../../lib/api';
+import { customersApi, rewardsApi } from '../../lib/api';
 import { Loader } from '../../components/Loader';
+import { Button } from '../../components/Button';
 import type { CustomerProfile, Reward } from '../../lib/api';
 
 function formatDate(s: string) {
@@ -15,16 +16,37 @@ export function UserRewardsPage() {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const [lastRedeemedCode, setLastRedeemedCode] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
+  const loadProfile = (showLoader = true) => {
+    if (showLoader) setLoading(true);
     setError('');
     customersApi
       .getMyProfile()
       .then(setProfile)
       .catch((e) => setError(e instanceof Error ? e.message : 'Could not load rewards'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadProfile();
   }, []);
+
+  const handleRedeem = async (rewardId: string) => {
+    setRedeemingId(rewardId);
+    setError('');
+    setLastRedeemedCode(null);
+    try {
+      const redeemed = await rewardsApi.redeem(rewardId);
+      if (redeemed.redemptionCode) setLastRedeemedCode(redeemed.redemptionCode);
+      loadProfile(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Redeem failed');
+    } finally {
+      setRedeemingId(null);
+    }
+  };
 
   const rewards: Reward[] = profile?.customer?.rewards ?? [];
   const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale opacity-0 animate-fade-in-up';
@@ -56,6 +78,18 @@ export function UserRewardsPage() {
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
         Rewards
       </h1>
+      <p className="text-white/60 text-sm -mt-2">Use your rewards at the store — tap Redeem and show the code to staff.</p>
+
+      {lastRedeemedCode && (
+        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5 opacity-0 animate-fade-in-up">
+          <p className="text-sm text-white/80 mb-1">Your reward code — show this to staff at the store</p>
+          <p className="text-2xl font-mono font-bold tracking-[0.3em] text-emerald-300">{lastRedeemedCode}</p>
+          <p className="text-xs text-white/50 mt-2">Staff will enter this code to give you your reward.</p>
+          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm text-cyan-400 font-medium hover:text-cyan-300">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {rewards.length === 0 ? (
         <div className={`${cardClass} stagger-1`}>
@@ -69,7 +103,7 @@ export function UserRewardsPage() {
               className={cardClass}
               style={{ animationDelay: `${0.12 + index * 0.08}s` }}
             >
-              <div className="flex justify-between items-start gap-3">
+              <div className="flex flex-wrap justify-between items-start gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-white text-lg truncate">{r.partner?.businessName ?? 'Store'}</p>
                   <span
@@ -85,6 +119,15 @@ export function UserRewardsPage() {
                     <p className="text-white/50 text-sm mt-2">Expires {formatDate(r.expiryDate)}</p>
                   )}
                 </div>
+                {r.status === 'ACTIVE' && (
+                  <Button
+                    onClick={() => handleRedeem(r.id)}
+                    disabled={!!redeemingId}
+                    className="shrink-0 min-h-[44px] bg-cyan-500/90 hover:bg-cyan-400 text-black font-semibold"
+                  >
+                    {redeemingId === r.id ? 'Redeeming…' : 'Redeem'}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
