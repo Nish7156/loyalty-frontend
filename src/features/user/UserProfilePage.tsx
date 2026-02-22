@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
-import { Loader } from '../../components/Loader';
+import { ProfileSkeleton } from '../../components/Skeleton';
 import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
@@ -84,8 +84,8 @@ export function UserProfilePage() {
 
   if (getCustomerTokenIfPresent() && loading && !profile) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <Loader message="Loading your profile…" />
+      <div className="max-w-md mx-auto w-full min-w-0">
+        <ProfileSkeleton />
       </div>
     );
   }
@@ -119,8 +119,8 @@ export function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <Loader message="Loading…" />
+      <div className="max-w-md mx-auto w-full min-w-0">
+        <ProfileSkeleton />
       </div>
     );
   }

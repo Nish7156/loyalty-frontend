@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { customersApi } from '../../lib/api';
-import { Loader } from '../../components/Loader';
+import { HistorySkeleton } from '../../components/Skeleton';
 import type { CustomerHistory, HistoryActivity, HistoryRedeemedReward } from '../../lib/api';
 
 function formatDateTime(s: string) {
@@ -98,8 +98,8 @@ export function UserHistoryPage() {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <Loader message="Loading history…" />
+      <div className="max-w-md mx-auto w-full min-w-0">
+        <HistorySkeleton />
       </div>
     );
   }

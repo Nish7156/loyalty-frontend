@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { customersApi, rewardsApi } from '../../lib/api';
-import { Loader } from '../../components/Loader';
+import { RewardsSkeleton } from '../../components/Skeleton';
 import { Button } from '../../components/Button';
 import type { CustomerProfile, Reward } from '../../lib/api';
 
@@ -54,8 +54,8 @@ export function UserRewardsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 min-h-[50vh] flex items-center justify-center">
-        <Loader message="Loading rewards…" />
+      <div className="max-w-md mx-auto w-full min-w-0">
+        <RewardsSkeleton />
       </div>
     );
   }

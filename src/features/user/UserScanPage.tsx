@@ -5,7 +5,7 @@ import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustome
 import type { CustomerProfile, Reward } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
 import { Button } from '../../components/Button';
-import { Loader } from '../../components/Loader';
+import { ScanSkeleton } from '../../components/Skeleton';
 
 type Step = 'phone' | 'otp' | 'checkin' | 'done';
 type OtpMode = 'register' | 'customerLogin';
@@ -259,8 +259,8 @@ export function UserScanPage() {
 
   if (profileLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] px-4">
-        <Loader message="Loading…" />
+      <div className="max-w-md mx-auto w-full min-w-0 px-4">
+        <ScanSkeleton />
       </div>
     );
   }
@@ -283,8 +283,8 @@ export function UserScanPage() {
       )}
 
       {step === 'phone' && branchId && getCustomerTokenIfPresent() && (
-        <div className="flex justify-center py-6">
-          <Loader message="Loading…" useDots />
+        <div className="max-w-md mx-auto w-full min-w-0">
+          <ScanSkeleton />
         </div>
       )}
       {step === 'phone' && branchId && !getCustomerTokenIfPresent() && (
