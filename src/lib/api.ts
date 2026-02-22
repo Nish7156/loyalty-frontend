@@ -160,6 +160,24 @@ export function getCustomerTokenIfPresent(): string | null {
   return getCustomerToken();
 }
 
+/** Decode customer JWT payload to get phone so socket can connect without waiting for getMyProfile(). */
+export function getCustomerPhoneFromToken(): string | null {
+  const token = getCustomerToken();
+  if (!token) return null;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padding = payloadBase64.length % 4;
+    const padded = padding ? payloadBase64 + '='.repeat(4 - padding) : payloadBase64;
+    const payload = JSON.parse(atob(padded)) as { phone?: string; type?: string };
+    if (payload.type === 'customer' && typeof payload.phone === 'string') return payload.phone;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function getAuthHeader(): string | null {
   const t = getToken();
   return t ? `Bearer ${t}` : null;

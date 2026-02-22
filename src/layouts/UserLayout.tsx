@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { getCustomerTokenIfPresent, customersApi } from '../lib/api';
+import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi } from '../lib/api';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
@@ -21,7 +21,12 @@ export function UserLayout() {
 
   useEffect(() => {
     if (!hasToken) return;
-    customersApi.getMyProfile().then((p) => setCustomerPhone(p.customer.phoneNumber)).catch(() => {});
+    const phone = getCustomerPhoneFromToken();
+    if (phone) {
+      setCustomerPhone(phone);
+    } else {
+      customersApi.getMyProfile().then((p) => setCustomerPhone(p.customer.phoneNumber)).catch(() => {});
+    }
   }, [hasToken]);
 
   useEffect(() => {
