@@ -155,6 +155,9 @@ export function UserProfilePage() {
       </div>
 
       <div className={`${cardClass} stagger-1`}>
+        {customer.name && (
+          <p className="font-semibold text-white text-lg truncate mb-1">{customer.name}</p>
+        )}
         <p className={descClass}>Member</p>
         <p className="font-mono text-base sm:text-lg tracking-wide text-white break-all mt-0.5">{customer.phoneNumber}</p>
         {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
