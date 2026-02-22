@@ -68,8 +68,19 @@ export function PartnersPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             >
               <option value="F&B">F&B</option>
-              <option value="Salon">Salon</option>
-              <option value="Fitness">Fitness</option>
+              <option value="Retail">Retail</option>
+              <option value="Grocery">Grocery</option>
+              {/* list down max 10 industries */}
+              <option value="Automotive">Automotive</option>
+              <option value="Health & Wellness">Health & Wellness</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Food & Beverage">Food & Beverage</option>
+              <option value="Gaming">Gaming</option>
+              <option value="Hospitality">Hospitality</option>
+              <option value="Retail">Retail</option>
+              <option value="Technology">Technology</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div className="mt-2">
