@@ -156,7 +156,7 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      const nameStr = typeof customerName === 'string' ? customerName.trim().slice(0, 200) : '';
+      const nameStr = (profile?.customer?.name ?? '').trim().slice(0, 200);
       const result = await activityApi.checkIn({
         branchId,
         phoneNumber: displayPhone,
@@ -354,6 +354,23 @@ export function UserScanPage() {
       {step === 'checkin' && (
         <>
           <p className="text-white/60 text-sm mb-4">Check-in as {displayName}</p>
+          {(() => {
+            const storeForBranch = profile?.storesVisited?.find((s) => s.branchId === branchId);
+            const threshold = storeForBranch?.rewardThreshold ?? 0;
+            const windowDays = storeForBranch?.rewardWindowDays ?? 30;
+            const rewardDesc = storeForBranch?.rewardDescription || 'Free reward';
+            if (threshold > 0 && windowDays > 0) {
+              return (
+                <div className="mb-4 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3">
+                  <p className="text-xs font-medium uppercase tracking-wider text-cyan-300/90">What you win here</p>
+                  <p className="text-sm text-white/90 mt-0.5">
+                    {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days → <span className="font-semibold text-cyan-200">{rewardDesc}</span>
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()}
           {activeRewardsForStore.length > 0 && (
             <div className={`${cardClass} mb-4 border-cyan-500/30`}>
               <h2 className="font-semibold bg-gradient-to-r from-cyan-300 to-cyan-200/80 bg-clip-text text-transparent mb-3">Use a reward</h2>
@@ -377,16 +394,7 @@ export function UserScanPage() {
           )}
           <form onSubmit={handleCheckIn} className="space-y-5">
             <div className={cardClass}>
-              <label className="block text-sm font-medium text-white/70 mb-2">Name</label>
-              <input
-                type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(String(e.target.value ?? '').slice(0, 200))}
-                placeholder="Your name"
-                maxLength={200}
-                className={inputClass}
-              />
-              <label className="block text-sm font-medium text-white/70 mb-2 mt-4">Amount</label>
+              <label className="block text-sm font-medium text-white/70 mb-2">Amount</label>
               <input
                 type="number"
                 step="0.01"
@@ -428,7 +436,7 @@ export function UserScanPage() {
               <p className="text-sm text-white/60 mt-1">Staff declined this check-in.</p>
             </>
           )}
-          <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setCustomerName(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
+          <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
             Another check-in
           </button>
         </div>
