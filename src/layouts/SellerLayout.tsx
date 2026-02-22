@@ -49,6 +49,10 @@ export function SellerLayout() {
           <span className="text-xl">📜</span>
           <span className="text-xs">History</span>
         </Link>
+        <Link to="/seller/rewards" className="flex flex-col items-center justify-center min-h-[56px] min-w-[64px] text-gray-600 hover:text-blue-600 active:text-blue-700 touch-manipulation">
+          <span className="text-xl">🎁</span>
+          <span className="text-xs">Rewards</span>
+        </Link>
         <Link to="/seller/qr" className="flex flex-col items-center justify-center min-h-[56px] min-w-[64px] text-gray-600 hover:text-blue-600 active:text-blue-700 touch-manipulation">
           <span className="text-xl">📱</span>
           <span className="text-xs">QR</span>

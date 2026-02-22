@@ -22,6 +22,7 @@ const SellerDashboard = lazy(() => import('../features/seller/SellerDashboard').
 const ApprovePage = lazy(() => import('../features/seller/ApprovePage').then((m) => ({ default: m.ApprovePage })));
 const SellerHistory = lazy(() => import('../features/seller/SellerHistory').then((m) => ({ default: m.SellerHistory })));
 const StoreQRPage = lazy(() => import('../features/seller/StoreQRPage').then((m) => ({ default: m.StoreQRPage })));
+const StaffRewardsPage = lazy(() => import('../features/seller/StaffRewardsPage').then((m) => ({ default: m.StaffRewardsPage })));
 
 function Fallback() {
   return (
@@ -52,6 +53,7 @@ export function AppRouter() {
             <Route path="dashboard" element={<SellerDashboard />} />
             <Route path="approve" element={<ApprovePage />} />
             <Route path="history" element={<SellerHistory />} />
+            <Route path="rewards" element={<StaffRewardsPage />} />
             <Route path="qr" element={<StoreQRPage />} />
           </Route>
         </Route>

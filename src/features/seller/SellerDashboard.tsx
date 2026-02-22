@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { activityApi, rewardsApi } from '../../lib/api';
+import { activityApi } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
-import type { Activity, Reward } from '../../lib/api';
+import type { Activity } from '../../lib/api';
 import { Button } from '../../components/Button';
 
 function normalizeActivity(p: unknown): Activity {
@@ -33,9 +33,6 @@ export function SellerDashboard() {
   const [rejectConfirmId, setRejectConfirmId] = useState<string | null>(null);
   const [amountOverrides, setAmountOverrides] = useState<Record<string, string>>({});
   const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-  const [pendingRewards, setPendingRewards] = useState<Reward[]>([]);
-  const [completingCode, setCompletingCode] = useState<string | null>(null);
-  const [codeInput, setCodeInput] = useState('');
 
   const branchId = auth.type === 'staff' ? auth.staff.branchId : '';
 
@@ -51,13 +48,6 @@ export function SellerDashboard() {
   useEffect(() => {
     fetchList();
   }, [fetchList]);
-
-  useEffect(() => {
-    if (!branchId) return;
-    rewardsApi.pendingRedemptions()
-      .then(setPendingRewards)
-      .catch(() => setPendingRewards([]));
-  }, [branchId]);
 
   useEffect(() => {
     if (!branchId) return;
@@ -119,20 +109,6 @@ export function SellerDashboard() {
       handleStatus(rejectConfirmId, 'REJECTED');
     }
   };
-
-  const handleCompleteReward = useCallback(async (code: string) => {
-    if (!code) return;
-    setCompletingCode(code);
-    setError('');
-    try {
-      await rewardsApi.completeByCode(code);
-      setPendingRewards((prev) => prev.filter((r) => r.redemptionCode !== code));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to complete');
-    } finally {
-      setCompletingCode(null);
-    }
-  }, []);
 
   if (loading) return <p className="text-gray-600">Loading…</p>;
   if (error) return <p className="text-red-600 text-sm mb-2">{error}</p>;
@@ -199,59 +175,6 @@ export function SellerDashboard() {
                     </Button>
                   </div>
                 </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      <h2 className="text-base font-bold mt-6 mb-2">Reward claims</h2>
-      <p className="text-gray-500 text-sm mb-3">Customer shows their code; mark complete when you have given the reward.</p>
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <input
-          type="text"
-          value={codeInput}
-          onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 8))}
-          placeholder="Enter code"
-          className="min-h-[44px] w-32 rounded-lg border border-gray-300 px-3 font-mono uppercase"
-          maxLength={8}
-        />
-        <Button
-          onClick={() => {
-            const c = codeInput.trim().toUpperCase();
-            if (c) {
-              handleCompleteReward(c);
-              setCodeInput('');
-            }
-          }}
-          disabled={!codeInput.trim() || completingCode !== null}
-          className="min-h-[44px] bg-emerald-600 hover:bg-emerald-500 text-white"
-        >
-          {completingCode ? '…' : 'Complete by code'}
-        </Button>
-      </div>
-      {pendingRewards.length === 0 ? (
-        <p className="text-gray-500 text-sm">No pending reward claims.</p>
-      ) : (
-        <ul className="space-y-3">
-          {pendingRewards.map((r) => {
-            const code = r.redemptionCode ?? '';
-            const isCompleting = completingCode === code;
-            return (
-              <li key={r.id} className="bg-white rounded-xl shadow border border-gray-100 p-4 flex flex-wrap items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-mono font-semibold text-gray-900">{code}</p>
-                  <p className="text-gray-600 text-sm">{r.customerId}</p>
-                  {r.customer?.name && <p className="text-gray-500 text-sm">{r.customer.name}</p>}
-                  <p className="text-gray-500 text-xs mt-0.5">{r.partner?.businessName}</p>
-                </div>
-                <Button
-                  onClick={() => handleCompleteReward(code)}
-                  disabled={isCompleting}
-                  className="min-h-[44px] bg-emerald-600 hover:bg-emerald-500 text-white font-medium shrink-0"
-                >
-                  {isCompleting ? '…' : 'Mark complete'}
-                </Button>
               </li>
             );
           })}
