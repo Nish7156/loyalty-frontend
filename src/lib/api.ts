@@ -171,7 +171,10 @@ export function getCustomerPhoneFromToken(): string | null {
     const padding = payloadBase64.length % 4;
     const padded = padding ? payloadBase64 + '='.repeat(4 - padding) : payloadBase64;
     const payload = JSON.parse(atob(padded)) as { phone?: string; type?: string };
-    if (payload.type === 'customer' && typeof payload.phone === 'string') return payload.phone;
+    if (payload.type === 'customer' && payload.phone != null) {
+      const p = payload.phone;
+      return typeof p === 'string' ? p.trim() : String(p).trim();
+    }
     return null;
   } catch {
     return null;
