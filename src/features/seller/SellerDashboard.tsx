@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { activityApi } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
@@ -31,6 +31,7 @@ export function SellerDashboard() {
   const [error, setError] = useState('');
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [amountOverrides, setAmountOverrides] = useState<Record<string, string>>({});
+  const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const branchId = auth.type === 'staff' ? auth.staff.branchId : '';
 
@@ -106,7 +107,7 @@ export function SellerDashboard() {
   return (
     <div className="min-w-0">
       <h1 className="text-lg font-bold mb-3 md:text-xl md:mb-4">Pending Check-ins</h1>
-      <p className="text-gray-500 text-sm mb-4">Approve or reject in one tap. Optionally edit amount before approving.</p>
+      <p className="text-gray-500 text-sm mb-4">Use Approve, Edit amount, or Reject — no need to open another page.</p>
       {activities.length === 0 ? (
         <p className="text-gray-500 text-sm">No pending check-ins.</p>
       ) : (
@@ -125,8 +126,10 @@ export function SellerDashboard() {
                       <p className="text-gray-500 text-xs mt-1">Requested: ${requestedAmount.toFixed(2)}</p>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <label className="sr-only">Amount (edit to override)</label>
                     <input
+                      ref={(el) => { amountInputRefs.current[a.id] = el; }}
                       type="number"
                       step="0.01"
                       min="0"
@@ -134,19 +137,30 @@ export function SellerDashboard() {
                       onChange={(e) => setAmountOverrides((prev) => ({ ...prev, [a.id]: e.target.value }))}
                       placeholder="Amount"
                       className="w-24 min-h-[44px] rounded-lg border border-gray-300 px-3 text-sm"
+                      aria-label="Amount"
                     />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       onClick={() => handleStatus(a.id, 'APPROVED')}
                       disabled={isSubmitting}
-                      className="min-h-[44px] flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
+                      className="min-h-[44px] flex-1 min-w-[100px] bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
                     >
                       {isSubmitting ? '…' : 'Approve'}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => amountInputRefs.current[a.id]?.focus()}
+                      disabled={isSubmitting}
+                      className="min-h-[44px] flex-1 min-w-[100px]"
+                    >
+                      Edit
                     </Button>
                     <Button
                       variant="danger"
                       onClick={() => handleStatus(a.id, 'REJECTED')}
                       disabled={isSubmitting}
-                      className="min-h-[44px] flex-1 sm:flex-none"
+                      className="min-h-[44px] flex-1 min-w-[100px]"
                     >
                       Reject
                     </Button>
