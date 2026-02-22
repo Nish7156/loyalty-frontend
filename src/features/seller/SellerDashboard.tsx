@@ -30,6 +30,7 @@ export function SellerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [rejectConfirmId, setRejectConfirmId] = useState<string | null>(null);
   const [amountOverrides, setAmountOverrides] = useState<Record<string, string>>({});
   const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -98,8 +99,16 @@ export function SellerDashboard() {
       setError(e instanceof Error ? e.message : 'Failed');
     } finally {
       setSubmittingId(null);
+      setRejectConfirmId(null);
     }
   }, [activities, amountOverrides]);
+
+  const handleRejectClick = (id: string) => setRejectConfirmId(id);
+  const handleRejectConfirm = () => {
+    if (rejectConfirmId) {
+      handleStatus(rejectConfirmId, 'REJECTED');
+    }
+  };
 
   if (loading) return <p className="text-gray-600">Loading…</p>;
   if (error) return <p className="text-red-600 text-sm mb-2">{error}</p>;
@@ -158,7 +167,7 @@ export function SellerDashboard() {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => handleStatus(a.id, 'REJECTED')}
+                      onClick={() => handleRejectClick(a.id)}
                       disabled={isSubmitting}
                       className="min-h-[44px] flex-1 min-w-[100px]"
                     >
@@ -170,6 +179,24 @@ export function SellerDashboard() {
             );
           })}
         </ul>
+      )}
+
+      {rejectConfirmId && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Confirm reject">
+          <div className="absolute inset-0 bg-black/50" aria-hidden="true" onClick={() => setRejectConfirmId(null)} />
+          <div className="relative bg-white rounded-xl shadow-xl p-5 max-w-sm w-full">
+            <p className="text-gray-900 font-medium">Reject this check-in?</p>
+            <p className="text-gray-500 text-sm mt-1">The customer will not get this visit approved.</p>
+            <div className="flex gap-2 mt-4">
+              <Button variant="secondary" onClick={() => setRejectConfirmId(null)} className="flex-1 min-h-[44px]">
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleRejectConfirm} disabled={submittingId !== null} className="flex-1 min-h-[44px]">
+                {submittingId === rejectConfirmId ? '…' : 'Reject'}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
