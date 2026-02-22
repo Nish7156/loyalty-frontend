@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { customersApi, getCustomerTokenIfPresent } from '../../lib/api';
 import { Loader } from '../../components/Loader';
 import type { CustomerHistory, HistoryActivity, HistoryRedeemedReward } from '../../lib/api';
