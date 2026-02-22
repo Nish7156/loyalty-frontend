@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi } from '../lib/api';
+import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
+const MAX_FEEDBACK_LENGTH = 2000;
 
 /** Centralized customer auth: only show login at / when logged out; once logged in, never ask again on /me, /history, /rewards. */
 export function UserLayout() {
@@ -17,7 +18,37 @@ export function UserLayout() {
   const isRewards = pathname === '/rewards';
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
   const [showApprovalCelebration, setShowApprovalCelebration] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackSending, setFeedbackSending] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
   const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = feedbackMessage.trim();
+    if (!text || feedbackSending) return;
+    setFeedbackSending(true);
+    setFeedbackError('');
+    try {
+      await feedbackApi.submit(text);
+      setFeedbackSent(true);
+      setFeedbackMessage('');
+    } catch (err) {
+      setFeedbackError(err instanceof Error ? err.message : 'Failed to send. Try again.');
+    } finally {
+      setFeedbackSending(false);
+    }
+  };
+
+  const closeFeedbackModal = () => {
+    if (feedbackSending) return;
+    setFeedbackOpen(false);
+    setFeedbackMessage('');
+    setFeedbackError('');
+    setFeedbackSent(false);
+  };
 
   useEffect(() => {
     if (!hasToken) return;
@@ -74,10 +105,65 @@ export function UserLayout() {
             Loyalty
           </span>
         </div>
+        {hasToken && (
+          <button
+            type="button"
+            onClick={() => setFeedbackOpen(true)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition touch-manipulation"
+            aria-label="Send feedback"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </button>
+        )}
       </header>
       <main className="flex-1 overflow-auto p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize">
         <Outlet />
       </main>
+      {feedbackOpen && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Feedback">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" onClick={closeFeedbackModal} />
+          <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-[var(--premium-bg)] p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Feedback</h2>
+              <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="p-2 -m-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-50" aria-label="Close">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            {feedbackSent ? (
+              <div className="py-2">
+                <p className="text-emerald-300 font-medium">Thank you!</p>
+                <p className="text-white/70 text-sm mt-1">Your feedback has been sent.</p>
+                <button type="button" onClick={() => setFeedbackSent(false)} className="mt-3 text-sm text-cyan-400 font-medium hover:text-cyan-300">Send another</button>
+                <button type="button" onClick={closeFeedbackModal} className="block mt-2 text-sm text-white/60 hover:text-white">Close</button>
+              </div>
+            ) : (
+              <form onSubmit={handleFeedbackSubmit}>
+                <label htmlFor="feedback-modal-message" className="block text-sm font-medium text-white/70 mb-2">What we can improve</label>
+                <textarea
+                  id="feedback-modal-message"
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
+                  placeholder="e.g. Faster check-in, better rewards..."
+                  className="w-full min-h-[100px] rounded-xl border border-white/20 bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 outline-none transition resize-y"
+                  maxLength={MAX_FEEDBACK_LENGTH}
+                  rows={3}
+                  disabled={feedbackSending}
+                />
+                <p className="text-white/40 text-xs mt-1">{feedbackMessage.length}/{MAX_FEEDBACK_LENGTH}</p>
+                {feedbackError && <p className="text-rose-400 text-sm mt-2">{feedbackError}</p>}
+                <div className="flex gap-2 mt-4">
+                  <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="flex-1 min-h-[44px] rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 disabled:opacity-50">Cancel</button>
+                  <button type="submit" disabled={feedbackSending || !feedbackMessage.trim()} className="flex-1 min-h-[44px] rounded-xl bg-cyan-400/90 text-black text-sm font-semibold hover:bg-cyan-300 disabled:opacity-50 disabled:pointer-events-none">
+                    {feedbackSending ? 'Sending…' : 'Send'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
       {showApprovalCelebration && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" aria-live="polite">
           <div className="bg-white/10 border border-white/20 rounded-2xl px-8 py-6 text-center shadow-xl animate-scale-in">

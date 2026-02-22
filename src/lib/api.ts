@@ -328,3 +328,19 @@ export const rewardsApi = {
       body: JSON.stringify({ code: code.trim().toUpperCase() }),
     }),
 };
+
+export interface Feedback {
+  id: string;
+  customerId: string;
+  message: string;
+  createdAt: string;
+}
+
+export const feedbackApi = {
+  submit: (message: string) =>
+    api<Feedback>('/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ message: message.trim() }),
+    }, true),
+  list: () => api<(Feedback & { customer?: { phoneNumber: string; name: string | null } })[]>('/feedback'),
+};
