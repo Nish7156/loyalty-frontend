@@ -166,7 +166,7 @@ export function UserLayout() {
         </div>
       )}
       {showApprovalCelebration && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm" aria-live="polite">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm" style={{ zIndex: 2147483647 }} aria-live="polite">
           <div className="bg-white/10 border border-white/20 rounded-2xl px-8 py-6 text-center shadow-xl animate-scale-in">
             <p className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-emerald-300 bg-clip-text text-transparent">Visit approved!</p>
             <p className="text-white/80 text-sm mt-1">Thanks for checking in.</p>
