@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
@@ -63,7 +62,7 @@ export function UserLayout() {
 
   useEffect(() => {
     if (!customerPhone) return;
-    const socket = createCustomerSocket(String(customerPhone).trim());
+    const socket = createCustomerSocket(customerPhone);
     const handler = (payload: { id: string; status: string }) => {
       window.dispatchEvent(new CustomEvent(CHECKIN_UPDATED_EVENT, { detail: payload }));
       if (payload.status === 'APPROVED') {
@@ -165,14 +164,13 @@ export function UserLayout() {
           </div>
         </div>
       )}
-      {showApprovalCelebration && createPortal(
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm" style={{ zIndex: 2147483647 }} aria-live="polite">
+      {showApprovalCelebration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" aria-live="polite">
           <div className="bg-white/10 border border-white/20 rounded-2xl px-8 py-6 text-center shadow-xl animate-scale-in">
             <p className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-emerald-300 bg-clip-text text-transparent">Visit approved!</p>
             <p className="text-white/80 text-sm mt-1">Thanks for checking in.</p>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
       <PWAInstallPrompt />
       <nav className="fixed bottom-0 left-0 right-0 z-20 bg-white/[0.06] backdrop-blur-md border-t border-white/10 flex justify-center items-center gap-1 py-2 px-1 safe-area-bottom">
