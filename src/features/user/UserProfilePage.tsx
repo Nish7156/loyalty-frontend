@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
-import { createCustomerSocket } from '../../lib/socket';
 import { Loader } from '../../components/Loader';
 import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
+const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 
 function formatDate(s: string) {
   try {
@@ -22,7 +22,6 @@ export function UserProfilePage() {
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const socketRef = useRef<ReturnType<typeof createCustomerSocket> | null>(null);
 
   useEffect(() => {
     if (getCustomerTokenIfPresent()) {
@@ -53,24 +52,16 @@ export function UserProfilePage() {
   }, [phone]);
 
   useEffect(() => {
-    const customerPhone = profile?.customer?.phoneNumber;
-    if (!customerPhone) return;
-    const socket = createCustomerSocket(customerPhone);
-    socketRef.current = socket;
     const handler = () => {
       if (getCustomerTokenIfPresent()) {
         customersApi.getMyProfile().then(setProfile).catch(() => {});
         customersApi.getMyHistory().then(setHistory).catch(() => {});
-      } else {
-        customersApi.getProfile(customerPhone).then(setProfile).catch(() => {});
+      } else if (profile?.customer?.phoneNumber) {
+        customersApi.getProfile(profile.customer.phoneNumber).then(setProfile).catch(() => {});
       }
     };
-    socket.on('checkin_updated', handler);
-    return () => {
-      socket.off('checkin_updated', handler);
-      socket.disconnect();
-      socketRef.current = null;
-    };
+    window.addEventListener(CHECKIN_UPDATED_EVENT, handler);
+    return () => window.removeEventListener(CHECKIN_UPDATED_EVENT, handler);
   }, [profile?.customer?.phoneNumber]);
 
   const handlePhoneSubmit = (e: React.FormEvent) => {

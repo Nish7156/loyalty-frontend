@@ -1,6 +1,11 @@
+import { useEffect, useState, useRef } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { getCustomerTokenIfPresent } from '../lib/api';
+import confetti from 'canvas-confetti';
+import { getCustomerTokenIfPresent, customersApi } from '../lib/api';
+import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+
+const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 
 /** Centralized customer auth: only show login at / when logged out; once logged in, never ask again on /me, /history, /rewards. */
 export function UserLayout() {
@@ -10,6 +15,44 @@ export function UserLayout() {
   const isMe = pathname === '/me';
   const isHistory = pathname === '/history';
   const isRewards = pathname === '/rewards';
+  const [customerPhone, setCustomerPhone] = useState<string | null>(null);
+  const [showApprovalCelebration, setShowApprovalCelebration] = useState(false);
+  const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!hasToken) return;
+    customersApi.getMyProfile().then((p) => setCustomerPhone(p.customer.phoneNumber)).catch(() => {});
+  }, [hasToken]);
+
+  useEffect(() => {
+    if (!customerPhone) return;
+    const socket = createCustomerSocket(customerPhone);
+    const handler = (payload: { id: string; status: string }) => {
+      window.dispatchEvent(new CustomEvent(CHECKIN_UPDATED_EVENT, { detail: payload }));
+      if (payload.status === 'APPROVED') {
+        if (celebrationEndRef.current) clearTimeout(celebrationEndRef.current);
+        setShowApprovalCelebration(true);
+        const duration = 2500;
+        const end = Date.now() + duration;
+        const frame = () => {
+          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#22d3ee', '#2dd4bf', '#fafafa'] });
+          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#22d3ee', '#2dd4bf', '#fafafa'] });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        };
+        frame();
+        celebrationEndRef.current = setTimeout(() => {
+          setShowApprovalCelebration(false);
+          celebrationEndRef.current = null;
+        }, 2200);
+      }
+    };
+    socket.on('checkin_updated', handler);
+    return () => {
+      socket.off('checkin_updated', handler);
+      socket.disconnect();
+      if (celebrationEndRef.current) clearTimeout(celebrationEndRef.current);
+    };
+  }, [customerPhone]);
 
   if (!hasToken && pathname !== '/' && pathname !== '/scan' && !pathname.startsWith('/scan/')) {
     return <Navigate to="/" replace state={{ from: location }} />;
@@ -30,6 +73,14 @@ export function UserLayout() {
       <main className="flex-1 overflow-auto p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize">
         <Outlet />
       </main>
+      {showApprovalCelebration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" aria-live="polite">
+          <div className="bg-white/10 border border-white/20 rounded-2xl px-8 py-6 text-center shadow-xl animate-scale-in">
+            <p className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-emerald-300 bg-clip-text text-transparent">Visit approved!</p>
+            <p className="text-white/80 text-sm mt-1">Thanks for checking in.</p>
+          </div>
+        </div>
+      )}
       <PWAInstallPrompt />
       <nav className="fixed bottom-0 left-0 right-0 z-20 bg-white/[0.06] backdrop-blur-md border-t border-white/10 flex justify-center items-center gap-1 py-2 px-1 safe-area-bottom">
         <Link
