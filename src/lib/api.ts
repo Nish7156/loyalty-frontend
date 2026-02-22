@@ -34,7 +34,7 @@ export interface Branch {
   id: string;
   branchName: string;
   partnerId: string;
-  settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
+  settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string };
   location?: { lat: number; lng: number };
   partner?: Partner;
   staff?: Staff[];
@@ -81,6 +81,7 @@ export interface Activity {
   staffId: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   value?: number;
+  customerName?: string | null;
   requestLocation?: { lat: number; lng: number };
   createdAt: string;
   customer?: Customer & { streaks?: unknown[] };
@@ -110,6 +111,7 @@ export interface HistoryActivity {
   staffId: string | null;
   status: string;
   value: number | null;
+  customerName?: string | null;
   createdAt: string;
   branch: Branch;
   partner: Partner;
@@ -230,14 +232,14 @@ export const branchesApi = {
   create: (body: {
     branchName: string;
     partnerId: string;
-    settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
+    settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string };
     location?: { lat: number; lng: number };
   }) => api<Branch>('/branches', { method: 'POST', body: JSON.stringify(body) }),
   update: (
     id: string,
     body: {
       branchName?: string;
-      settings?: { streakThreshold?: number; cooldownHours?: number; rewardWindowDays?: number; rewardDescription?: string };
+      settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string };
       location?: { lat: number; lng: number };
     }
   ) => api<Branch>(`/branches/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
@@ -278,6 +280,7 @@ export const activityApi = {
   checkIn: (body: {
     branchId: string;
     phoneNumber: string;
+    customerName?: string;
     value?: number;
     requestLocation?: { lat: number; lng: number };
   }) =>

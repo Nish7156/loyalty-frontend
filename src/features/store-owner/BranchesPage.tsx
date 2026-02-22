@@ -19,12 +19,14 @@ export function BranchesPage() {
   const [branchName, setBranchName] = useState('');
   const [partnerId, setPartnerId] = useState('');
   const [cooldownHours, setCooldownHours] = useState(0);
+  const [cooldownMinutes, setCooldownMinutes] = useState(0);
   const [streakThreshold, setStreakThreshold] = useState<number>(5);
   const [rewardWindowDays, setRewardWindowDays] = useState<number>(30);
   const [rewardDescription, setRewardDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
-  const [editCooldown, setEditCooldown] = useState<number>(0);
+  const [editCooldownHours, setEditCooldownHours] = useState<number>(0);
+  const [editCooldownMinutes, setEditCooldownMinutes] = useState<number>(0);
   const [editStreakThreshold, setEditStreakThreshold] = useState<number>(5);
   const [editRewardWindowDays, setEditRewardWindowDays] = useState<number>(30);
   const [editRewardDescription, setEditRewardDescription] = useState('');
@@ -80,7 +82,7 @@ export function BranchesPage() {
         branchName,
         partnerId,
         settings: {
-          cooldownHours,
+          cooldownMinutes: cooldownHours * 60 + cooldownMinutes,
           streakThreshold,
           rewardWindowDays,
           rewardDescription: rewardDescription || undefined,
@@ -88,6 +90,7 @@ export function BranchesPage() {
       });
       setBranchName('');
       setCooldownHours(0);
+      setCooldownMinutes(0);
       setStreakThreshold(5);
       setRewardWindowDays(30);
       setRewardDescription('');
@@ -136,16 +139,28 @@ export function BranchesPage() {
             required
           />
           <div className="mt-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cooldown (hours)</label>
-            <p className="text-xs text-gray-500 mb-1">0 = no cooldown. Max 48 (2 days). Next check-in allowed after this many hours from last approved visit.</p>
-            <input
-              type="number"
-              min={0}
-              max={48}
-              value={cooldownHours}
-              onChange={(e) => setCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cooldown (hours and/or minutes)</label>
+            <p className="text-xs text-gray-500 mb-1">0 = no cooldown. Max 48 h. Next check-in allowed after this from last approved visit.</p>
+            <div className="flex gap-2 items-center">
+              <input
+                type="number"
+                min={0}
+                max={48}
+                value={cooldownHours}
+                onChange={(e) => setCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
+                className="w-20 border border-gray-300 rounded-lg px-3 py-2"
+              />
+              <span>hrs</span>
+              <input
+                type="number"
+                min={0}
+                max={59}
+                value={cooldownMinutes}
+                onChange={(e) => setCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))}
+                className="w-20 border border-gray-300 rounded-lg px-3 py-2"
+              />
+              <span>min</span>
+            </div>
           </div>
           <div className="mt-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Reward: purchases needed</label>
@@ -190,13 +205,23 @@ export function BranchesPage() {
           const settings = b.settings as {
             streakThreshold?: number;
             cooldownHours?: number;
+            cooldownMinutes?: number;
             rewardWindowDays?: number;
             rewardDescription?: string;
           } | undefined;
           const location = b.location as { lat: number; lng: number } | undefined;
           const staffCount = Array.isArray(b.staff) ? b.staff.length : 0;
           const scanUrl = typeof window !== 'undefined' ? `${window.location.origin}/scan/${b.id}` : '';
-          const currentCooldown = settings?.cooldownHours ?? 0;
+          const currentCooldownTotalMinutes = settings?.cooldownMinutes ?? (settings?.cooldownHours ?? 0) * 60;
+          const currentCooldownHours = Math.floor(currentCooldownTotalMinutes / 60);
+          const currentCooldownMinutes = currentCooldownTotalMinutes % 60;
+          const cooldownLabel = currentCooldownTotalMinutes === 0
+            ? 'No cooldown'
+            : currentCooldownMinutes === 0
+              ? `${currentCooldownHours} h`
+              : currentCooldownHours === 0
+                ? `${currentCooldownMinutes} min`
+                : `${currentCooldownHours} h ${currentCooldownMinutes} min`;
           const currentThreshold = settings?.streakThreshold ?? 5;
           const currentWindowDays = settings?.rewardWindowDays ?? 30;
           const currentRewardDesc = settings?.rewardDescription ?? '';
@@ -221,11 +246,20 @@ export function BranchesPage() {
                           type="number"
                           min={0}
                           max={48}
-                          value={editCooldown}
-                          onChange={(e) => setEditCooldown(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
-                          className="w-20 border border-gray-300 rounded px-2 py-1"
+                          value={editCooldownHours}
+                          onChange={(e) => setEditCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
+                          className="w-16 border border-gray-300 rounded px-2 py-1"
                         />
-                        <span>hours (0 = no cooldown, max 2 days)</span>
+                        <span>hrs</span>
+                        <input
+                          type="number"
+                          min={0}
+                          max={59}
+                          value={editCooldownMinutes}
+                          onChange={(e) => setEditCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))}
+                          className="w-16 border border-gray-300 rounded px-2 py-1"
+                        />
+                        <span>min (0 = no cooldown, max 48 h)</span>
                         <Button
                           className="text-sm px-2 py-1"
                           disabled={editSubmitting}
@@ -236,7 +270,7 @@ export function BranchesPage() {
                               await branchesApi.update(b.id, {
                                 settings: {
                                   ...settings,
-                                  cooldownHours: editCooldown,
+                                  cooldownMinutes: Math.min(48 * 60, editCooldownHours * 60 + editCooldownMinutes),
                                   streakThreshold: editStreakThreshold,
                                   rewardWindowDays: editRewardWindowDays,
                                   rewardDescription: editRewardDescription || undefined,
@@ -259,13 +293,14 @@ export function BranchesPage() {
                       </span>
                     ) : (
                       <>
-                        <span>{currentCooldown === 0 ? 'No cooldown' : `${currentCooldown}h — next check-in allowed after ${currentCooldown} hours from last approved visit.`}</span>
+                        <span>{cooldownLabel === 'No cooldown' ? cooldownLabel : `${cooldownLabel} — next check-in allowed after this from last approved visit.`}</span>
                         <Button
                           variant="secondary"
                           className="ml-2 text-sm px-2 py-1"
                           onClick={() => {
                             setEditingBranchId(b.id);
-                            setEditCooldown(currentCooldown);
+                            setEditCooldownHours(currentCooldownHours);
+                            setEditCooldownMinutes(currentCooldownMinutes);
                             setEditStreakThreshold(currentThreshold);
                             setEditRewardWindowDays(currentWindowDays);
                             setEditRewardDescription(currentRewardDesc);
@@ -315,7 +350,8 @@ export function BranchesPage() {
                           className="ml-2 text-sm px-2 py-1"
                           onClick={() => {
                             setEditingBranchId(b.id);
-                            setEditCooldown(currentCooldown);
+                            setEditCooldownHours(currentCooldownHours);
+                            setEditCooldownMinutes(currentCooldownMinutes);
                             setEditStreakThreshold(currentThreshold);
                             setEditRewardWindowDays(currentWindowDays);
                             setEditRewardDescription(currentRewardDesc);

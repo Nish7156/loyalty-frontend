@@ -64,6 +64,9 @@ export function ApprovePage() {
       <h1 className="text-lg font-bold mb-3 md:text-xl md:mb-4">Approve Check-in</h1>
       <div className="bg-white rounded-lg shadow p-3 mb-3 md:p-4 md:mb-4">
         <p className="text-sm md:text-base break-all"><strong>Customer:</strong> {activity.customerId}</p>
+        {activity.customerName && (
+          <p className="text-sm md:text-base mt-1"><strong>Name:</strong> {activity.customerName}</p>
+        )}
         <p className="text-sm md:text-base mt-1"><strong>Branch:</strong> {activity.branch?.branchName ?? activity.branchId}</p>
         {requestedAmount != null && (
           <p className="text-sm text-gray-600 mt-1">Requested amount: ${requestedAmount.toFixed(2)}</p>

@@ -24,6 +24,7 @@ export function UserScanPage() {
   const [mpin, setMpin] = useState('');
   const [otpMode, setOtpMode] = useState<OtpMode>('register');
   const [amount, setAmount] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
@@ -138,9 +139,11 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
+      const nameStr = typeof customerName === 'string' ? customerName.trim().slice(0, 200) : '';
       const result = await activityApi.checkIn({
         branchId,
         phoneNumber: displayPhone,
+        ...(nameStr ? { customerName: nameStr } : {}),
         value: amount.trim() ? Number(amount) : undefined,
       });
       setLastActivityId(result.id);
@@ -339,7 +342,16 @@ export function UserScanPage() {
           )}
           <form onSubmit={handleCheckIn} className="space-y-5">
             <div className={cardClass}>
-              <label className="block text-sm font-medium text-white/70 mb-2">Amount</label>
+              <label className="block text-sm font-medium text-white/70 mb-2">Name</label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(String(e.target.value ?? '').slice(0, 200))}
+                placeholder="Your name"
+                maxLength={200}
+                className={inputClass}
+              />
+              <label className="block text-sm font-medium text-white/70 mb-2 mt-4">Amount</label>
               <input
                 type="number"
                 step="0.01"
@@ -381,7 +393,7 @@ export function UserScanPage() {
               <p className="text-sm text-white/60 mt-1">Staff declined this check-in.</p>
             </>
           )}
-          <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
+          <button type="button" className={`${btnPrimary} mt-5`} onClick={() => { setStep('checkin'); setAmount(''); setCustomerName(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
             Another check-in
           </button>
         </div>
