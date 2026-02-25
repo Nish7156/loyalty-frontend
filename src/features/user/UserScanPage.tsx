@@ -35,7 +35,23 @@ export function UserScanPage() {
   const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [minCheckInAmount, setMinCheckInAmount] = useState<number | null>(null);
+  const [resendCooldownUntil, setResendCooldownUntil] = useState(0);
+  const [resendSecondsLeft, setResendSecondsLeft] = useState(0);
   const socketRef = useRef<ReturnType<typeof createBranchSocket> | null>(null);
+
+  useEffect(() => {
+    if (resendCooldownUntil <= Date.now()) {
+      setResendSecondsLeft(0);
+      return;
+    }
+    const tick = () => {
+      const left = Math.ceil((resendCooldownUntil - Date.now()) / 1000);
+      setResendSecondsLeft(left > 0 ? left : 0);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [resendCooldownUntil, step]);
 
   const isLoggedIn = !!getCustomerTokenIfPresent();
   const displayPhone = profile?.customer?.phoneNumber ?? phone;
@@ -80,16 +96,15 @@ export function UserScanPage() {
     } catch {
       try {
         const res = await authApi.sendOtp(normalized);
+        setPhone(normalized);
         setMpin(res.otp ?? '');
         setOtpMode('register');
         setStep('otp');
         setOtp('');
         setRegisterName('');
-      } catch {
-        setOtpMode('register');
-        setStep('otp');
-        setOtp('');
-        setRegisterName('');
+        setResendCooldownUntil(Date.now() + 60000);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Could not send verification code. Try again.');
       }
     } finally {
       setLoading(false);
@@ -101,13 +116,32 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.sendOtp(normalizeIndianPhone(phone.trim()));
+      const normalized = normalizeIndianPhone(phone.trim());
+      const res = await authApi.sendOtp(normalized);
       setMpin(res.otp ?? '');
       setOtpMode('customerLogin');
       setStep('otp');
       setOtp('');
+      setResendCooldownUntil(Date.now() + 60000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not send OTP');
+      setError(e instanceof Error ? e.message : 'Could not send verification code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!phone.trim() || resendCooldownUntil > Date.now()) return;
+    setError('');
+    setLoading(true);
+    try {
+      const normalized = normalizeIndianPhone(phone.trim());
+      const res = await authApi.sendOtp(normalized);
+      setMpin(res.otp ?? '');
+      setOtp('');
+      setResendCooldownUntil(Date.now() + 60000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not resend code. Try again.');
     } finally {
       setLoading(false);
     }
@@ -361,7 +395,15 @@ export function UserScanPage() {
             <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>
               {loading ? 'Verifying…' : otpMode === 'register' ? 'Complete registration' : 'Verify'}
             </button>
-            <button type="button" onClick={() => { setStep('phone'); setError(''); }} className="w-full mt-2 min-h-[44px] rounded-xl text-white/50 text-sm font-medium hover:text-white/80 hover:bg-white/5 transition">
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              disabled={loading || resendSecondsLeft > 0}
+              className="w-full mt-2 min-h-[44px] rounded-xl text-cyan-400 text-sm font-medium hover:text-cyan-300 hover:bg-white/5 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {resendSecondsLeft > 0 ? `Resend code (${resendSecondsLeft}s)` : 'Resend code'}
+            </button>
+            <button type="button" onClick={() => { setStep('phone'); setError(''); }} className="w-full mt-1 min-h-[44px] rounded-xl text-white/50 text-sm font-medium hover:text-white/80 hover:bg-white/5 transition">
               Change number
             </button>
           </div>

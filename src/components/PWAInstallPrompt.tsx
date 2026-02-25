@@ -7,7 +7,12 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DELAY_MS = 40 * 1000;
 
-export function PWAInstallPrompt() {
+const COPY = {
+  default: { title: 'Install Loyalty', subtitle: 'Add to your home screen for a better experience.' },
+  login: { title: 'Install Loyalty', subtitle: 'Add to home screen for quick login (owners & staff).' },
+} as const;
+
+export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' | 'login' } = {}) {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -54,8 +59,8 @@ export function PWAInstallPrompt() {
         <div className="flex flex-col items-center text-center gap-4">
           <img src="/icon-192.png" alt="" className="h-16 w-16 rounded-2xl object-contain" />
           <div>
-            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Install Loyalty</h3>
-            <p className="text-white/60 text-sm mt-1">Add to your home screen for a better experience.</p>
+            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">{COPY[variant].title}</h3>
+            <p className="text-white/60 text-sm mt-1">{COPY[variant].subtitle}</p>
           </div>
           <div className="flex w-full gap-3">
             <button

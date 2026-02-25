@@ -250,6 +250,7 @@ export const partnersApi = {
 export const branchesApi = {
   list: () => api<Branch[]>('/branches'),
   get: (id: string) => api<Branch & { partner?: Partner; staff?: Staff[] }>(`/branches/${id}`),
+  getActivities: (branchId: string) => api<Activity[]>(`/branches/${branchId}/activities`),
   create: (body: {
     branchName: string;
     partnerId: string;

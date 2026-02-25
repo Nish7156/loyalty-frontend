@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { PhoneInput } from '../../components/PhoneInput';
+import { PWAInstallPrompt } from '../../components/PWAInstallPrompt';
 
 export function LoginPage() {
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
@@ -103,6 +104,7 @@ export function LoginPage() {
           </form>
         )}
       </div>
+      <PWAInstallPrompt variant="login" />
     </div>
   );
 }
