@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/Button';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+import { PWAInstallButton } from '../components/PWAInstallButton';
 
 export function OwnerLayout() {
   const { auth, logout } = useAuth();
@@ -47,7 +48,8 @@ export function OwnerLayout() {
             Staff
           </Link>
         </nav>
-        <div className="p-2 border-t border-slate-700">
+        <div className="p-2 border-t border-slate-700 space-y-2">
+          <PWAInstallButton />
           <Button variant="ghost" className="w-full text-left text-white min-h-[44px]" onClick={handleLogout}>
             Logout
           </Button>

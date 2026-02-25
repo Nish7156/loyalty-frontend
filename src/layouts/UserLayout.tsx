@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+import { PWAInstallButton } from '../components/PWAInstallButton';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 const MAX_FEEDBACK_LENGTH = 2000;
@@ -105,18 +106,21 @@ export function UserLayout() {
             Loyalty
           </span>
         </div>
-        {hasToken && (
-          <button
-            type="button"
-            onClick={() => setFeedbackOpen(true)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition touch-manipulation"
-            aria-label="Send feedback"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
-          </button>
-        )}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <PWAInstallButton />
+            {hasToken && (
+              <button
+                type="button"
+                onClick={() => setFeedbackOpen(true)}
+                className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition touch-manipulation"
+                aria-label="Send feedback"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+              </button>
+            )}
+          </div>
       </header>
       <main className="flex-1 overflow-auto p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize">
         <Outlet />

@@ -218,12 +218,12 @@ export function UserProfilePage() {
                   </div>
                 </div>
                 {(threshold > 0 && windowDays > 0) && (
-                  <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 animate-reward-glow">
-                    <p className="text-xs font-medium uppercase tracking-wider text-cyan-300/90 mb-1">You win when you complete</p>
-                    <p className="text-sm text-white/90 font-medium">
+                  <div className="mt-4 rounded-xl border border-cyan-400/60 border-t-cyan-300/70 bg-cyan-500/15 px-4 py-3 animate-reward-glow shadow-[0_0_20px_-4px_rgba(34,211,238,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]">
+                    <p className="text-xs font-medium uppercase tracking-wider text-cyan-300 mb-1" style={{ textShadow: '0 0 12px rgba(34,211,238,0.4)' }}>You win when you complete</p>
+                    <p className="text-sm font-medium text-cyan-200/95" style={{ textShadow: '0 0 10px rgba(34,211,238,0.35)' }}>
                       {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
                     </p>
-                    <p className="mt-1.5 text-base font-semibold bg-gradient-to-r from-cyan-200 to-cyan-400/90 bg-clip-text text-transparent">
+                    <p className="mt-1.5 text-base font-semibold bg-gradient-to-r from-cyan-200 to-cyan-400 bg-clip-text text-transparent" style={{ textShadow: '0 0 14px rgba(34,211,238,0.4)' }}>
                       → {description}
                     </p>
                   </div>

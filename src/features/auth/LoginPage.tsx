@@ -7,6 +7,7 @@ import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { PhoneInput } from '../../components/PhoneInput';
 import { PWAInstallPrompt } from '../../components/PWAInstallPrompt';
+import { PWAInstallButton } from '../../components/PWAInstallButton';
 
 export function LoginPage() {
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
@@ -58,7 +59,10 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-gray-100 p-3 sm:p-4">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center bg-gray-100 p-3 sm:p-4">
+      <div className="absolute top-4 right-4">
+        <PWAInstallButton />
+      </div>
       <div className="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6">
         <h1 className="text-lg font-bold text-center mb-4 sm:text-xl sm:mb-6">Login</h1>
 

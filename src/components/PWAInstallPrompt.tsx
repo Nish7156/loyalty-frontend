@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
+import { usePWA } from '../contexts/PWAContext';
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
-}
-
-const DELAY_DEFAULT_MS = 40 * 1000;  // end user: 40s
-const DELAY_LOGIN_MS = 12 * 1000;    // /login (owner, staff, admin): 12s
+const DELAY_MS = 40 * 1000;  // 40s
+const MAX_SHOW_COUNT = 2;
 
 const COPY = {
   default: { title: 'Install Loyalty', subtitle: 'Add to your home screen for a better experience.' },
@@ -14,45 +10,30 @@ const COPY = {
 } as const;
 
 export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' | 'login' } = {}) {
-  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const pwa = usePWA();
   const [showBanner, setShowBanner] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const delayMs = variant === 'login' ? DELAY_LOGIN_MS : DELAY_DEFAULT_MS;
+  const [showCount, setShowCount] = useState(0);
 
   useEffect(() => {
-    const standalone = window.matchMedia('(display-mode: standalone)').matches
-      || (window.navigator as unknown as { standalone?: boolean }).standalone === true
-      || document.referrer.includes('android-app://');
-    setIsStandalone(standalone);
-
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setInstallEvent(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener('beforeinstallprompt', onBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
-  }, []);
-
-  useEffect(() => {
-    if (isStandalone || !installEvent || showBanner) return;
-    const t = setTimeout(() => setShowBanner(true), delayMs);
+    if (!pwa || pwa.isStandalone || !pwa.installEvent || showBanner || showCount >= MAX_SHOW_COUNT) return;
+    const t = setTimeout(() => {
+      setShowBanner(true);
+      setShowCount((c) => c + 1);
+    }, DELAY_MS);
     return () => clearTimeout(t);
-  }, [installEvent, isStandalone, showBanner, delayMs]);
+  }, [pwa?.installEvent, pwa?.isStandalone, showBanner, showCount]);
 
   const handleInstall = async () => {
-    if (!installEvent) return;
-    installEvent.prompt();
-    const { outcome } = await installEvent.userChoice;
+    if (!pwa) return;
+    const outcome = await pwa.triggerInstall();
     if (outcome === 'accepted') setShowBanner(false);
-    setInstallEvent(null);
   };
 
   const handleDismiss = () => {
     setShowBanner(false);
   };
 
-  if (isStandalone || !showBanner || !installEvent) return null;
+  if (!pwa || pwa.isStandalone || !showBanner || !pwa.installEvent) return null;
 
   return (
     <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Install app">

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { branchesApi } from '../lib/api';
 import { Button } from '../components/Button';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+import { PWAInstallButton } from '../components/PWAInstallButton';
 
 export function SellerLayout() {
   const { auth, logout } = useAuth();
@@ -30,9 +31,12 @@ export function SellerLayout() {
           {storeName && <p className="text-xs text-gray-500 truncate">{name}</p>}
         </div>
         {!storeName && <span className="text-sm text-gray-600 truncate ml-2">{name}</span>}
-        <Button variant="ghost" onClick={handleLogout} className="shrink-0 min-h-[44px] min-w-[44px]">
-          Logout
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <PWAInstallButton />
+          <Button variant="ghost" onClick={handleLogout} className="min-h-[44px] min-w-[44px]">
+            Logout
+          </Button>
+        </div>
       </header>
       <main className="flex-1 overflow-auto p-3 md:p-4 min-w-0">
         <Outlet />
