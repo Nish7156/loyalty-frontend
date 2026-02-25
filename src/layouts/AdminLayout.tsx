@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/Button';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
 export function AdminLayout() {
   const { auth, logout } = useAuth();
@@ -53,6 +54,7 @@ export function AdminLayout() {
       <main className="flex-1 overflow-auto p-4 md:p-6 min-w-0">
         <Outlet />
       </main>
+      <PWAInstallPrompt variant="login" />
     </div>
   );
 }

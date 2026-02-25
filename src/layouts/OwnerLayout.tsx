@@ -57,7 +57,7 @@ export function OwnerLayout() {
       <main className="flex-1 overflow-auto p-4 md:p-6 min-w-0">
         <Outlet />
       </main>
-      <PWAInstallPrompt />
+      <PWAInstallPrompt variant="login" />
     </div>
   );
 }

@@ -37,7 +37,7 @@ export function SellerLayout() {
       <main className="flex-1 overflow-auto p-3 md:p-4 min-w-0">
         <Outlet />
       </main>
-      <PWAInstallPrompt />
+      <PWAInstallPrompt variant="login" />
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 safe-area-pb">
         <Link to="/seller/dashboard" className="flex flex-col items-center justify-center min-h-[56px] min-w-[64px] text-gray-600 hover:text-blue-600 active:text-blue-700 touch-manipulation">
           <span className="text-xl">📋</span>

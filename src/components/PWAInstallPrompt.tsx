@@ -5,7 +5,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-const DELAY_MS = 40 * 1000;
+const DELAY_DEFAULT_MS = 40 * 1000;  // end user: 40s
+const DELAY_LOGIN_MS = 12 * 1000;    // /login (owner, staff, admin): 12s
 
 const COPY = {
   default: { title: 'Install Loyalty', subtitle: 'Add to your home screen for a better experience.' },
@@ -16,6 +17,7 @@ export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' 
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const delayMs = variant === 'login' ? DELAY_LOGIN_MS : DELAY_DEFAULT_MS;
 
   useEffect(() => {
     const standalone = window.matchMedia('(display-mode: standalone)').matches
@@ -34,9 +36,9 @@ export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' 
 
   useEffect(() => {
     if (isStandalone || !installEvent || showBanner) return;
-    const t = setTimeout(() => setShowBanner(true), DELAY_MS);
+    const t = setTimeout(() => setShowBanner(true), delayMs);
     return () => clearTimeout(t);
-  }, [installEvent, isStandalone, showBanner]);
+  }, [installEvent, isStandalone, showBanner, delayMs]);
 
   const handleInstall = async () => {
     if (!installEvent) return;
