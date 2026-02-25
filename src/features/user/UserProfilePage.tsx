@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
+import { PhoneInput } from '../../components/PhoneInput';
 import { ProfileSkeleton } from '../../components/Skeleton';
 import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
@@ -15,7 +17,7 @@ function formatDate(s: string) {
 }
 
 export function UserProfilePage() {
-  const [phone, setPhone] = useState(() => localStorage.getItem(PHONE_KEY) || '');
+  const [phone, setPhone] = useState(() => localStorage.getItem(PHONE_KEY) || DEFAULT_PHONE_PREFIX);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [history, setHistory] = useState<CustomerHistory | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +44,7 @@ export function UserProfilePage() {
     setLoading(true);
     setError('');
     customersApi
-      .getProfile(phone)
+      .getProfile(normalizeIndianPhone(phone))
       .then((p) => {
         setProfile(p);
         setHistory(null);
@@ -66,10 +68,10 @@ export function UserProfilePage() {
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const p = (e.target as HTMLFormElement).querySelector<HTMLInputElement>('input[name="phone"]')?.value?.trim();
-    if (p) {
-      setPhone(p);
-      localStorage.setItem(PHONE_KEY, p);
+    if (phone) {
+      const normalized = normalizeIndianPhone(phone);
+      setPhone(normalized);
+      localStorage.setItem(PHONE_KEY, normalized);
     }
   };
 
@@ -78,7 +80,7 @@ export function UserProfilePage() {
     clearCustomerToken();
     setProfile(null);
     setHistory(null);
-    setPhone('');
+    setPhone(DEFAULT_PHONE_PREFIX);
     setLoadedByToken(false);
   };
 
@@ -98,13 +100,13 @@ export function UserProfilePage() {
         </h1>
         <p className="text-white/60 text-sm mb-6">Enter your phone to view your profile and rewards.</p>
         <form onSubmit={handlePhoneSubmit} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale">
-          <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
-          <input
-            name="phone"
-            type="tel"
-            placeholder="+91 98765 43210"
-            className="w-full min-h-[48px] border border-white/20 rounded-xl px-4 py-3 bg-black/30 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition-all duration-200"
+          <PhoneInput
+            label="Phone"
+            value={phone}
+            onChange={setPhone}
+            placeholder="98765 43210"
             required
+            variant="dark"
           />
           <button
             type="submit"

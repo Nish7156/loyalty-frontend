@@ -2,9 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import type { CustomerProfile, Reward } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
 import { Button } from '../../components/Button';
+import { PhoneInput } from '../../components/PhoneInput';
 import { ScanSkeleton } from '../../components/Skeleton';
 
 type Step = 'phone' | 'otp' | 'checkin' | 'done';
@@ -15,7 +17,7 @@ export function UserScanPage() {
   const navigate = useNavigate();
   const branchId = storeId || '';
   const [step, setStep] = useState<Step>('phone');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
   const [otpMode, setOtpMode] = useState<OtpMode>('register');
@@ -68,14 +70,16 @@ export function UserScanPage() {
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone.trim() || !branchId) return;
+    const normalized = normalizeIndianPhone(phone.trim());
     setError('');
     setLoading(true);
     try {
-      await customersApi.getByPhone(phone.trim());
+      await customersApi.getByPhone(normalized);
+      setPhone(normalized);
       setStep('checkin');
     } catch {
       try {
-        const res = await authApi.sendOtp(phone.trim());
+        const res = await authApi.sendOtp(normalized);
         setMpin(res.otp ?? '');
         setOtpMode('register');
         setStep('otp');
@@ -97,7 +101,7 @@ export function UserScanPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.sendOtp(phone.trim());
+      const res = await authApi.sendOtp(normalizeIndianPhone(phone.trim()));
       setMpin(res.otp ?? '');
       setOtpMode('customerLogin');
       setStep('otp');
@@ -126,7 +130,8 @@ export function UserScanPage() {
     setLoading(true);
     try {
       if (otpMode === 'customerLogin') {
-        const res = await authApi.customerLogin(phone.trim(), otp.trim());
+        const normalized = normalizeIndianPhone(phone.trim());
+        const res = await authApi.customerLogin(normalized, otp.trim());
         setCustomerToken(res.access_token);
         setPhone(res.customer.phone);
         setProfile(null);
@@ -137,7 +142,7 @@ export function UserScanPage() {
         const nameToSave = registerName.trim().slice(0, 200);
         const res = await customersApi.register({
           branchId,
-          phoneNumber: phone.trim(),
+          phoneNumber: normalizeIndianPhone(phone.trim()),
           name: nameToSave,
           otp: otp.trim(),
         });
@@ -200,7 +205,7 @@ export function UserScanPage() {
     setShowLogoutConfirm(false);
     clearCustomerToken();
     setProfile(null);
-    setPhone('');
+    setPhone(DEFAULT_PHONE_PREFIX);
     setStep('phone');
   };
 
@@ -300,15 +305,14 @@ export function UserScanPage() {
       {step === 'phone' && branchId && !getCustomerTokenIfPresent() && (
         <form onSubmit={handlePhoneSubmit} className="space-y-5">
           <div className={cardClass}>
-            <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
-            <input
-              type="tel"
+            <PhoneInput
+              label="Phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
+              onChange={setPhone}
+              placeholder="98765 43210"
               required
               autoComplete="tel"
-              className={inputClass}
+              variant="dark"
             />
             {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
             <button type="submit" disabled={loading} className={`${btnPrimary} mt-4`}>

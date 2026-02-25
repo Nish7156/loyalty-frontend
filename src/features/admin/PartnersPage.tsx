@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { partnersApi } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import type { Partner } from '../../lib/api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { PhoneInput } from '../../components/PhoneInput';
 
 export function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -11,7 +13,7 @@ export function PartnersPage() {
   const [showForm, setShowForm] = useState(false);
   const [businessName, setBusinessName] = useState('');
   const [industryType, setIndustryType] = useState('F&B');
-  const [ownerPhone, setOwnerPhone] = useState('');
+  const [ownerPhone, setOwnerPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [submitting, setSubmitting] = useState(false);
 
   const load = () => {
@@ -30,9 +32,9 @@ export function PartnersPage() {
     setSubmitting(true);
     setError('');
     try {
-      await partnersApi.create({ businessName, industryType, ownerPhone });
+      await partnersApi.create({ businessName, industryType, ownerPhone: normalizeIndianPhone(ownerPhone) });
       setBusinessName('');
-      setOwnerPhone('');
+      setOwnerPhone(DEFAULT_PHONE_PREFIX);
       setShowForm(false);
       load();
     } catch (e) {
@@ -84,11 +86,11 @@ export function PartnersPage() {
             </select>
           </div>
           <div className="mt-2">
-            <Input
+            <PhoneInput
               label="Owner Phone"
               value={ownerPhone}
-              onChange={(e) => setOwnerPhone(e.target.value)}
-              placeholder="+91 98765 43210"
+              onChange={setOwnerPhone}
+              placeholder="98765 43210"
               required
             />
             <p className="text-xs text-gray-500 mt-1">

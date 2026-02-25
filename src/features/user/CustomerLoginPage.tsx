@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
+import { PhoneInput } from '../../components/PhoneInput';
 
 export function CustomerLoginPage() {
   const navigate = useNavigate();
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -17,7 +19,7 @@ export function CustomerLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.sendOtp(phone.trim());
+      const res = await authApi.sendOtp(normalizeIndianPhone(phone.trim()));
       setMpin(res.otp ?? '');
       setStep('otp');
       setOtp('');
@@ -34,7 +36,7 @@ export function CustomerLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.customerLogin(phone.trim(), otp.trim());
+      const res = await authApi.customerLogin(normalizeIndianPhone(phone.trim()), otp.trim());
       setCustomerToken(res.access_token);
       navigate('/me', { replace: true });
     } catch (e) {
@@ -66,15 +68,14 @@ export function CustomerLoginPage() {
       {step === 'phone' && (
         <form onSubmit={handlePhoneSubmit} className="space-y-5">
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]">
-            <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
-            <input
-              type="tel"
+            <PhoneInput
+              label="Phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
+              onChange={setPhone}
+              placeholder="98765 43210"
               required
               autoComplete="tel"
-              className="w-full min-h-[48px] rounded-xl border border-white/20 bg-black/30 px-4 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition"
+              variant="dark"
             />
             {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
             <button

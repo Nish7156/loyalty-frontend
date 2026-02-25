@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { partnersApi, staffApi, branchesApi } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import type { Partner } from '../../lib/api';
 import type { Staff } from '../../lib/api';
 import type { Branch } from '../../lib/api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { PhoneInput } from '../../components/PhoneInput';
 
 export function StaffPage() {
   const { auth } = useAuth();
@@ -16,7 +18,7 @@ export function StaffPage() {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [branchId, setBranchId] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -48,9 +50,9 @@ export function StaffPage() {
     setSubmitting(true);
     setError('');
     try {
-      await staffApi.create({ name, phone, branchId });
+      await staffApi.create({ name, phone: normalizeIndianPhone(phone), branchId });
       setName('');
-      setPhone('');
+      setPhone(DEFAULT_PHONE_PREFIX);
       setShowForm(false);
       load();
     } catch (e) {
@@ -73,7 +75,7 @@ export function StaffPage() {
       ) : (
         <form onSubmit={handleCreate} className="bg-white rounded-lg shadow p-3 mb-3 md:p-4 md:mb-4 max-w-md w-full">
           <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-          <Input label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" required className="mt-2" />
+          <PhoneInput label="Phone" value={phone} onChange={setPhone} placeholder="98765 43210" required className="mt-2" />
           <p className="text-xs text-gray-500 mt-1">Seller will log in using this phone via OTP.</p>
           <div className="mt-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Branch</label>

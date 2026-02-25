@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from '../../lib/api';
+import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { PhoneInput } from '../../components/PhoneInput';
 
 export function LoginPage() {
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [error, setError] = useState('');
@@ -21,7 +23,7 @@ export function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await authApi.sendOtp(phone);
+      await authApi.sendOtp(normalizeIndianPhone(phone));
       setStep('otp');
       setOtp('');
     } catch (err) {
@@ -36,7 +38,7 @@ export function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.login(phone, otp);
+      const res = await authApi.login(normalizeIndianPhone(phone), otp);
       if (res.user && res.access_token) {
         loginPlatform(res.user, res.access_token);
         if (res.user.role === 'SUPER_ADMIN') navigate(from || '/admin/dashboard', { replace: true });
@@ -61,12 +63,11 @@ export function LoginPage() {
 
         {step === 'phone' ? (
           <form onSubmit={handleSendOtp} className="space-y-4">
-            <Input
+            <PhoneInput
               label="Phone"
-              type="tel"
-              placeholder="+91 98765 43210"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={setPhone}
+              placeholder="98765 43210"
               required
               autoComplete="tel"
             />
@@ -77,7 +78,7 @@ export function LoginPage() {
           </form>
         ) : (
           <form onSubmit={handleLogin} className="space-y-4">
-            <p className="text-sm text-gray-600">Code sent to {phone}</p>
+            <p className="text-sm text-gray-600">Code sent to {normalizeIndianPhone(phone)}</p>
             <Input
               label="OTP"
               type="text"
