@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
@@ -131,18 +132,18 @@ export function UserLayout() {
 
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] bg-[var(--user-bg)] text-[var(--user-text)] safe-area" data-theme={resolvedTheme}>
-      <header className="relative backdrop-blur-md border-b h-12 md:h-14 shrink-0 safe-area-top" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="pointer-events-auto font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none">
+      <header className="flex items-center justify-between gap-2 h-12 md:h-14 shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b min-h-[3rem]" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
+        <div className="flex-1 min-w-0 flex justify-center">
+          <span className="font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none truncate block text-center">
             Loyalty
           </span>
         </div>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setThemeMenuOpen((o) => !o)}
-                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation"
+                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
                 style={{ backgroundColor: themeMenuOpen ? 'var(--user-hover)' : undefined }}
                 aria-label="Theme"
                 aria-expanded={themeMenuOpen}
@@ -153,21 +154,30 @@ export function UserLayout() {
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 )}
               </button>
-              {themeMenuOpen && (
+              {themeMenuOpen && createPortal(
                 <>
-                  <div className="fixed inset-0 z-40" aria-hidden onClick={() => setThemeMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-xl border shadow-lg py-1.5" style={{ backgroundColor: 'var(--user-card)', borderColor: 'var(--user-border-subtle)' }}>
-                    <button type="button" onClick={() => { setThemeChoice('system'); setThemeMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition" style={{ color: themeChoice === 'system' ? 'var(--premium-blue)' : 'var(--user-text)' }}>
+                  <div className="fixed inset-0 z-[9998]" aria-hidden onClick={() => setThemeMenuOpen(false)} />
+                  <div
+                    className="fixed right-2 left-2 sm:left-auto sm:right-3 top-[3.5rem] z-[9999] min-w-[140px] max-w-[calc(100vw-1rem)] rounded-xl border shadow-xl py-1.5 touch-manipulation"
+                    style={{
+                      backgroundColor: resolvedTheme === 'light' ? '#ffffff' : '#1e293b',
+                      borderColor: 'var(--user-border-subtle)',
+                      boxShadow: '0 10px 40px -10px rgba(0,0,0,0.25)',
+                      opacity: 1,
+                    }}
+                  >
+                    <button type="button" onClick={() => { setThemeChoice('system'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'system' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
                       System
                     </button>
-                    <button type="button" onClick={() => { setThemeChoice('light'); setThemeMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition" style={{ color: themeChoice === 'light' ? 'var(--premium-blue)' : 'var(--user-text)' }}>
+                    <button type="button" onClick={() => { setThemeChoice('light'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'light' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
                       Light
                     </button>
-                    <button type="button" onClick={() => { setThemeChoice('dark'); setThemeMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition" style={{ color: themeChoice === 'dark' ? 'var(--premium-blue)' : 'var(--user-text)' }}>
+                    <button type="button" onClick={() => { setThemeChoice('dark'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'dark' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
                       Dark
                     </button>
                   </div>
-                </>
+                </>,
+                document.body
               )}
             </div>
             <PWAInstallButton />
@@ -175,7 +185,7 @@ export function UserLayout() {
               <button
                 type="button"
                 onClick={() => setFeedbackOpen(true)}
-                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation"
+                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
                 style={{ backgroundColor: 'transparent' }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--user-hover)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -188,13 +198,13 @@ export function UserLayout() {
             )}
           </div>
       </header>
-      <main className="flex-1 overflow-auto p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize">
+      <main className="flex-1 overflow-auto overflow-x-hidden p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize safe-area-x">
         <Outlet />
       </main>
       {feedbackOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Feedback">
           <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={closeFeedbackModal} />
-          <div className="relative w-full max-w-sm rounded-2xl border p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto" style={{ backgroundColor: 'var(--user-bg)', borderColor: 'var(--user-border-subtle)' }} onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-sm rounded-2xl border p-4 sm:p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto safe-area-x min-w-0" style={{ backgroundColor: 'var(--user-bg)', borderColor: 'var(--user-border-subtle)' }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold" style={{ color: 'var(--user-text)' }}>Feedback</h2>
               <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="p-2 -m-2 rounded-lg disabled:opacity-50" style={{ color: 'var(--user-text-muted)' }} onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--user-text)'; e.currentTarget.style.backgroundColor = 'var(--user-hover)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--user-text-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }} aria-label="Close">
@@ -244,7 +254,7 @@ export function UserLayout() {
         </div>
       )}
       <PWAInstallPrompt />
-      <nav className="fixed bottom-0 left-0 right-0 z-20 backdrop-blur-md border-t flex justify-center items-center gap-1 py-2 px-1 safe-area-bottom" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
+      <nav className="fixed bottom-0 left-0 right-0 z-20 backdrop-blur-md border-t flex justify-center items-center gap-1 py-2 px-2 sm:px-1 safe-area-bottom safe-area-x" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
         {hasToken ? (
           <>
             <Link

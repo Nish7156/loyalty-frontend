@@ -48,8 +48,8 @@ export function CustomerLoginPage() {
 
   if (getCustomerTokenIfPresent()) {
     return (
-      <div className="max-w-md mx-auto pb-20 w-full min-w-0">
-        <div className="rounded-2xl border p-6 shadow-[0_0_40px_-12px_rgba(0,0,0,0.15)]" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
+      <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden">
+        <div className="rounded-2xl border p-4 sm:p-6 shadow-[0_0_40px_-12px_rgba(0,0,0,0.15)]" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
           <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">Welcome</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--user-text-muted)' }}>You’re logged in. Scan a store QR to check in or view your profile.</p>
           <Link to="/me" className="hover-user-bg block w-full min-h-[48px] rounded-xl border font-medium flex items-center justify-center transition" style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}>
@@ -61,13 +61,13 @@ export function CustomerLoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto pb-20 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">Login or Register</h1>
-      <p className="text-sm mb-6" style={{ color: 'var(--user-text-muted)' }}>Enter your phone number to continue.</p>
+    <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden">
+      <h1 className="text-xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight break-words">Login or Register</h1>
+      <p className="text-sm mb-4 sm:mb-6 break-words" style={{ color: 'var(--user-text-muted)' }}>Enter your phone number to continue.</p>
 
       {step === 'phone' && (
         <form onSubmit={handlePhoneSubmit} className="space-y-5">
-          <div className="rounded-2xl border p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
+          <div className="rounded-2xl border p-4 sm:p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] min-w-0" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
             <PhoneInput
               label="Phone"
               value={phone}
@@ -92,7 +92,7 @@ export function CustomerLoginPage() {
 
       {step === 'otp' && (
         <form onSubmit={handleOtpSubmit} className="space-y-5">
-          <div className="rounded-2xl border p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
+          <div className="rounded-2xl border p-4 sm:p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] min-w-0" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
             <p className="text-sm mb-1" style={{ color: 'var(--user-text-muted)' }}>Your 4-digit verification code</p>
             {mpin && <p className="text-2xl font-mono font-bold text-cyan-500 tracking-[0.4em] mb-4">{mpin}</p>}
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--user-text-muted)' }}>Enter code</label>

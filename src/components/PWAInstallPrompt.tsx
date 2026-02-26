@@ -38,7 +38,7 @@ export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' 
   return (
     <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Install app">
       <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={handleDismiss} />
-      <div className="relative w-full max-w-sm rounded-2xl border p-6 shadow-xl animate-scale-in" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-surface)' }}>
+      <div className="relative w-full max-w-sm rounded-2xl border p-4 sm:p-6 shadow-xl animate-scale-in min-w-0 safe-area-x" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-surface)' }}>
         <div className="flex flex-col items-center text-center gap-4">
           <img src="/icon-192.png" alt="" className="h-16 w-16 rounded-2xl object-contain" />
           <div>
