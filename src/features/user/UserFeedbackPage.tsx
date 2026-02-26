@@ -32,31 +32,31 @@ export function UserFeedbackPage() {
     }
   };
 
-  const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] opacity-0 animate-fade-in-up';
-  const inputClass = 'w-full min-h-[120px] rounded-xl border border-white/20 bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition resize-y';
+  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] opacity-0 animate-fade-in-up';
+  const inputClass = 'w-full min-h-[120px] rounded-xl border px-4 py-3 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition resize-y';
 
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
         Feedback
       </h1>
-      <p className="text-white/60 text-sm -mt-2 opacity-0 animate-fade-in-up">Tell us what we can improve. We track your feedback so we can serve you better.</p>
+      <p className="user-text-muted text-sm -mt-2 opacity-0 animate-fade-in-up">Tell us what we can improve. We track your feedback so we can serve you better.</p>
 
       {sent ? (
         <div className={`${cardClass} border-emerald-500/30 bg-emerald-500/10`}>
-          <p className="text-emerald-300 font-medium">Thank you!</p>
-          <p className="text-white/70 text-sm mt-1">Your feedback has been sent.</p>
+          <p className="text-emerald-600 font-medium">Thank you!</p>
+          <p className="user-text-muted text-sm mt-1">Your feedback has been sent.</p>
           <button
             type="button"
             onClick={() => setSent(false)}
-            className="mt-3 text-sm text-cyan-400 font-medium hover:text-cyan-300"
+            className="mt-3 text-sm text-cyan-600 font-medium hover:text-cyan-500"
           >
             Send another
           </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className={cardClass}>
-          <label htmlFor="feedback-message" className="block text-sm font-medium text-white/70 mb-2">
+          <label htmlFor="feedback-message" className="block text-sm font-medium user-text-muted mb-2">
             Your feedback / What we can improve
           </label>
           <textarea
@@ -65,16 +65,18 @@ export function UserFeedbackPage() {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="e.g. Faster check-in, better rewards..."
             className={inputClass}
+            style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-input-bg)', color: 'var(--user-text)' }}
             maxLength={2000}
             rows={4}
             disabled={sending}
           />
-          <p className="text-white/40 text-xs mt-1">{message.length}/2000</p>
-          {error && <p className="text-rose-400 text-sm mt-2">{error}</p>}
+          <p className="user-text-subtle text-xs mt-1">{message.length}/2000</p>
+          {error && <p className="text-rose-500 text-sm mt-2">{error}</p>}
           <button
             type="submit"
             disabled={sending || !message.trim()}
-            className="w-full min-h-[48px] mt-4 rounded-xl border border-white/40 text-white font-medium hover:bg-white/10 transition disabled:opacity-50 disabled:pointer-events-none"
+            className="hover-user-bg w-full min-h-[48px] mt-4 rounded-xl border font-medium transition disabled:opacity-50 disabled:pointer-events-none"
+            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
           >
             {sending ? 'Sending…' : 'Send feedback'}
           </button>

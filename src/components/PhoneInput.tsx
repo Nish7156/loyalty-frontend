@@ -16,10 +16,10 @@ const light = {
 };
 
 const dark = {
-  label: 'block text-sm font-medium text-white/70 mb-2',
-  wrapper: 'flex min-h-[48px] rounded-xl border border-white/20 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-400/40 focus-within:border-cyan-400/50',
-  prefix: 'inline-flex items-center px-3 py-2.5 bg-black/30 text-white/50 select-none border-r border-white/20 shrink-0',
-  input: 'flex-1 min-w-0 bg-black/30 text-white placeholder-white/40 px-3 py-2.5 outline-none',
+  label: 'block text-sm font-medium mb-2 user-text-muted',
+  wrapper: 'flex min-h-[48px] rounded-xl border overflow-hidden focus-within:ring-2 focus-within:ring-cyan-400/40 focus-within:border-cyan-400/50 [border-color:var(--user-border-subtle)]',
+  prefix: 'inline-flex items-center px-3 py-2.5 select-none border-r shrink-0 user-text-muted [background-color:var(--user-input-bg)] [border-color:var(--user-border-subtle)]',
+  input: 'flex-1 min-w-0 px-3 py-2.5 outline-none [background-color:var(--user-input-bg)] [color:var(--user-text)] placeholder:[color:var(--user-text-subtle)]',
 };
 
 interface PhoneInputProps {

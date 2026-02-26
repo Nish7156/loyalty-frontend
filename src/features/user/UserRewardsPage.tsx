@@ -49,8 +49,8 @@ export function UserRewardsPage() {
   };
 
   const rewards: Reward[] = profile?.customer?.rewards ?? [];
-  const cardClass = 'rounded-2xl p-5 sm:p-6 min-w-0 border border-white/10 bg-white/[0.04] shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)] card-interactive tap-scale opacity-0 animate-fade-in-up';
-  const descClass = 'text-white/60 text-sm';
+  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] card-interactive tap-scale opacity-0 animate-fade-in-up';
+  const descClass = 'user-text-muted text-sm';
 
   if (loading) {
     return (
@@ -63,11 +63,11 @@ export function UserRewardsPage() {
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
           Rewards
         </h1>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.3)]">
-          <p className="text-rose-400 text-sm">{error}</p>
+        <div className="user-card rounded-2xl p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]">
+          <p className="text-rose-500 text-sm">{error}</p>
         </div>
       </div>
     );
@@ -75,17 +75,17 @@ export function UserRewardsPage() {
 
   return (
     <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-cyan-200/90 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
         Rewards
       </h1>
-      <p className="text-white/60 text-sm -mt-2">Use your rewards at the store — tap Redeem and show the code to staff.</p>
+      <p className="user-text-muted text-sm -mt-2">Use your rewards at the store — tap Redeem and show the code to staff.</p>
 
       {lastRedeemedCode && (
         <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5 opacity-0 animate-fade-in-up">
-          <p className="text-sm text-white/80 mb-1">Your reward code — show this to staff at the store</p>
-          <p className="text-2xl font-mono font-bold tracking-[0.3em] text-emerald-300">{lastRedeemedCode}</p>
-          <p className="text-xs text-white/50 mt-2">Staff will enter this code to give you your reward.</p>
-          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm text-cyan-400 font-medium hover:text-cyan-300">
+          <p className="text-sm user-text mb-1">Your reward code — show this to staff at the store</p>
+          <p className="text-2xl font-mono font-bold tracking-[0.3em] text-emerald-500">{lastRedeemedCode}</p>
+          <p className="text-xs user-text-subtle mt-2">Staff will enter this code to give you your reward.</p>
+          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm text-cyan-600 font-medium hover:text-cyan-500">
             Dismiss
           </button>
         </div>
@@ -105,18 +105,19 @@ export function UserRewardsPage() {
             >
               <div className="flex flex-wrap justify-between items-start gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-white text-lg truncate">{r.partner?.businessName ?? 'Store'}</p>
+                  <p className="font-semibold user-text text-lg truncate">{r.partner?.businessName ?? 'Store'}</p>
                   <span
                     className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       r.status === 'ACTIVE'
-                        ? 'bg-cyan-400/20 text-cyan-300'
-                        : 'bg-white/10 text-white/70'
+                        ? 'bg-cyan-400/20 text-cyan-600'
+                        : 'user-text-muted'
                     }`}
+                    style={r.status !== 'ACTIVE' ? { backgroundColor: 'var(--user-hover)' } : undefined}
                   >
                     {r.status === 'ACTIVE' ? 'Ready to use' : 'Redeemed'}
                   </span>
                   {r.expiryDate && (
-                    <p className="text-white/50 text-sm mt-2">Expires {formatDate(r.expiryDate)}</p>
+                    <p className="user-text-subtle text-sm mt-2">Expires {formatDate(r.expiryDate)}</p>
                   )}
                 </div>
                 {r.status === 'ACTIVE' && (

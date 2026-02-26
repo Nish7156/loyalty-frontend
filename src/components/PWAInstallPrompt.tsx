@@ -37,26 +37,27 @@ export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' 
 
   return (
     <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Install app">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" onClick={handleDismiss} />
-      <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-[var(--premium-surface)] p-6 shadow-xl animate-scale-in">
+      <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={handleDismiss} />
+      <div className="relative w-full max-w-sm rounded-2xl border p-6 shadow-xl animate-scale-in" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-surface)' }}>
         <div className="flex flex-col items-center text-center gap-4">
           <img src="/icon-192.png" alt="" className="h-16 w-16 rounded-2xl object-contain" />
           <div>
-            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">{COPY[variant].title}</h3>
-            <p className="text-white/60 text-sm mt-1">{COPY[variant].subtitle}</p>
+            <h3 className="text-lg font-semibold uppercase tracking-wide" style={{ color: 'var(--user-text)' }}>{COPY[variant].title}</h3>
+            <p className="text-sm mt-1" style={{ color: 'var(--user-text-muted)' }}>{COPY[variant].subtitle}</p>
           </div>
           <div className="flex w-full gap-3">
             <button
               type="button"
               onClick={handleDismiss}
-              className="flex-1 min-h-[44px] rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition btn-interactive"
+              className="hover-user-bg flex-1 min-h-[44px] rounded-xl border text-sm font-medium transition btn-interactive"
+              style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
             >
               Not Now
             </button>
             <button
               type="button"
               onClick={handleInstall}
-              className="flex-1 min-h-[44px] rounded-xl bg-cyan-400/90 text-black text-sm font-semibold uppercase tracking-wide hover:bg-cyan-300 transition btn-interactive"
+              className="flex-1 min-h-[44px] rounded-xl bg-cyan-500 text-white text-sm font-semibold uppercase tracking-wide hover:bg-cyan-400 transition btn-interactive"
             >
               Install
             </button>
