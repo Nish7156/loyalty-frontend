@@ -12,7 +12,7 @@ const ROOT = join(__dirname, '..');
 const PUBLIC = join(ROOT, 'public');
 const SRC = join(PUBLIC, 'logo.png');
 
-const BACKGROUND = { r: 12, g: 10, b: 9 }; // #0c0a09 theme
+const BACKGROUND = { r: 255, g: 255, b: 255 }; // white, for light logo
 
 const SIZES = [
   { name: 'icon-192.png', width: 192, height: 192 },

@@ -1,15 +1,20 @@
 @import "tailwindcss";
 
 :root {
+  /* Logo palette: blue + green, modern */
+  --premium-blue: #06b6d4;
+  --premium-blue-light: #22d3ee;
+  --premium-green: #10b981;
+  --premium-green-light: #34d399;
   --premium-bg: #0c0a09;
-  --premium-surface: #1c1917;
-  --premium-card: #292524;
-  --premium-border: #44403c;
-  --premium-muted: #a8a29e;
-  --premium-gold: #d4a853;
-  --premium-gold-dim: #b45309;
-  --premium-cream: #fafaf9;
-  --premium-cream-dim: #f5f5f4;
+  --premium-surface: #111827;
+  --premium-card: #1e293b;
+  --premium-border: #334155;
+  --premium-muted: #94a3b8;
+  --premium-gold: #06b6d4;
+  --premium-gold-dim: #0891b2;
+  --premium-cream: #f0fdfa;
+  --premium-cream-dim: #ccfbf1;
 }
 
 body {
@@ -89,14 +94,14 @@ body {
 @keyframes reward-glow {
   0%, 100% {
     box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.5),
-      0 0 16px -2px rgba(34, 211, 238, 0.35),
+      0 0 0 1px rgba(6, 182, 212, 0.5),
+      0 0 16px -2px rgba(16, 185, 129, 0.35),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
   50% {
     box-shadow:
       0 0 0 1px rgba(34, 211, 238, 0.75),
-      0 0 24px 0 rgba(34, 211, 238, 0.45),
+      0 0 24px 0 rgba(52, 211, 153, 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 }
@@ -188,7 +193,8 @@ body {
   width: 48px;
   height: 48px;
   border: 3px solid rgba(255, 255, 255, 0.12);
-  border-top-color: rgba(34, 211, 238, 0.9);
+  border-top-color: rgba(6, 182, 212, 0.9);
+  border-right-color: rgba(16, 185, 129, 0.6);
   border-radius: 50%;
   animation: loader-spin 0.85s linear infinite;
 }
@@ -197,7 +203,8 @@ body {
   position: absolute;
   inset: 4px;
   border: 2px solid transparent;
-  border-top-color: rgba(34, 211, 238, 0.5);
+  border-top-color: rgba(6, 182, 212, 0.5);
+  border-left-color: rgba(52, 211, 153, 0.4);
   border-radius: 50%;
   animation: loader-spin 1.2s linear infinite reverse;
 }
@@ -206,7 +213,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(34, 211, 238, 0.9);
+  background: rgba(6, 182, 212, 0.9);
   animation: loader-dot 1s ease-in-out infinite both;
 }
 .loader-dot:nth-child(1) { animation-delay: -0.32s; }
