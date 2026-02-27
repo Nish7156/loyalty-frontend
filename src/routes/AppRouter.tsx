@@ -12,6 +12,7 @@ import { UserScanPage } from '../features/user/UserScanPage';
 import { UserProfilePage } from '../features/user/UserProfilePage';
 import { UserHistoryPage } from '../features/user/UserHistoryPage';
 import { UserRewardsPage } from '../features/user/UserRewardsPage';
+import { UserRequestsPage } from '../features/user/UserRequestsPage';
 
 const AdminDashboard = lazy(() => import('../features/admin/Dashboard').then((m) => ({ default: m.AdminDashboard })));
 const PartnersPage = lazy(() => import('../features/admin/PartnersPage').then((m) => ({ default: m.PartnersPage })));
@@ -45,6 +46,7 @@ export function AppRouter() {
           <Route path="scan/:storeId" element={<UserScanPage />} />
           <Route path="history" element={<UserHistoryPage />} />
           <Route path="rewards" element={<UserRewardsPage />} />
+          <Route path="requests" element={<UserRequestsPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 

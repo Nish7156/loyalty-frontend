@@ -290,6 +290,8 @@ export const customersApi = {
     api<CustomerProfile>('/customers/me/profile', {}, true),
   getMyHistory: () =>
     api<CustomerHistory>('/customers/me/history', {}, true),
+  getMyRequests: () =>
+    api<HistoryActivity[]>('/customers/me/requests', {}, true),
   create: (body: { phoneNumber: string }) =>
     api<Customer>('/customers', { method: 'POST', body: JSON.stringify(body) }),
   register: (body: { branchId: string; phoneNumber: string; name: string; otp: string }) =>

@@ -147,8 +147,8 @@ export function UserHistoryPage() {
               {store.visits.length > 0 && (
                 <div className="mt-4">
                   <h3 className={sectionTitleClass}>Visits</h3>
-                  <ul className="mt-1">
-                    {store.visits.slice(0, 15).map((a) => (
+                  <ul className="user-history-visits-list mt-1 max-h-[260px] overflow-y-auto overflow-x-hidden">
+                    {store.visits.map((a) => (
                       <li key={a.id} className={itemClass}>
                         <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.4)]" />
                         <div className="min-w-0 flex-1">
@@ -161,9 +161,6 @@ export function UserHistoryPage() {
                       </li>
                     ))}
                   </ul>
-                  {store.visits.length > 15 && (
-                    <p className="user-text-subtle text-xs mt-2">+{store.visits.length - 15} more visits</p>
-                  )}
                 </div>
               )}
 

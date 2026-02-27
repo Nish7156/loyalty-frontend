@@ -26,6 +26,7 @@ export function UserLayout() {
   const isMe = pathname === '/me';
   const isHistory = pathname === '/history';
   const isRewards = pathname === '/rewards';
+  const isRequests = pathname === '/requests';
   const [themeChoice, setThemeChoice] = useState<ThemeChoice>(() => {
     try {
       const s = localStorage.getItem(THEME_STORAGE_KEY);
@@ -282,6 +283,18 @@ export function UserLayout() {
               <span className="text-xs font-medium uppercase tracking-wide">Rewards</span>
             </Link>
             <Link
+              to="/requests"
+              className={`nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 flex-1 max-w-[100px] ${
+                isRequests ? 'text-cyan-500 ring-1 ring-cyan-500/30' : ''
+              }`}
+              style={isRequests ? { backgroundColor: 'var(--user-hover)' } : { color: 'var(--user-text-subtle)' }}
+            >
+              <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span className="text-xs font-medium uppercase tracking-wide">Requests</span>
+            </Link>
+            <Link
               to="/history"
               className={`nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center touch-manipulation md:min-h-0 md:py-2.5 flex-1 max-w-[100px] ${
                 isHistory ? 'text-cyan-500 ring-1 ring-cyan-500/30' : ''
@@ -307,6 +320,12 @@ export function UserLayout() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
               </svg>
               <span className="text-xs font-medium uppercase tracking-wide">Rewards</span>
+            </span>
+            <span className="nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center md:min-h-0 md:py-2.5 flex-1 max-w-[100px] cursor-not-allowed pointer-events-none select-none" style={{ color: 'var(--user-text-subtle)', opacity: 0.8 }} aria-disabled="true">
+              <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span className="text-xs font-medium uppercase tracking-wide">Requests</span>
             </span>
             <span className="nav-tab flex flex-col items-center gap-1 py-3 px-4 rounded-2xl min-w-[64px] min-h-[52px] justify-center md:min-h-0 md:py-2.5 flex-1 max-w-[100px] cursor-not-allowed pointer-events-none select-none" style={{ color: 'var(--user-text-subtle)', opacity: 0.8 }} aria-disabled="true">
               <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

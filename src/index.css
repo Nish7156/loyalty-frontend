@@ -94,6 +94,68 @@
   --user-reward-box-text-strong: #0891b2;
 }
 
+/* Light mode: request cards and status badges look clean */
+.user-theme[data-theme="light"] .user-request-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+}
+.user-theme[data-theme="light"] .user-request-card:hover {
+  box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+}
+.user-theme[data-theme="light"] .user-request-badge-pending {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+.user-theme[data-theme="light"] .user-request-badge-approved {
+  background-color: #d1fae5;
+  color: #047857;
+}
+.user-theme[data-theme="light"] .user-request-badge-rejected {
+  background-color: #ffe4e6;
+  color: #be123c;
+}
+.user-theme[data-theme="light"] .user-request-amount {
+  background-color: #f1f5f9;
+}
+.user-theme[data-theme="light"] .user-request-card .user-request-amount .user-text-subtle {
+  color: #64748b;
+}
+.user-theme[data-theme="light"] .user-request-card .user-request-amount .user-text {
+  color: #0f172a;
+}
+.user-theme[data-theme="light"] .user-request-avatar {
+  background-color: #e2e8f0;
+}
+.user-theme[data-theme="light"] .user-request-avatar span {
+  color: #0891b2;
+}
+
+/* History Visits list: show scrollbar when scrollable */
+.user-theme .user-history-visits-list {
+  scrollbar-gutter: stable;
+}
+.user-theme .user-history-visits-list::-webkit-scrollbar {
+  width: 6px;
+}
+.user-theme .user-history-visits-list::-webkit-scrollbar-track {
+  background: var(--user-border-subtle);
+  border-radius: 3px;
+}
+.user-theme .user-history-visits-list::-webkit-scrollbar-thumb {
+  background: var(--user-text-subtle);
+  border-radius: 3px;
+}
+.user-theme .user-history-visits-list::-webkit-scrollbar-thumb:hover {
+  background: var(--user-text-muted);
+}
+@supports (scrollbar-width: thin) {
+  .user-theme .user-history-visits-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--user-text-subtle) var(--user-border-subtle);
+  }
+}
+
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
