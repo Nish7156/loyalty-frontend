@@ -38,6 +38,7 @@ export function UserLayout() {
   const [systemDark, setSystemDark] = useState(getSystemDark);
   const resolvedTheme = themeChoice === 'system' ? (systemDark ? 'dark' : 'light') : themeChoice;
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState<string | null>(null);
   const [showApprovalCelebration, setShowApprovalCelebration] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
@@ -91,9 +92,15 @@ export function UserLayout() {
     const phone = getCustomerPhoneFromToken();
     if (phone) {
       setCustomerPhone(phone);
-    } else {
-      customersApi.getMyProfile().then((p) => setCustomerPhone(p.customer.phoneNumber)).catch(() => {});
     }
+
+    // Fetch profile to get name
+    customersApi.getMyProfile()
+      .then((p) => {
+        setCustomerPhone(p.customer.phoneNumber);
+        setCustomerName(p.customer.name || null);
+      })
+      .catch(() => {});
 
     // Fetch wallet balances
     walletApi.getAllBalances().then(setWalletBalances).catch(() => {});
@@ -140,9 +147,9 @@ export function UserLayout() {
 
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] bg-[var(--user-bg)] text-[var(--user-text)] safe-area" data-theme={resolvedTheme}>
-      <header className="flex items-center justify-between gap-2 h-12 md:h-14 shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b min-h-[3rem]" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
-        <div className="flex-1 min-w-0 flex items-center justify-center gap-3">
-          <span className="font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none truncate block text-center">
+      <header className="flex items-center justify-between gap-1 sm:gap-2 h-12 md:h-14 shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b min-h-[3rem] px-2 sm:px-3" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
+        <div className="flex-1 min-w-0 flex items-center justify-center gap-2 sm:gap-3">
+          <span className="font-bold text-sm sm:text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none truncate block text-center">
             Loyalty
           </span>
           {hasToken && walletBalances.length > 0 && (() => {
@@ -150,14 +157,14 @@ export function UserLayout() {
             return totalPoints > 0 ? (
               <Link
                 to="/wallet"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-all hover:scale-105 touch-manipulation min-h-[32px]"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full border transition-all hover:scale-105 touch-manipulation min-h-[32px]"
                 style={{
                   backgroundColor: 'var(--user-surface)',
                   borderColor: 'var(--user-border-subtle)',
                 }}
               >
-                <span className="text-lg">💰</span>
-                <span className="font-bold text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
+                <span className="text-base sm:text-lg">💰</span>
+                <span className="font-bold text-xs sm:text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
                   {totalPoints.toFixed(0)}
                 </span>
               </Link>
@@ -165,14 +172,14 @@ export function UserLayout() {
           })()}
         </div>
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-            {hasToken && customerPhone && (
+            {hasToken && (customerPhone || customerName) && (
               <Link
                 to="/profile"
                 className="p-1 rounded-full transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="My Profile"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold shadow-md hover:scale-110 transition-transform">
-                  {(customerPhone || 'U')[0].toUpperCase()}
+                  {(customerName || customerPhone || 'U')[0].toUpperCase()}
                 </div>
               </Link>
             )}
