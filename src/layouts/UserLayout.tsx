@@ -33,10 +33,8 @@ export function UserLayout() {
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState('');
-  const [showThemeToggle, setShowThemeToggle] = useState(true);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [showThemeToggle, setShowThemeToggle] = useState(false);
   const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const m = window.matchMedia('(prefers-color-scheme: dark)');
@@ -45,38 +43,15 @@ export function UserLayout() {
     return () => m.removeEventListener('change', handler);
   }, []);
 
-  // Auto-hide theme toggle after 3 seconds
-  useEffect(() => {
-    hideTimerRef.current = setTimeout(() => {
-      setShowThemeToggle(false);
-    }, 3000);
-
-    return () => {
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    };
-  }, []);
-
-  // Show theme toggle on scroll
+  // Show theme toggle on scroll only
   useEffect(() => {
     const handleScroll = () => {
       const scrolled = window.scrollY > 50;
-      setIsScrolled(scrolled);
-
-      if (scrolled) {
-        setShowThemeToggle(true);
-        // Reset hide timer on scroll
-        if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-        hideTimerRef.current = setTimeout(() => {
-          setShowThemeToggle(false);
-        }, 2000);
-      }
+      setShowThemeToggle(scrolled);
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
@@ -350,58 +325,30 @@ export function UserLayout() {
         )}
       </nav>
 
-      {/* Fixed Theme Toggle Button - auto-hide and smaller on scroll */}
-      <button
-        onClick={() => {
-          setSystemDark(!systemDark);
-          // Keep visible for a bit after click
-          setShowThemeToggle(true);
-          if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-          hideTimerRef.current = setTimeout(() => {
-            setShowThemeToggle(false);
-          }, 2000);
-        }}
-        className="fixed z-50 flex items-center justify-center outline-none cursor-pointer"
-        style={{
-          bottom: isScrolled ? 'calc(80px + env(safe-area-inset-bottom, 0px))' : '28px',
-          right: isScrolled ? '16px' : '28px',
-          width: isScrolled ? '44px' : '54px',
-          height: isScrolled ? '44px' : '54px',
-          borderRadius: '50%',
-          background: 'var(--user-icon-btn-bg)',
-          border: '1.5px solid var(--user-icon-btn-border)',
-          color: 'rgba(255,255,255,0.85)',
-          fontSize: isScrolled ? '18px' : '22px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(16px)',
-          opacity: showThemeToggle ? '1' : '0',
-          pointerEvents: showThemeToggle ? 'auto' : 'none',
-          transform: showThemeToggle ? 'scale(1)' : 'scale(0.8)',
-          transition: 'all 0.3s cubic-bezier(.34,1.56,.64,1)'
-        }}
-        onMouseEnter={(e) => {
-          if (showThemeToggle) {
-            e.currentTarget.style.transform = isScrolled ? 'scale(1.1)' : 'scale(1.12) rotate(15deg)';
-            e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,212,200,0.35)';
-            e.currentTarget.style.borderColor = 'var(--accent)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = showThemeToggle ? 'scale(1)' : 'scale(0.8)';
-          e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5)';
-          e.currentTarget.style.borderColor = 'var(--user-icon-btn-border)';
-        }}
-        onMouseDown={(e) => {
-          e.currentTarget.style.transform = 'scale(0.96)';
-        }}
-        onMouseUp={(e) => {
-          e.currentTarget.style.transform = isScrolled ? 'scale(1.1)' : 'scale(1.12) rotate(15deg)';
-        }}
-        aria-label="Toggle theme"
-        title="Toggle theme"
-      >
-        {systemDark ? '🌙' : '☀️'}
-      </button>
+      {/* Fixed Theme Toggle Button - shows only on scroll, above bottom bar */}
+      {showThemeToggle && (
+        <button
+          onClick={() => setSystemDark(!systemDark)}
+          className="fixed z-50 flex items-center justify-center outline-none cursor-pointer"
+          style={{
+            bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+            right: '16px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: 'var(--user-icon-btn-bg)',
+            border: '1.5px solid var(--user-icon-btn-border)',
+            color: 'rgba(255,255,255,0.85)',
+            fontSize: '18px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(16px)'
+          }}
+          aria-label="Toggle theme"
+          title="Toggle theme"
+        >
+          {systemDark ? '🌙' : '☀️'}
+        </button>
+      )}
     </div>
   );
 }
