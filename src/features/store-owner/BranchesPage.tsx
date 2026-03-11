@@ -41,7 +41,6 @@ export function BranchesPage() {
   const [editPointsPercentage, setEditPointsPercentage] = useState<number>(5);
   const [editPointsExpiryDays, setEditPointsExpiryDays] = useState<number>(365);
   const [editPointsToRewardRatio, setEditPointsToRewardRatio] = useState<number>(100);
-  const [editMinimumRedemptionPoints, setEditMinimumRedemptionPoints] = useState<number>(50);
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   const myPartners =
@@ -516,7 +515,6 @@ export function BranchesPage() {
                                     setEditPointsPercentage(currentPointsPercentage);
                                     setEditPointsExpiryDays(currentPointsExpiryDays);
                                     setEditPointsToRewardRatio(currentPointsToRewardRatio);
-                                    setEditMinimumRedemptionPoints(currentMinimumRedemptionPoints);
                                   }}
                                 >
                                   Edit
@@ -621,30 +619,20 @@ export function BranchesPage() {
                               </div>
 
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Redemption Ratio</p>
+                                <p className="text-sm font-medium text-gray-700">Points Per Reward</p>
+                                <p className="text-xs text-gray-500 mt-0.5">How many points customers need to redeem 1 reward</p>
                                 {!isEditing && <p className="text-sm text-gray-600 mt-1">{currentPointsToRewardRatio} points = 1 reward</p>}
                                 {isEditing && (
-                                  <input
-                                    type="number"
-                                    min={1}
-                                    value={editPointsToRewardRatio}
-                                    onChange={(e) => setEditPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))}
-                                    className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2"
-                                  />
-                                )}
-                              </div>
-
-                              <div>
-                                <p className="text-sm font-medium text-gray-700">Min Redemption</p>
-                                {!isEditing && <p className="text-sm text-gray-600 mt-1">{currentMinimumRedemptionPoints} points</p>}
-                                {isEditing && (
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    value={editMinimumRedemptionPoints}
-                                    onChange={(e) => setEditMinimumRedemptionPoints(Math.max(0, Number(e.target.value) || 0))}
-                                    className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2"
-                                  />
+                                  <div className="mt-1 flex items-center gap-2">
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      value={editPointsToRewardRatio}
+                                      onChange={(e) => setEditPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))}
+                                      className="w-24 border border-gray-300 rounded-lg px-3 py-2"
+                                    />
+                                    <span className="text-sm text-gray-600">points = 1 reward</span>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -665,7 +653,6 @@ export function BranchesPage() {
                                   setEditPointsPercentage(currentPointsPercentage);
                                   setEditPointsExpiryDays(currentPointsExpiryDays);
                                   setEditPointsToRewardRatio(currentPointsToRewardRatio);
-                                  setEditMinimumRedemptionPoints(currentMinimumRedemptionPoints);
                                 }}
                               >
                                 Edit
@@ -696,7 +683,7 @@ export function BranchesPage() {
                                       pointsPercentage: editPointsPercentage,
                                       pointsExpiryDays: editPointsExpiryDays,
                                       pointsToRewardRatio: editPointsToRewardRatio,
-                                      minimumRedemptionPoints: editMinimumRedemptionPoints,
+                                      minimumRedemptionPoints: editPointsToRewardRatio, // Set to same as ratio for simplicity
                                     },
                                   });
                                   setEditingBranchId(null);
