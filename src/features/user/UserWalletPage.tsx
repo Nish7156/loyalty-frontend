@@ -52,53 +52,57 @@ export function UserWalletPage() {
   const stores = profile?.storesVisited || [];
 
   return (
-    <div className="max-w-md mx-auto space-y-4 pb-8 w-full min-w-0">
+    <div className="max-w-md mx-auto w-full min-w-0 space-y-[13px] pb-8">
 
-      {/* Page Title */}
-      <div className="opacity-0 animate-fade-in-up">
-        <p className="text-[10px] user-text-muted uppercase tracking-[0.05em] mb-1">Overview</p>
-        <h1 className="text-2xl font-black user-text leading-tight">
-          Your Loyalty <span className="text-cyan-500">Cards</span>
+      {/* Page Title - matching HTML exactly */}
+      <div className="a1 px-0.5">
+        <p className="text-[11px] uppercase tracking-[0.05em] mb-1" style={{ color: 'var(--user-text-muted)' }}>Overview</p>
+        <h1 className="font-syne text-2xl font-black leading-[1.15]" style={{ color: 'var(--user-text-primary)' }}>
+          Your Loyalty <span style={{ color: 'var(--accent)' }}>Cards</span>
         </h1>
       </div>
 
-      {/* Tab Switcher */}
+      {/* Tab Switcher - matching HTML exactly */}
       <div
-        className="flex gap-1 p-1 rounded-2xl border opacity-0 animate-fade-in-up"
+        className="a2 flex p-1 rounded-2xl border"
         style={{
-          background: 'var(--user-surface)',
-          borderColor: 'var(--user-border-subtle)',
-          animationDelay: '0.1s'
+          background: 'var(--user-tabs-bg)',
+          borderColor: 'var(--user-tabs-border)',
+          gap: '4px'
         }}
       >
         <button
           onClick={() => setActiveTab('wallet')}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-medium transition-all ${
-            activeTab === 'wallet'
-              ? 'bg-cyan-500/10 text-cyan-500 shadow-sm'
-              : 'text-[var(--user-text-muted)]'
-          }`}
+          className="flex-1 rounded-xl border-none text-[13px] font-medium cursor-pointer transition-all"
+          style={{
+            padding: '9px 12px',
+            background: activeTab === 'wallet' ? 'rgba(0,212,200,0.14)' : 'transparent',
+            color: activeTab === 'wallet' ? 'var(--accent)' : 'var(--user-tab-color)',
+            boxShadow: activeTab === 'wallet' ? '0 2px 12px rgba(0,212,200,0.1)' : 'none'
+          }}
         >
           👛 Your Wallet
         </button>
         <button
           onClick={() => setActiveTab('stores')}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-medium transition-all ${
-            activeTab === 'stores'
-              ? 'bg-cyan-500/10 text-cyan-500 shadow-sm'
-              : 'text-[var(--user-text-muted)]'
-          }`}
+          className="flex-1 rounded-xl border-none text-[13px] font-medium cursor-pointer transition-all"
+          style={{
+            padding: '9px 12px',
+            background: activeTab === 'stores' ? 'rgba(0,212,200,0.14)' : 'transparent',
+            color: activeTab === 'stores' ? 'var(--accent)' : 'var(--user-tab-color)',
+            boxShadow: activeTab === 'stores' ? '0 2px 12px rgba(0,212,200,0.1)' : 'none'
+          }}
         >
           🏪 Stores You Use
         </button>
       </div>
 
-      {/* Hero Balance Card */}
+      {/* Hero Balance Card - matching HTML exactly */}
       <div
-        className="relative rounded-[22px] p-6 overflow-hidden opacity-0 animate-scale-in"
+        className="a3 relative rounded-[22px] overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #00C2B8 0%, #007A8A 55%, #004F66 100%)',
-          animationDelay: '0.2s'
+          padding: '24px'
         }}
       >
         {/* Decorative gradients */}
@@ -123,162 +127,237 @@ export function UserWalletPage() {
           }}
         />
 
-        {/* Top row */}
-        <div className="flex justify-between items-start relative z-10">
+        {/* Top row - matching HTML exactly */}
+        <div className="flex justify-between items-start">
           <div>
-            <span className="inline-flex items-center gap-1.5 bg-black/20 border border-white/20 text-white/90 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider">
-              ● Total Balance
+            <span
+              className="inline-flex items-center rounded-full text-[10px] font-semibold uppercase tracking-[0.07em]"
+              style={{
+                gap: '5px',
+                background: 'rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                color: 'rgba(255,255,255,0.9)',
+                padding: '3px 10px'
+              }}
+            >
+              ● Total
             </span>
-            <p className="text-white/75 text-xs mt-4 mb-1">Wallet Balance</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-[58px] font-black text-white leading-none">{totalPoints.toFixed(0)}</span>
-              <span className="text-xl font-semibold text-white/80">pts</span>
+            <p className="text-xs mt-4 mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Wallet Balance</p>
+            <div className="flex items-baseline" style={{ gap: '6px' }}>
+              <span className="font-syne text-[58px] font-black leading-none text-white">{totalPoints.toFixed(0)}</span>
+              <span className="text-xl font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>pts</span>
             </div>
           </div>
           <div
-            className="w-[54px] h-[54px] bg-white/20 rounded-[18px] flex items-center justify-center text-[26px] backdrop-blur-sm"
+            className="flex items-center justify-center text-[26px]"
+            style={{
+              width: '54px',
+              height: '54px',
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '18px',
+              backdropFilter: 'blur(8px)'
+            }}
           >
             💰
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="flex gap-2.5 mt-5 relative z-10">
-          <div className="flex-1 bg-black/20 rounded-[14px] p-3 backdrop-blur-sm">
-            <p className="text-[10px] text-white/65 uppercase tracking-wider mb-1">Earned</p>
-            <p className="text-xl font-black text-white">+{totalEarned.toFixed(0)}</p>
+        {/* Stats - matching HTML exactly */}
+        <div className="flex mt-5 relative z-10" style={{ gap: '10px' }}>
+          <div
+            className="flex-1 rounded-[14px]"
+            style={{
+              background: 'var(--user-stat-chip-bg)',
+              padding: '12px 14px',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-[0.06em] mb-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Earned</p>
+            <p className="font-syne text-xl font-black text-white">+{totalEarned.toFixed(0)}</p>
           </div>
-          <div className="flex-1 bg-black/20 rounded-[14px] p-3 backdrop-blur-sm">
-            <p className="text-[10px] text-white/65 uppercase tracking-wider mb-1">Spent</p>
-            <p className="text-xl font-black text-white">-{totalSpent.toFixed(0)}</p>
+          <div
+            className="flex-1 rounded-[14px]"
+            style={{
+              background: 'var(--user-stat-chip-bg)',
+              padding: '12px 14px',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <p className="text-[10px] uppercase tracking-[0.06em] mb-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Spent</p>
+            <p className="font-syne text-xl font-black text-white">-{totalSpent.toFixed(0)}</p>
           </div>
         </div>
       </div>
 
       {/* Content based on active tab */}
       {activeTab === 'wallet' && wallets.length > 0 && (
-        <div className="space-y-3">
-          {/* Bento Grid */}
-          <div className="grid grid-cols-2 gap-3 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
+          {/* Bento Grid - matching HTML exactly */}
+          <div className="a4 grid grid-cols-2" style={{ gap: '13px' }}>
             {wallets.slice(0, 2).map((wallet, idx) => {
               const minRedemption = 100; // Default redemption threshold
               const progress = (wallet.balance / minRedemption) * 100;
 
               if (idx === 0) {
-                // Redeem progress card
+                // Redeem progress card - matching HTML exactly
                 return (
                   <div
                     key={wallet.partnerId}
-                    className="glass-card rounded-[22px] p-4 hover-lift relative overflow-hidden"
+                    className="glass-card rounded-[22px]"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-                    <p className="text-[10px] user-text-muted uppercase tracking-wider mb-2">Redeem At</p>
-                    <p className="text-[30px] font-black text-cyan-500 leading-none">{minRedemption}</p>
-                    <p className="text-[11px] user-text-muted mt-1">pts minimum</p>
+                    <div style={{ padding: '18px' }}>
+                      <p className="text-[10px] uppercase tracking-[0.07em] mb-2" style={{ color: 'var(--user-text-muted)' }}>Redeem At</p>
+                      <p className="font-syne text-[30px] font-black leading-none" style={{ color: 'var(--accent)' }}>{minRedemption}</p>
+                      <p className="text-[11px] mt-1" style={{ color: 'var(--user-text-muted)' }}>pts minimum</p>
 
-                    {/* Progress bar */}
-                    <div className="h-1.5 bg-white/10 dark:bg-white/10 rounded-full overflow-hidden mt-2.5">
+                      {/* Progress bar - matching HTML exactly */}
                       <div
-                        className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full relative"
-                        style={{ width: `${Math.min(progress, 100)}%` }}
+                        className="rounded-full overflow-hidden mt-2.5"
+                        style={{ height: '5px', background: 'var(--user-prog-track)' }}
                       >
-                        <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-white/50 rounded-full blur-[2px]" />
+                        <div
+                          className="h-full rounded-full relative"
+                          style={{
+                            width: `${Math.min(progress, 100)}%`,
+                            background: 'linear-gradient(90deg, #00D4C8, #00A0A8)'
+                          }}
+                        >
+                          <div
+                            className="absolute right-0 top-0 bottom-0 rounded-full"
+                            style={{
+                              width: '6px',
+                              background: 'rgba(255,255,255,0.5)',
+                              filter: 'blur(2px)'
+                            }}
+                          />
+                        </div>
                       </div>
+                      <p className="text-[10px] mt-1.5" style={{ color: 'var(--user-text-subtle)' }}>
+                        {wallet.balance.toFixed(0)} of {minRedemption} pts
+                      </p>
                     </div>
-                    <p className="text-[10px] user-text-subtle mt-1.5">
-                      {wallet.balance.toFixed(0)} of {minRedemption} pts
-                    </p>
                   </div>
                 );
               } else {
-                // Store mini card
+                // Store mini card - matching HTML exactly
                 return (
                   <div
                     key={wallet.partnerId}
-                    className="glass-card rounded-[22px] p-4 hover-lift relative overflow-hidden"
+                    className="glass-card rounded-[22px]"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-                    <p className="text-[10px] user-text-muted uppercase tracking-wider mb-2">Store</p>
-                    <p className="text-xl font-black user-text leading-tight">{wallet.partnerName}</p>
-                    <p className="text-xs user-text-muted mt-1">📍 {wallet.balance.toFixed(0)} pts</p>
-                    <span className="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider mt-3">
-                      ■ Points
-                    </span>
+                    <div style={{ padding: '18px' }}>
+                      <p className="text-[10px] uppercase tracking-[0.07em] mb-2" style={{ color: 'var(--user-text-muted)' }}>Store</p>
+                      <p className="font-syne text-xl font-black leading-tight" style={{ color: 'var(--user-text-primary)' }}>{wallet.partnerName}</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--user-text-muted)' }}>📍 Branch</p>
+                      <span
+                        className="inline-flex items-center rounded-full text-[10px] font-semibold uppercase tracking-[0.08em] mt-3.5"
+                        style={{
+                          gap: '5px',
+                          background: 'rgba(0,212,200,0.1)',
+                          border: '1px solid rgba(0,212,200,0.22)',
+                          color: 'var(--accent)',
+                          padding: '4px 11px'
+                        }}
+                      >
+                        ■ Points
+                      </span>
+                    </div>
                   </div>
                 );
               }
             })}
           </div>
 
-          {/* Store Balance Cards */}
+          {/* Store Balance Cards - matching HTML exactly */}
           {wallets.map((wallet, idx) => {
             const store = stores.find(s => s.partnerId === wallet.partnerId);
 
             return (
               <div
                 key={wallet.partnerId}
-                className="glass-card rounded-[22px] overflow-hidden hover-lift opacity-0 animate-fade-in-up"
-                style={{ animationDelay: `${0.35 + idx * 0.07}s` }}
+                className={`glass-card rounded-[22px] overflow-hidden ${idx === 0 ? 'a5' : 'a' + (5 + idx)}`}
               >
                 <div
-                  className="px-4 py-3.5 border-b flex justify-between items-center"
-                  style={{ borderColor: 'var(--user-border-subtle)' }}
+                  className="flex justify-between items-center border-b"
+                  style={{
+                    padding: '18px 18px 14px',
+                    borderColor: 'var(--user-store-divider)'
+                  }}
                 >
                   <div>
-                    <p className="text-base font-black user-text">{wallet.partnerName}</p>
-                    <p className="text-xs user-text-muted mt-0.5">📍 {store?.branchName || 'Branch'}</p>
+                    <p className="font-syne text-base font-black" style={{ color: 'var(--user-text-primary)' }}>{wallet.partnerName}</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--user-text-muted)' }}>📍 {store?.branchName || 'Branch'}</p>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider">
+                  <span
+                    className="inline-flex items-center rounded-full text-[10px] font-semibold uppercase tracking-[0.08em]"
+                    style={{
+                      gap: '5px',
+                      background: 'rgba(0,212,200,0.1)',
+                      border: '1px solid rgba(0,212,200,0.22)',
+                      color: 'var(--accent)',
+                      padding: '4px 11px'
+                    }}
+                  >
                     ■ Points
                   </span>
                 </div>
 
-                <div className="p-5 text-center">
-                  <p className="text-[10px] user-text-muted uppercase tracking-[0.1em] mb-2.5">Your Balance</p>
-                  <div className="flex items-baseline justify-center gap-1.5">
-                    <span className="text-[46px] font-black text-cyan-500 leading-none">{wallet.balance.toFixed(0)}</span>
-                    <span className="text-base font-semibold text-cyan-500/70">Pts</span>
+                <div className="text-center" style={{ padding: '20px 18px' }}>
+                  <p className="text-[10px] uppercase tracking-[0.1em] mb-2.5" style={{ color: 'var(--user-text-muted)' }}>Your Balance</p>
+                  <div className="flex items-baseline justify-center" style={{ gap: '6px' }}>
+                    <span className="font-syne text-[46px] font-black leading-none" style={{ color: 'var(--accent)' }}>{wallet.balance.toFixed(0)}</span>
+                    <span className="text-base font-semibold" style={{ color: 'var(--accent)', opacity: 0.7 }}>Pts</span>
                   </div>
-                  <p className="text-xs user-text-muted mt-2.5">💰 Earn Points On Every Purchase</p>
+                  <p className="text-xs mt-2.5" style={{ color: 'var(--user-text-muted)' }}>💰 Earn Points On Every Purchase</p>
                 </div>
               </div>
             );
           })}
 
-          {/* Earn Banner */}
-          <div
-            className="glass-card rounded-[22px] hover-lift opacity-0 animate-fade-in-up"
-            style={{ animationDelay: `${0.42 + wallets.length * 0.07}s` }}
-          >
-            <div className="flex items-center gap-3.5 p-4">
+          {/* Earn Banner - matching HTML exactly */}
+          <div className="glass-card rounded-[22px] a6">
+            <div className="flex items-center" style={{ gap: '14px', padding: '16px 18px' }}>
               <div
-                className="w-[46px] h-[46px] flex-shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-[15px] flex items-center justify-center text-[22px]"
+                className="flex-shrink-0 flex items-center justify-center text-[22px]"
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  background: 'var(--user-earn-icon-bg)',
+                  border: '1px solid var(--user-earn-icon-border)',
+                  borderRadius: '15px'
+                }}
               >
                 💳
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm user-text">Earn on Every Purchase</p>
-                <p className="text-xs user-text-muted mt-0.5">Points added automatically</p>
+              <div className="flex-1">
+                <p className="font-semibold text-sm" style={{ color: 'var(--user-text-primary)' }}>Earn on Every Purchase</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--user-text-muted)' }}>Points added automatically</p>
               </div>
-              <span className="text-[22px] text-cyan-500 opacity-60">›</span>
+              <span className="text-[22px] ml-auto" style={{ color: 'var(--accent)', opacity: 0.6 }}>›</span>
             </div>
           </div>
 
-          {/* Minimum Redemption Notice */}
+          {/* Minimum Redemption Notice - matching HTML exactly */}
           {wallets.some(w => w.balance < 100) && (
-            <div
-              className="glass-card rounded-[22px] hover-lift opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${0.48 + wallets.length * 0.07}s` }}
-            >
-              <div className="flex items-center gap-3.5 p-4">
+            <div className="glass-card rounded-[22px] a7">
+              <div className="flex items-center" style={{ gap: '14px', padding: '16px 18px' }}>
                 <div
-                  className="w-[46px] h-[46px] flex-shrink-0 bg-amber-500/10 border border-amber-500/20 rounded-[15px] flex items-center justify-center text-xl"
+                  className="flex-shrink-0 flex items-center justify-center text-xl"
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    background: 'var(--user-earn-icon-bg)',
+                    border: '1px solid var(--user-earn-icon-border)',
+                    borderRadius: '15px'
+                  }}
                 >
                   🎯
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm user-text">Keep Earning Points</p>
-                  <p className="text-xs user-text-muted mt-0.5">Redeem when you reach minimum balance</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm" style={{ color: 'var(--user-text-primary)' }}>Need {100} Points to Redeem</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--user-text-muted)' }}>
+                    You're {Math.max(0, 100 - totalPoints).toFixed(0)} pts away — keep going!
+                  </p>
                 </div>
               </div>
             </div>
