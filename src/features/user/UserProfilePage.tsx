@@ -244,6 +244,7 @@ export function UserProfilePage() {
       ) : (
         <div className="space-y-4">
           {storesVisited.map((store, index) => {
+            const loyaltyType = store.loyaltyType || 'VISITS';
             const threshold = store.rewardThreshold ?? 5;
             const windowDays = store.rewardWindowDays ?? 30;
             const description = store.rewardDescription || 'Free reward';
@@ -251,6 +252,10 @@ export function UserProfilePage() {
             const periodStart = store.streakPeriodStartedAt;
             const progressPct = threshold > 0 ? Math.min(100, (current / threshold) * 100) : 0;
             const isComplete = threshold > 0 && current >= threshold;
+
+            // Find wallet for this partner if POINTS or HYBRID
+            const wallet = profile.wallets?.find(w => w.partnerId === store.partnerId);
+            const pointsBalance = wallet?.balance ?? 0;
             return (
               <div
                 key={store.branchId}
@@ -267,32 +272,50 @@ export function UserProfilePage() {
                     <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
                   </div>
                 </div>
-                {(threshold > 0 && windowDays > 0) && (
+
+                {/* POINTS-based or HYBRID system */}
+                {(loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') && (
                   <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
-                    <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">You win when you complete</p>
-                    <p className="user-reward-box-text text-sm font-medium">
-                      {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
-                    </p>
-                    <p className="user-reward-box-text-strong mt-1.5 text-base font-semibold">
-                      → {description}
-                    </p>
-                  </div>
-                )}
-                {periodStart && (
-                  <p className="user-text-subtle text-xs mt-2">Period started: {formatDate(periodStart)}</p>
-                )}
-                {(threshold > 0) && (
-                  <div className="mt-4 flex items-center gap-3">
-                    <div className="h-2.5 flex-1 max-w-[180px] rounded-full overflow-hidden" style={{ backgroundColor: 'var(--user-hover)' }}>
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 animate-progress-fill transition-[width] duration-500"
-                        style={{ width: `${progressPct}%` }}
-                      />
+                    <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">Points Balance</p>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
+                        {pointsBalance.toFixed(0)}
+                      </p>
+                      <p className="user-reward-box-text text-sm">points</p>
                     </div>
-                    <span className={`font-semibold text-sm tabular-nums ${isComplete ? 'text-emerald-500' : 'user-reward-box-text-strong'}`}>
-                      {current}/{threshold}
-                    </span>
+                    <p className="user-reward-box-text-strong mt-2 text-sm">
+                      Earn points on every purchase to redeem rewards
+                    </p>
                   </div>
+                )}
+
+                {/* VISITS-based system */}
+                {loyaltyType === 'VISITS' && threshold > 0 && windowDays > 0 && (
+                  <>
+                    <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
+                      <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">You win when you complete</p>
+                      <p className="user-reward-box-text text-sm font-medium">
+                        {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
+                      </p>
+                      <p className="user-reward-box-text-strong mt-1.5 text-base font-semibold">
+                        → {description}
+                      </p>
+                    </div>
+                    {periodStart && (
+                      <p className="user-text-subtle text-xs mt-2">Period started: {formatDate(periodStart)}</p>
+                    )}
+                    <div className="mt-4 flex items-center gap-3">
+                      <div className="h-2.5 flex-1 max-w-[180px] rounded-full overflow-hidden" style={{ backgroundColor: 'var(--user-hover)' }}>
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 animate-progress-fill transition-[width] duration-500"
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                      <span className={`font-semibold text-sm tabular-nums ${isComplete ? 'text-emerald-500' : 'user-reward-box-text-strong'}`}>
+                        {current}/{threshold}
+                      </span>
+                    </div>
+                  </>
                 )}
               </div>
             );

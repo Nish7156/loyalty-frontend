@@ -74,6 +74,7 @@ export interface StoreVisit {
   partnerName: string;
   visitCount: number;
   lastVisitAt: string;
+  loyaltyType?: 'VISITS' | 'POINTS' | 'HYBRID';
   rewardThreshold?: number;
   rewardWindowDays?: number;
   rewardDescription?: string;
