@@ -25,7 +25,7 @@ export function CustomerLoginPage() {
       // Check if customer is verified and can skip OTP
       if (res.skipOtp) {
         // Verified customer - login directly without OTP
-        const loginRes = await authApi.customerLogin(normalized, '');
+        const loginRes = await authApi.customerLogin(normalized);
         setCustomerToken(loginRes.access_token);
         navigate('/me', { replace: true });
         return;
