@@ -19,7 +19,19 @@ export function CustomerLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.sendOtp(normalizeIndianPhone(phone.trim()));
+      const normalized = normalizeIndianPhone(phone.trim());
+      const res = await authApi.sendOtp(normalized);
+
+      // Check if customer is verified and can skip OTP
+      if (res.skipOtp) {
+        // Verified customer - login directly without OTP
+        const loginRes = await authApi.customerLogin(normalized, '');
+        setCustomerToken(loginRes.access_token);
+        navigate('/me', { replace: true });
+        return;
+      }
+
+      // New/unverified customer - show OTP screen
       setMpin(res.otp ?? '');
       setStep('otp');
       setOtp('');

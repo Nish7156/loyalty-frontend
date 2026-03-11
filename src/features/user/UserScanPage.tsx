@@ -98,6 +98,26 @@ export function UserScanPage() {
       try {
         const res = await authApi.sendOtp(normalized);
         setPhone(normalized);
+
+        // Check if customer is verified and can skip OTP
+        if (res.skipOtp) {
+          // Verified customer - login directly and go to checkin
+          const loginRes = await authApi.customerLogin(normalized, '');
+          setCustomerToken(loginRes.access_token);
+          setProfileLoading(true);
+          const p = await customersApi.getMyProfile();
+          setProfile(p);
+          if (p.customer.name?.trim()) {
+            setCustomerName(p.customer.name.trim());
+          }
+          const store = p.storesVisited?.find((s) => s.branchId === branchId);
+          setCurrentPartnerId(store?.partnerId ?? null);
+          setProfileLoading(false);
+          setStep('checkin');
+          return;
+        }
+
+        // New/unverified customer - show OTP screen
         setMpin(res.otp ?? '');
         setOtpMode('register');
         setStep('otp');
@@ -119,6 +139,26 @@ export function UserScanPage() {
     try {
       const normalized = normalizeIndianPhone(phone.trim());
       const res = await authApi.sendOtp(normalized);
+
+      // Check if customer is verified and can skip OTP
+      if (res.skipOtp) {
+        // Verified customer - login directly
+        const loginRes = await authApi.customerLogin(normalized, '');
+        setCustomerToken(loginRes.access_token);
+        setProfileLoading(true);
+        const p = await customersApi.getMyProfile();
+        setProfile(p);
+        if (p.customer.name?.trim()) {
+          setCustomerName(p.customer.name.trim());
+        }
+        const store = p.storesVisited?.find((s) => s.branchId === branchId);
+        setCurrentPartnerId(store?.partnerId ?? null);
+        setProfileLoading(false);
+        setStep('checkin');
+        return;
+      }
+
+      // New/unverified customer - show OTP screen
       setMpin(res.otp ?? '');
       setOtpMode('customerLogin');
       setStep('otp');
@@ -138,6 +178,25 @@ export function UserScanPage() {
     try {
       const normalized = normalizeIndianPhone(phone.trim());
       const res = await authApi.sendOtp(normalized);
+
+      // Check if customer is verified and can skip OTP
+      if (res.skipOtp) {
+        // This shouldn't happen during resend, but handle it anyway
+        const loginRes = await authApi.customerLogin(normalized, '');
+        setCustomerToken(loginRes.access_token);
+        setProfileLoading(true);
+        const p = await customersApi.getMyProfile();
+        setProfile(p);
+        if (p.customer.name?.trim()) {
+          setCustomerName(p.customer.name.trim());
+        }
+        const store = p.storesVisited?.find((s) => s.branchId === branchId);
+        setCurrentPartnerId(store?.partnerId ?? null);
+        setProfileLoading(false);
+        setStep('checkin');
+        return;
+      }
+
       setMpin(res.otp ?? '');
       setOtp('');
       setResendCooldownUntil(Date.now() + 60000);
