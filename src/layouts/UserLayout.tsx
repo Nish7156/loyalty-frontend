@@ -148,34 +148,53 @@ export function UserLayout() {
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] bg-[var(--user-bg)] text-[var(--user-text)] safe-area" data-theme={resolvedTheme}>
       <header className="shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
-        {/* Top row: Logo + Right actions */}
-        <div className="flex items-center justify-between gap-2 h-12 px-3">
-          {/* Left: Avatar (if logged in) */}
+        {/* Single clean row */}
+        <div className="flex items-center justify-between gap-3 h-14 px-4">
+          {/* Left: Avatar */}
           <div className="shrink-0">
             {hasToken && (customerPhone || customerName) ? (
               <Link
                 to="/profile"
-                className="p-1 rounded-full transition touch-manipulation flex items-center justify-center"
+                className="block rounded-full transition touch-manipulation"
                 aria-label="My Profile"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold shadow-md hover:scale-110 transition-transform">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-base font-bold shadow-lg hover:scale-110 transition-transform">
                   {(customerName || customerPhone || 'U')[0].toUpperCase()}
                 </div>
               </Link>
             ) : (
-              <div className="w-8 h-8" />
+              <div className="w-9 h-9" />
             )}
           </div>
 
-          {/* Center: App Name */}
-          <div className="flex-1 min-w-0 flex justify-center">
-            <span className="font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none">
+          {/* Center: App Name + Wallet */}
+          <div className="flex-1 min-w-0 flex items-center justify-center gap-3">
+            <span className="font-bold text-lg tracking-[0.15em] uppercase bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-clip-text text-transparent select-none whitespace-nowrap">
               LOYALTY
             </span>
+
+            {hasToken && walletBalances.length > 0 && (() => {
+              const totalPoints = walletBalances.reduce((sum, w) => sum + w.balance, 0);
+              return totalPoints > 0 ? (
+                <Link
+                  to="/wallet"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all hover:scale-105 touch-manipulation"
+                  style={{
+                    backgroundColor: 'var(--user-surface)',
+                    borderColor: 'var(--user-border-subtle)',
+                  }}
+                >
+                  <span className="text-base">💰</span>
+                  <span className="font-semibold text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent whitespace-nowrap">
+                    {totalPoints.toFixed(0)}
+                  </span>
+                </Link>
+              ) : null;
+            })()}
           </div>
 
-          {/* Right: Theme + PWA + Feedback */}
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Right: Actions */}
+          <div className="flex items-center gap-0.5 shrink-0">
             <div className="relative">
               <button
                 type="button"
@@ -235,28 +254,6 @@ export function UserLayout() {
             )}
           </div>
         </div>
-
-        {/* Bottom row: Wallet badge (only show if has points) */}
-        {hasToken && walletBalances.length > 0 && (() => {
-          const totalPoints = walletBalances.reduce((sum, w) => sum + w.balance, 0);
-          return totalPoints > 0 ? (
-            <div className="px-3 pb-2">
-              <Link
-                to="/wallet"
-                className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:scale-105 touch-manipulation w-full max-w-[200px] mx-auto"
-                style={{
-                  backgroundColor: 'var(--user-surface)',
-                  borderColor: 'var(--user-border-subtle)',
-                }}
-              >
-                <span className="text-lg">💰</span>
-                <span className="font-bold text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
-                  {totalPoints.toFixed(0)} Points
-                </span>
-              </Link>
-            </div>
-          ) : null;
-        })()}
       </header>
       <main className="flex-1 overflow-auto overflow-x-hidden p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize safe-area-x">
         <Outlet />
