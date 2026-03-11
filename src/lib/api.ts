@@ -236,7 +236,7 @@ export interface CustomerLoginResponse {
 
 export const authApi = {
   sendOtp: (phone: string, code?: string) =>
-    api<{ success: true; otp?: string }>('/auth/send-otp', {
+    api<{ success: true; otp?: string; skipOtp?: boolean }>('/auth/send-otp', {
       method: 'POST',
       body: JSON.stringify({ phone, ...(code != null && { code }) }),
     }),
