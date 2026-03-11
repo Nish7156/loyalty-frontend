@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
+import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi, walletApi } from '../lib/api';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { PWAInstallButton } from '../components/PWAInstallButton';
+import type { WalletBalance } from '../lib/api';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 const MAX_FEEDBACK_LENGTH = 2000;
@@ -44,6 +45,7 @@ export function UserLayout() {
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState('');
+  const [walletBalances, setWalletBalances] = useState<WalletBalance[]>([]);
   const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -92,6 +94,9 @@ export function UserLayout() {
     } else {
       customersApi.getMyProfile().then((p) => setCustomerPhone(p.customer.phoneNumber)).catch(() => {});
     }
+
+    // Fetch wallet balances
+    walletApi.getAllBalances().then(setWalletBalances).catch(() => {});
   }, [hasToken]);
 
   useEffect(() => {
@@ -114,6 +119,8 @@ export function UserLayout() {
           setShowApprovalCelebration(false);
           celebrationEndRef.current = null;
         }, 2200);
+        // Refresh wallet balances after approval
+        walletApi.getAllBalances().then(setWalletBalances).catch(() => {});
       }
     };
     socket.on('checkin_updated', handler);
@@ -134,10 +141,28 @@ export function UserLayout() {
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] bg-[var(--user-bg)] text-[var(--user-text)] safe-area" data-theme={resolvedTheme}>
       <header className="flex items-center justify-between gap-2 h-12 md:h-14 shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b min-h-[3rem]" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
-        <div className="flex-1 min-w-0 flex justify-center">
+        <div className="flex-1 min-w-0 flex items-center justify-center gap-3">
           <span className="font-bold text-base md:text-lg tracking-widest uppercase bg-[length:200%_100%] bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-left hover:bg-right transition-[background-position] duration-500 select-none truncate block text-center">
             Loyalty
           </span>
+          {hasToken && walletBalances.length > 0 && (() => {
+            const totalPoints = walletBalances.reduce((sum, w) => sum + w.balance, 0);
+            return totalPoints > 0 ? (
+              <Link
+                to="/wallet"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-all hover:scale-105 touch-manipulation min-h-[32px]"
+                style={{
+                  backgroundColor: 'var(--user-surface)',
+                  borderColor: 'var(--user-border-subtle)',
+                }}
+              >
+                <span className="text-lg">💰</span>
+                <span className="font-bold text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
+                  {totalPoints.toFixed(0)}
+                </span>
+              </Link>
+            ) : null;
+          })()}
         </div>
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <div className="relative">

@@ -34,7 +34,21 @@ export interface Branch {
   id: string;
   branchName: string;
   partnerId: string;
-  settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string; minCheckInAmount?: number };
+  loyaltyType?: 'VISITS' | 'POINTS' | 'HYBRID';
+  settingsLocked?: boolean;
+  settings?: {
+    streakThreshold?: number;
+    cooldownHours?: number;
+    cooldownMinutes?: number;
+    rewardWindowDays?: number;
+    rewardDescription?: string;
+    minCheckInAmount?: number;
+    walletEnabled?: boolean;
+    pointsPercentage?: number;
+    pointsExpiryDays?: number;
+    pointsToRewardRatio?: number;
+    minimumRedemptionPoints?: number;
+  };
   location?: { lat: number; lng: number };
   partner?: Partner;
   staff?: Staff[];
@@ -73,6 +87,7 @@ export interface CustomerProfile {
     rewards?: Reward[];
   };
   storesVisited: StoreVisit[];
+  wallets?: WalletBalance[];
 }
 
 export interface Activity {
@@ -254,14 +269,41 @@ export const branchesApi = {
   create: (body: {
     branchName: string;
     partnerId: string;
-    settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string; minCheckInAmount?: number };
+    loyaltyType?: 'VISITS' | 'POINTS' | 'HYBRID';
+    settings?: {
+      streakThreshold?: number;
+      cooldownHours?: number;
+      cooldownMinutes?: number;
+      rewardWindowDays?: number;
+      rewardDescription?: string;
+      minCheckInAmount?: number;
+      walletEnabled?: boolean;
+      pointsPercentage?: number;
+      pointsExpiryDays?: number;
+      pointsToRewardRatio?: number;
+      minimumRedemptionPoints?: number;
+    };
     location?: { lat: number; lng: number };
   }) => api<Branch>('/branches', { method: 'POST', body: JSON.stringify(body) }),
   update: (
     id: string,
     body: {
       branchName?: string;
-      settings?: { streakThreshold?: number; cooldownHours?: number; cooldownMinutes?: number; rewardWindowDays?: number; rewardDescription?: string; minCheckInAmount?: number };
+      loyaltyType?: 'VISITS' | 'POINTS' | 'HYBRID';
+      settingsLocked?: boolean;
+      settings?: {
+        streakThreshold?: number;
+        cooldownHours?: number;
+        cooldownMinutes?: number;
+        rewardWindowDays?: number;
+        rewardDescription?: string;
+        minCheckInAmount?: number;
+        walletEnabled?: boolean;
+        pointsPercentage?: number;
+        pointsExpiryDays?: number;
+        pointsToRewardRatio?: number;
+        minimumRedemptionPoints?: number;
+      };
       location?: { lat: number; lng: number };
     }
   ) => api<Branch>(`/branches/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
@@ -346,4 +388,56 @@ export const feedbackApi = {
       body: JSON.stringify({ message: message.trim() }),
     }, true),
   list: () => api<(Feedback & { customer?: { phoneNumber: string; name: string | null } })[]>('/feedback'),
+};
+
+export interface WalletBalance {
+  balance: number;
+  lifetimeEarned: number;
+  lifetimeSpent: number;
+  partnerId: string;
+  partnerName: string;
+}
+
+export interface WalletTransaction {
+  id: string;
+  type: 'EARN' | 'SPEND' | 'EXPIRE' | 'ADJUST';
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  description: string;
+  metadata?: Record<string, unknown>;
+  expiresAt?: string;
+  createdAt: string;
+  partnerId: string;
+  partnerName: string;
+}
+
+export interface RedeemPointsResponse {
+  success: boolean;
+  pointsSpent: number;
+  rewardsCreated: number;
+  rewards: Reward[];
+  remainingBalance: number;
+}
+
+export const walletApi = {
+  getAllBalances: () => api<WalletBalance[]>('/wallet/balance', {}, true),
+  getBalance: (partnerId: string) =>
+    api<{ balance: number; lifetimeEarned: number; lifetimeSpent: number; partnerId: string }>(
+      `/wallet/balance/${partnerId}`,
+      {},
+      true
+    ),
+  getTransactions: (partnerId?: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (partnerId) params.set('partnerId', partnerId);
+    if (limit) params.set('limit', limit.toString());
+    if (offset) params.set('offset', offset.toString());
+    return api<WalletTransaction[]>(`/wallet/transactions?${params.toString()}`, {}, true);
+  },
+  redeemPoints: (partnerId: string, branchId: string) =>
+    api<RedeemPointsResponse>('/wallet/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ partnerId, branchId }),
+    }, true),
 };

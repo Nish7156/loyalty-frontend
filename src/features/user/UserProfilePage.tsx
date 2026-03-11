@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { PhoneInput } from '../../components/PhoneInput';
-import { ProfileSkeleton } from '../../components/Skeleton';
+import { EmptyState } from '../../components/EmptyState';
+import { SkeletonLoader } from '../../components/SkeletonLoader';
+import { useHaptic } from '../../hooks/useHaptic';
 import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
@@ -17,6 +19,7 @@ function formatDate(s: string) {
 }
 
 export function UserProfilePage() {
+  const haptic = useHaptic();
   const [phone, setPhone] = useState(() => localStorage.getItem(PHONE_KEY) || DEFAULT_PHONE_PREFIX);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [history, setHistory] = useState<CustomerHistory | null>(null);
@@ -76,6 +79,7 @@ export function UserProfilePage() {
   };
 
   const handleLogout = () => {
+    haptic.medium();
     setShowLogoutConfirm(false);
     clearCustomerToken();
     setProfile(null);
@@ -87,7 +91,7 @@ export function UserProfilePage() {
   if (getCustomerTokenIfPresent() && loading && !profile) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0">
-        <ProfileSkeleton />
+        <SkeletonLoader type="profile" count={1} />
       </div>
     );
   }
@@ -95,11 +99,11 @@ export function UserProfilePage() {
   if (!phone && !profile) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8 opacity-0 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gradient-premium tracking-tight">
           My Loyalty Card
         </h1>
         <p className="user-text-muted text-sm mb-6">Enter your phone to view your profile and rewards.</p>
-        <form onSubmit={handlePhoneSubmit} className="user-card rounded-2xl p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] card-interactive tap-scale">
+        <form onSubmit={handlePhoneSubmit} className="glass-card rounded-2xl p-5 shadow-premium-md card-premium haptic-feedback">
           <PhoneInput
             label="Phone"
             value={phone}
@@ -110,8 +114,8 @@ export function UserProfilePage() {
           />
           <button
             type="submit"
-            className="hover-user-bg w-full min-h-[48px] mt-4 rounded-xl border font-medium transition-all duration-200 touch-manipulation btn-interactive"
-            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
+            onClick={() => haptic.light()}
+            className="btn-premium text-white w-full min-h-[48px] mt-4 rounded-xl font-medium transition-colors-premium touch-manipulation"
           >
             Explore
           </button>
@@ -123,7 +127,7 @@ export function UserProfilePage() {
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0">
-        <ProfileSkeleton />
+        <SkeletonLoader type="profile" count={1} />
       </div>
     );
   }
@@ -136,8 +140,8 @@ export function UserProfilePage() {
   const activeRewards = rewards.filter((r) => r.status === 'ACTIVE');
   const redeemedFromHistory = history?.redeemedRewards ?? [];
 
-  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] card-interactive tap-scale opacity-0 animate-fade-in-up';
-  const sectionTitleClass = 'text-base font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent mb-1';
+  const cardClass = 'glass-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-premium-md card-premium haptic-feedback opacity-0 animate-slide-in-up';
+  const sectionTitleClass = 'text-base font-semibold text-gradient-premium mb-1';
   const descClass = 'user-text-muted text-sm';
 
   return (
@@ -149,8 +153,8 @@ export function UserProfilePage() {
         {loadedByToken && (
           <button
             type="button"
-            onClick={() => setShowLogoutConfirm(true)}
-            className="hover-user-bg shrink-0 min-h-[44px] px-4 rounded-xl border text-sm font-medium transition-all duration-200 touch-manipulation btn-interactive"
+            onClick={() => { haptic.light(); setShowLogoutConfirm(true); }}
+            className="shrink-0 min-h-[44px] px-4 rounded-xl border text-sm font-medium transition-colors-premium touch-manipulation haptic-feedback"
             style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
           >
             Log out
@@ -185,14 +189,58 @@ export function UserProfilePage() {
         </div>
       </div>
 
+      {profile.wallets && profile.wallets.length > 0 && (
+        <>
+          <div className="opacity-0 animate-fade-in-up stagger-2">
+            <h2 className={sectionTitleClass}>💰 Your Wallet</h2>
+            <p className="user-text-subtle text-sm mt-0.5">Points you've earned from purchases.</p>
+          </div>
+          <div className="space-y-3">
+            {profile.wallets.map((wallet, index) => (
+              <div
+                key={wallet.partnerId}
+                className={`${cardClass} stagger-2`}
+                style={{ animationDelay: `${0.19 + index * 0.08}s` }}
+              >
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold user-text text-lg truncate">{wallet.partnerName}</p>
+                    <p className={descClass}>Wallet Balance</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
+                      {wallet.balance.toFixed(0)}
+                    </p>
+                    <p className={descClass}>points</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-4 text-sm">
+                  <div>
+                    <p className={descClass}>Earned</p>
+                    <p className="font-semibold user-text mt-0.5">+{wallet.lifetimeEarned.toFixed(0)}</p>
+                  </div>
+                  <div>
+                    <p className={descClass}>Spent</p>
+                    <p className="font-semibold user-text mt-0.5">-{wallet.lifetimeSpent.toFixed(0)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <div className="opacity-0 animate-fade-in-up stagger-2">
         <h2 className={sectionTitleClass}>Stores you use</h2>
         <p className="user-text-subtle text-sm mt-0.5">Your progress and what you win at each store.</p>
       </div>
       {storesVisited.length === 0 ? (
-        <div className={`${cardClass} stagger-2`}>
-          <p className={descClass}>No store visits yet. Scan a store QR to check in — your first visit counts.</p>
-        </div>
+        <EmptyState
+          icon="🏪"
+          title="No stores visited yet"
+          description="Scan a store QR code to check in and start earning rewards. Your loyalty journey begins with your first visit!"
+          className="stagger-2"
+        />
       ) : (
         <div className="space-y-4">
           {storesVisited.map((store, index) => {

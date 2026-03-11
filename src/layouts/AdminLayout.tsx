@@ -44,6 +44,9 @@ export function AdminLayout() {
           <Link to="/admin/stores" className="block px-3 py-2.5 rounded hover:bg-gray-700 min-h-[44px] flex items-center" onClick={() => setMenuOpen(false)}>
             Stores
           </Link>
+          <Link to="/admin/branches" className="block px-3 py-2.5 rounded hover:bg-gray-700 min-h-[44px] flex items-center" onClick={() => setMenuOpen(false)}>
+            Branches
+          </Link>
         </nav>
         <div className="p-2 border-t border-gray-700 space-y-2">
           <PWAInstallButton />

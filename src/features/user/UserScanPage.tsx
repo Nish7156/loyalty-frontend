@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { customersApi, activityApi, branchesApi, authApi, rewardsApi, setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { customersApi, activityApi, branchesApi, authApi, rewardsApi, walletApi, setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import type { CustomerProfile, Reward } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
@@ -33,6 +33,7 @@ export function UserScanPage() {
   const [currentPartnerId, setCurrentPartnerId] = useState<string | null>(null);
   const [lastActivityId, setLastActivityId] = useState<string | null>(null);
   const [checkinStatus, setCheckinStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
+  const [pointsEarned, setPointsEarned] = useState<number | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [minCheckInAmount, setMinCheckInAmount] = useState<number | null>(null);
   const [resendCooldownUntil, setResendCooldownUntil] = useState(0);
@@ -264,6 +265,16 @@ export function UserScanPage() {
       setCheckinStatus(payload.status as 'APPROVED' | 'REJECTED');
       if (payload.status === 'APPROVED' && getCustomerTokenIfPresent()) {
         customersApi.getMyProfile().then(setProfile).catch(() => {});
+        walletApi.getTransactions(undefined, 1, 0).then((txs) => {
+          if (txs && txs.length > 0 && txs[0].type === 'EARN') {
+            const recentTx = txs[0];
+            const txTime = new Date(recentTx.createdAt).getTime();
+            const now = Date.now();
+            if (now - txTime < 10000) {
+              setPointsEarned(recentTx.amount);
+            }
+          }
+        }).catch(() => {});
       }
     };
     socket.on('checkin_updated', handler);
@@ -504,7 +515,17 @@ export function UserScanPage() {
           ) : checkinStatus === 'APPROVED' ? (
             <>
               <p className="font-semibold text-emerald-500">Approved!</p>
-              <p className="text-sm user-text-muted mt-1">Your visit and points have been updated.</p>
+              {pointsEarned && pointsEarned > 0 ? (
+                <>
+                  <p className="text-sm user-text-muted mt-1">Your visit has been recorded.</p>
+                  <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-cyan-400/10 border border-cyan-500/20">
+                    <p className="text-lg font-bold text-cyan-500">+{pointsEarned.toFixed(0)} points earned!</p>
+                    <p className="text-xs text-cyan-600 mt-1">Check your wallet to see your balance</p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm user-text-muted mt-1">Your visit and points have been updated.</p>
+              )}
             </>
           ) : (
             <>
@@ -512,7 +533,7 @@ export function UserScanPage() {
               <p className="text-sm user-text-muted mt-1">Staff declined this check-in.</p>
             </>
           )}
-          <button type="button" className={`${btnPrimary} mt-5`} style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); }}>
+          <button type="button" className={`${btnPrimary} mt-5`} style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }} onClick={() => { setStep('checkin'); setAmount(''); setError(''); setLastActivityId(null); setCheckinStatus(null); setPointsEarned(null); }}>
             Another check-in
           </button>
         </div>

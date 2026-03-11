@@ -13,9 +13,11 @@ import { UserProfilePage } from '../features/user/UserProfilePage';
 import { UserHistoryPage } from '../features/user/UserHistoryPage';
 import { UserRewardsPage } from '../features/user/UserRewardsPage';
 import { UserRequestsPage } from '../features/user/UserRequestsPage';
+import { UserWalletPage } from '../features/user/UserWalletPage';
 
 const AdminDashboard = lazy(() => import('../features/admin/Dashboard').then((m) => ({ default: m.AdminDashboard })));
 const PartnersPage = lazy(() => import('../features/admin/PartnersPage').then((m) => ({ default: m.PartnersPage })));
+const AdminBranchesPage = lazy(() => import('../features/admin/BranchesPage').then((m) => ({ default: m.AdminBranchesPage })));
 const OwnerDashboard = lazy(() => import('../features/store-owner/Dashboard').then((m) => ({ default: m.OwnerDashboard })));
 const BranchesPage = lazy(() => import('../features/store-owner/BranchesPage').then((m) => ({ default: m.BranchesPage })));
 const StaffPage = lazy(() => import('../features/store-owner/StaffPage').then((m) => ({ default: m.StaffPage })));
@@ -47,6 +49,7 @@ export function AppRouter() {
           <Route path="history" element={<UserHistoryPage />} />
           <Route path="rewards" element={<UserRewardsPage />} />
           <Route path="requests" element={<UserRequestsPage />} />
+          <Route path="wallet" element={<UserWalletPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 
@@ -72,6 +75,7 @@ export function AppRouter() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="stores" element={<PartnersPage />} />
+            <Route path="branches" element={<AdminBranchesPage />} />
           </Route>
         </Route>
 
