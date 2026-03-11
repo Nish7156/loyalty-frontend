@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { customersApi, getCustomerTokenIfPresent, clearCustomerToken } from '../../lib/api';
+import { customersApi, getCustomerTokenIfPresent, clearCustomerToken, walletApi } from '../../lib/api';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { PhoneInput } from '../../components/PhoneInput';
 import { EmptyState } from '../../components/EmptyState';
@@ -27,6 +27,8 @@ export function UserProfilePage() {
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [redeemingPartnerId, setRedeemingPartnerId] = useState<string | null>(null);
+  const [redeemSuccess, setRedeemSuccess] = useState<{ partnerId: string; rewardsCreated: number } | null>(null);
 
   useEffect(() => {
     if (getCustomerTokenIfPresent()) {
@@ -75,6 +77,27 @@ export function UserProfilePage() {
       const normalized = normalizeIndianPhone(phone);
       setPhone(normalized);
       localStorage.setItem(PHONE_KEY, normalized);
+    }
+  };
+
+  const handleRedeemPoints = async (partnerId: string, branchId: string) => {
+    if (!loadedByToken) return;
+    setRedeemingPartnerId(partnerId);
+    setError('');
+    setRedeemSuccess(null);
+    try {
+      const result = await walletApi.redeemPoints(partnerId, branchId);
+      setRedeemSuccess({ partnerId, rewardsCreated: result.rewardsCreated });
+      // Refresh profile to show updated wallet balance and rewards
+      const p = await customersApi.getMyProfile();
+      setProfile(p);
+      haptic.medium();
+      // Clear success message after 5 seconds
+      setTimeout(() => setRedeemSuccess(null), 5000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to redeem points');
+    } finally {
+      setRedeemingPartnerId(null);
     }
   };
 
@@ -131,7 +154,6 @@ export function UserProfilePage() {
       </div>
     );
   }
-  if (error) return <p className="text-rose-500 text-sm">{error}</p>;
   if (!profile) return null;
 
   const { customer, storesVisited } = profile;
@@ -161,6 +183,15 @@ export function UserProfilePage() {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 opacity-0 animate-fade-in-up">
+          <p className="text-rose-500 text-sm">{error}</p>
+          <button type="button" onClick={() => setError('')} className="text-rose-400 text-xs mt-1 hover:text-rose-300">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className={`${cardClass} stagger-1`}>
         {customer.name && (
@@ -275,18 +306,46 @@ export function UserProfilePage() {
 
                 {/* POINTS-based or HYBRID system */}
                 {(loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') && (
-                  <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
-                    <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">Points Balance</p>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <p className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
-                        {pointsBalance.toFixed(0)}
+                  <>
+                    <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
+                      <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">Points Balance</p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <p className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
+                          {pointsBalance.toFixed(0)}
+                        </p>
+                        <p className="user-reward-box-text text-sm">points</p>
+                      </div>
+                      <p className="user-reward-box-text-strong mt-2 text-sm">
+                        Earn points on every purchase to redeem rewards
                       </p>
-                      <p className="user-reward-box-text text-sm">points</p>
                     </div>
-                    <p className="user-reward-box-text-strong mt-2 text-sm">
-                      Earn points on every purchase to redeem rewards
-                    </p>
-                  </div>
+
+                    {/* Redeem Points Button - only show if logged in */}
+                    {loadedByToken && pointsBalance >= 50 && (
+                      <>
+                        {redeemSuccess?.partnerId === store.partnerId ? (
+                          <div className="mt-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3">
+                            <p className="text-emerald-500 font-semibold text-sm">
+                              ✓ Redeemed! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added
+                            </p>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
+                            disabled={!!redeemingPartnerId}
+                            className="hover-user-bg w-full min-h-[44px] mt-3 rounded-xl border font-medium transition disabled:opacity-50 touch-manipulation"
+                            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
+                          >
+                            {redeemingPartnerId === store.partnerId ? 'Redeeming...' : 'Redeem Points for Rewards'}
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {loadedByToken && pointsBalance < 50 && (
+                      <p className="user-text-subtle text-xs mt-3">Minimum 50 points required to redeem</p>
+                    )}
+                  </>
                 )}
 
                 {/* VISITS-based system */}
