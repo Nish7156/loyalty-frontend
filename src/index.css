@@ -15,20 +15,41 @@
   --premium-gold-dim: #0891b2;
   --premium-cream: #f0fdfa;
   --premium-cream-dim: #ccfbf1;
-  /* End-user theme (dark): semantic tokens for UserLayout */
-  --user-bg: #0c0a09;
-  --user-surface: #111827;
-  --user-card: #1e293b;
-  --user-border: #334155;
-  --user-text: #f8fafc;
-  --user-text-muted: rgba(248, 250, 252, 0.7);
-  --user-text-subtle: rgba(248, 250, 252, 0.5);
-  --user-border-subtle: rgba(255, 255, 255, 0.1);
+
+  /* End-user theme (dark): semantic tokens for UserLayout - matching loyalty-ui.html */
+  --user-bg-page: radial-gradient(ellipse at 30% 20%, #0d2a2a 0%, #060A13 50%, #08101a 100%);
+  --user-bg: #070B14;
+  --user-surface: rgba(7, 11, 20, 0.97);
+  --user-card: rgba(255, 255, 255, 0.04);
+  --user-border: rgba(255, 255, 255, 0.08);
+  --user-text: #fff;
+  --user-text-primary: #fff;
+  --user-text-muted: rgba(255, 255, 255, 0.38);
+  --user-text-subtle: rgba(255, 255, 255, 0.28);
+  --user-text-mid: rgba(255, 255, 255, 0.65);
+  --user-border-subtle: rgba(255, 255, 255, 0.08);
+  --user-card-border: rgba(255, 255, 255, 0.08);
+  --user-card-hover-border: rgba(0, 212, 200, 0.3);
+  --user-card-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
   --user-overlay: rgba(0, 0, 0, 0.6);
   --user-input-bg: rgba(0, 0, 0, 0.3);
-  --user-nav-bg: rgba(255, 255, 255, 0.06);
+  --user-nav-bg: rgba(7, 11, 20, 0.97);
+  --user-nav-border: rgba(255, 255, 255, 0.06);
+  --user-nav-item-color: rgba(255, 255, 255, 0.28);
+  --user-nav-item-hover: rgba(255, 255, 255, 0.05);
   --user-hover: rgba(255, 255, 255, 0.1);
   --user-card-subtle: rgba(255, 255, 255, 0.04);
+  --user-tabs-bg: rgba(255, 255, 255, 0.04);
+  --user-tabs-border: rgba(255, 255, 255, 0.07);
+  --user-tab-color: rgba(255, 255, 255, 0.38);
+  --user-icon-btn-bg: rgba(255, 255, 255, 0.05);
+  --user-icon-btn-border: rgba(255, 255, 255, 0.09);
+  --user-prog-track: rgba(255, 255, 255, 0.1);
+  --user-store-divider: rgba(255, 255, 255, 0.06);
+  --user-stat-chip-bg: rgba(0, 0, 0, 0.2);
+  --user-earn-icon-bg: rgba(0, 212, 200, 0.1);
+  --user-earn-icon-border: rgba(0, 212, 200, 0.18);
+  --accent: #00D4C8;
   --user-skeleton-bg: rgba(255, 255, 255, 0.14);
   --user-skeleton-card-bg: rgba(255, 255, 255, 0.04);
   --user-skeleton-card-border: rgba(255, 255, 255, 0.1);
@@ -72,19 +93,41 @@
   --premium-muted: #64748b;
   --premium-cream: #0f172a;
   --premium-cream-dim: #1e293b;
-  --user-bg: #f8fafc;
-  --user-surface: #f1f5f9;
-  --user-card: #ffffff;
-  --user-border: #e2e8f0;
-  --user-text: #0f172a;
-  --user-text-muted: #475569;
-  --user-text-subtle: #64748b;
-  --user-border-subtle: rgba(15, 23, 42, 0.12);
+
+  /* Light theme matching loyalty-ui.html */
+  --user-bg-page: radial-gradient(ellipse at 30% 20%, #d0f5f3 0%, #f0fafa 50%, #e8f4f8 100%);
+  --user-bg: #ffffff;
+  --user-surface: rgba(255, 255, 255, 0.97);
+  --user-card: rgba(0, 0, 0, 0.03);
+  --user-border: rgba(0, 0, 0, 0.08);
+  --user-text: #0a1a1a;
+  --user-text-primary: #0a1a1a;
+  --user-text-muted: rgba(0, 0, 0, 0.42);
+  --user-text-subtle: rgba(0, 0, 0, 0.3);
+  --user-text-mid: rgba(0, 0, 0, 0.55);
+  --user-border-subtle: rgba(0, 0, 0, 0.08);
+  --user-card-border: rgba(0, 0, 0, 0.08);
+  --user-card-hover-border: rgba(0, 180, 170, 0.4);
+  --user-card-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
   --user-overlay: rgba(15, 23, 42, 0.4);
   --user-input-bg: #f1f5f9;
-  --user-nav-bg: rgba(15, 23, 42, 0.04);
+  --user-nav-bg: rgba(255, 255, 255, 0.97);
+  --user-nav-border: rgba(0, 0, 0, 0.07);
+  --user-nav-item-color: rgba(0, 0, 0, 0.3);
+  --user-nav-item-hover: rgba(0, 0, 0, 0.05);
   --user-hover: rgba(0, 0, 0, 0.06);
   --user-card-subtle: rgba(0, 0, 0, 0.03);
+  --user-tabs-bg: rgba(0, 0, 0, 0.04);
+  --user-tabs-border: rgba(0, 0, 0, 0.07);
+  --user-tab-color: rgba(0, 0, 0, 0.38);
+  --user-icon-btn-bg: rgba(0, 0, 0, 0.05);
+  --user-icon-btn-border: rgba(0, 0, 0, 0.1);
+  --user-prog-track: rgba(0, 0, 0, 0.1);
+  --user-store-divider: rgba(0, 0, 0, 0.07);
+  --user-stat-chip-bg: rgba(0, 0, 0, 0.15);
+  --user-earn-icon-bg: rgba(0, 180, 170, 0.1);
+  --user-earn-icon-border: rgba(0, 180, 170, 0.22);
+  --accent: #009990;
   --user-skeleton-bg: rgba(0, 0, 0, 0.1);
   --user-skeleton-card-bg: rgba(0, 0, 0, 0.04);
   --user-skeleton-card-border: rgba(0, 0, 0, 0.1);
@@ -168,6 +211,7 @@ body {
   background-color: #f5f5f4;
   color: #1c1917;
   overflow-x: hidden;
+  font-family: 'DM Sans', sans-serif;
 }
 
 #root {
@@ -212,27 +256,30 @@ body {
   }
 }
 
-/* Glassmorphic wallet cards */
+/* Glassmorphic wallet cards - matching loyalty-ui.html exactly */
 .glass-card {
-  background: var(--user-card-subtle);
-  border: 1px solid var(--user-border-subtle);
+  background: var(--user-card);
+  border: 1px solid var(--user-card-border);
   position: relative;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+  background: var(--user-card-shine);
   pointer-events: none;
+  transition: background 0.3s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(0, 212, 200, 0.3);
+  border-color: var(--user-card-hover-border);
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 212, 200, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 212, 200, 0.08);
 }
 
 .hover-lift {
@@ -243,19 +290,9 @@ body {
   transform: translateY(-2px);
 }
 
-/* Light mode glass cards */
-.user-theme[data-theme="light"] .glass-card {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.08);
-}
-
-.user-theme[data-theme="light"] .glass-card::before {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
-}
-
-.user-theme[data-theme="light"] .glass-card:hover {
-  border-color: rgba(0, 180, 170, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 180, 170, 0.15), 0 0 0 1px rgba(0, 180, 170, 0.12);
+/* Typography - Syne font for headings and large numbers */
+.font-syne {
+  font-family: 'Syne', sans-serif;
 }
 
 /* PWA: animations & micro-interactions */

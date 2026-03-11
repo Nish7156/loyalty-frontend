@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi, walletApi } from '../lib/api';
@@ -10,9 +9,6 @@ import type { WalletBalance } from '../lib/api';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 const MAX_FEEDBACK_LENGTH = 2000;
-const THEME_STORAGE_KEY = 'loyalty-user-theme';
-
-type ThemeChoice = 'system' | 'dark' | 'light';
 
 function getSystemDark(): boolean {
   if (typeof window === 'undefined') return true;
@@ -28,32 +24,18 @@ export function UserLayout() {
   const isHistory = pathname === '/history';
   const isRewards = pathname === '/rewards';
   const isRequests = pathname === '/requests';
-  const [themeChoice, setThemeChoice] = useState<ThemeChoice>(() => {
-    try {
-      const s = localStorage.getItem(THEME_STORAGE_KEY);
-      if (s === 'dark' || s === 'light' || s === 'system') return s;
-    } catch (_) {}
-    return 'system';
-  });
   const [systemDark, setSystemDark] = useState(getSystemDark);
-  const resolvedTheme = themeChoice === 'system' ? (systemDark ? 'dark' : 'light') : themeChoice;
+  const resolvedTheme = systemDark ? 'dark' : 'light';
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
   const [showApprovalCelebration, setShowApprovalCelebration] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState('');
   const [walletBalances, setWalletBalances] = useState<WalletBalance[]>([]);
   const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, themeChoice);
-    } catch (_) {}
-  }, [themeChoice]);
 
   useEffect(() => {
     const m = window.matchMedia('(prefers-color-scheme: dark)');
@@ -147,115 +129,89 @@ export function UserLayout() {
 
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] bg-[var(--user-bg)] text-[var(--user-text)] safe-area" data-theme={resolvedTheme}>
-      <header className="shrink-0 safe-area-top safe-area-x backdrop-blur-md border-b" style={{ backgroundColor: 'var(--user-nav-bg)', borderColor: 'var(--user-border-subtle)' }}>
-        {/* Single clean row */}
-        <div className="flex items-center justify-between gap-3 h-14 px-4">
-          {/* Left: Avatar */}
-          <div className="shrink-0">
-            {hasToken && (customerPhone || customerName) ? (
-              <Link
-                to="/profile"
-                className="block rounded-full transition touch-manipulation"
-                aria-label="My Profile"
-              >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-base font-bold shadow-lg hover:scale-110 transition-transform">
-                  {(customerName || customerPhone || 'U')[0].toUpperCase()}
-                </div>
-              </Link>
-            ) : (
-              <div className="w-9 h-9" />
-            )}
-          </div>
-
-          {/* Center: App Name + Wallet */}
-          <div className="flex-1 min-w-0 flex items-center justify-center gap-3">
-            <span className="font-bold text-lg tracking-[0.15em] uppercase bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 bg-clip-text text-transparent select-none whitespace-nowrap">
+      <header className="shrink-0 safe-area-top safe-area-x" style={{ padding: '18px 20px 0' }}>
+        <div className="flex items-center justify-between">
+          {/* Left: Logo matching HTML exactly */}
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white font-black text-base"
+              style={{ background: 'linear-gradient(135deg, #00D4C8, #007A8A)' }}
+            >
+              +
+            </div>
+            <span className="font-syne text-[17px] font-black tracking-[0.01em]" style={{ color: 'var(--user-text-primary)' }}>
               LOYALTY
             </span>
+            <span style={{ fontSize: '16px', marginLeft: '-4px' }}>
+              {resolvedTheme === 'light' ? '☀️' : '🌙'}
+            </span>
+          </div>
 
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            {hasToken && (customerPhone || customerName) && (
+              <Link
+                to="/profile"
+                className="block transition touch-manipulation"
+                aria-label="My Profile"
+              >
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-base transition hover:opacity-80"
+                  style={{
+                    background: 'var(--user-icon-btn-bg)',
+                    border: '1px solid var(--user-icon-btn-border)',
+                  }}
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold">
+                    {(customerName || customerPhone || 'U')[0].toUpperCase()}
+                  </div>
+                </div>
+              </Link>
+            )}
             {hasToken && walletBalances.length > 0 && (() => {
               const totalPoints = walletBalances.reduce((sum, w) => sum + w.balance, 0);
               return totalPoints > 0 ? (
                 <Link
                   to="/wallet"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all hover:scale-105 touch-manipulation"
+                  className="flex items-center gap-1.5 transition-all touch-manipulation"
                   style={{
-                    backgroundColor: 'var(--user-surface)',
-                    borderColor: 'var(--user-border-subtle)',
+                    background: 'rgba(0, 212, 200, 0.1)',
+                    border: '1px solid rgba(0, 212, 200, 0.22)',
+                    color: 'var(--accent)',
+                    borderRadius: '100px',
+                    padding: '7px 13px',
+                    fontSize: '12px',
+                    fontWeight: 600,
                   }}
                 >
-                  <span className="text-base">💰</span>
-                  <span className="font-semibold text-sm bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent whitespace-nowrap">
-                    {totalPoints.toFixed(0)}
+                  <span>💰</span>
+                  <span className="whitespace-nowrap">
+                    {totalPoints.toFixed(0)} pts
                   </span>
                 </Link>
               ) : null;
             })()}
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-0.5 shrink-0">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setThemeMenuOpen((o) => !o)}
-                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
-                style={{ backgroundColor: themeMenuOpen ? 'var(--user-hover)' : undefined }}
-                aria-label="Theme"
-                aria-expanded={themeMenuOpen}
-              >
-                {resolvedTheme === 'light' ? (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                )}
-              </button>
-              {themeMenuOpen && createPortal(
-                <>
-                  <div className="fixed inset-0 z-[9998]" aria-hidden onClick={() => setThemeMenuOpen(false)} />
-                  <div
-                    className="fixed right-2 left-2 sm:left-auto sm:right-3 top-[3.5rem] z-[9999] min-w-[140px] max-w-[calc(100vw-1rem)] rounded-xl border shadow-xl py-1.5 touch-manipulation"
-                    style={{
-                      backgroundColor: resolvedTheme === 'light' ? '#ffffff' : '#1e293b',
-                      borderColor: 'var(--user-border-subtle)',
-                      boxShadow: '0 10px 40px -10px rgba(0,0,0,0.25)',
-                      opacity: 1,
-                    }}
-                  >
-                    <button type="button" onClick={() => { setThemeChoice('system'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'system' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
-                      System
-                    </button>
-                    <button type="button" onClick={() => { setThemeChoice('light'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'light' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
-                      Light
-                    </button>
-                    <button type="button" onClick={() => { setThemeChoice('dark'); setThemeMenuOpen(false); }} className="w-full px-4 py-3 sm:py-2 text-left text-sm min-h-[44px] sm:min-h-0 flex items-center" style={{ color: themeChoice === 'dark' ? 'var(--premium-blue)' : (resolvedTheme === 'light' ? '#0f172a' : '#f8fafc') }}>
-                      Dark
-                    </button>
-                  </div>
-                </>,
-                document.body
-              )}
-            </div>
             <PWAInstallButton />
             {hasToken && (
               <button
                 type="button"
                 onClick={() => setFeedbackOpen(true)}
-                className="p-2 rounded-xl text-[var(--user-text-muted)] hover:text-[var(--user-text)] transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--user-hover)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                aria-label="Send feedback"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-base cursor-pointer transition hover:opacity-80"
+                style={{
+                  background: 'var(--user-icon-btn-bg)',
+                  border: '1px solid var(--user-icon-btn-border)',
+                }}
+                aria-label="Feedback"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                </svg>
+                💬
               </button>
             )}
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-auto overflow-x-hidden p-4 pb-24 md:pb-24 md:p-5 min-w-0 capitalize safe-area-x">
+
+      {/* Scrollable main content */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 safe-area-x" style={{ padding: '20px 18px 10px' }}>
         <Outlet />
       </main>
       {feedbackOpen && (
