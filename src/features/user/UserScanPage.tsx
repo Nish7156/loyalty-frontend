@@ -82,7 +82,7 @@ export function UserScanPage() {
     } else if (!token && branchId) {
       setStep('phone');
     }
-  }, [branchId]);
+  }, [branchId]); // Only runs when branchId changes
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,10 +169,17 @@ export function UserScanPage() {
         const res = await authApi.customerLogin(normalized, otp.trim());
         setCustomerToken(res.access_token);
         setPhone(res.customer.phone);
-        setProfile(null);
+        // Profile will be loaded by the useEffect when step changes to 'checkin'
+        setStep('checkin');
+        setProfileLoading(true);
         const p = await customersApi.getMyProfile();
         setProfile(p);
-        setStep('checkin');
+        if (p.customer.name?.trim()) {
+          setCustomerName(p.customer.name.trim());
+        }
+        const store = p.storesVisited?.find((s) => s.branchId === branchId);
+        setCurrentPartnerId(store?.partnerId ?? null);
+        setProfileLoading(false);
       } else {
         const nameToSave = registerName.trim().slice(0, 200);
         const res = await customersApi.register({
@@ -226,9 +233,10 @@ export function UserScanPage() {
     setLastRedeemedCode(null);
     try {
       const redeemed = await rewardsApi.redeem(rewardId);
+      if (redeemed.redemptionCode) setLastRedeemedCode(redeemed.redemptionCode);
+      // Refresh profile to update rewards list
       const p = await customersApi.getMyProfile();
       setProfile(p);
-      if (redeemed.redemptionCode) setLastRedeemedCode(redeemed.redemptionCode);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Redeem failed');
     } finally {
@@ -264,8 +272,12 @@ export function UserScanPage() {
       if (payload.id !== lastActivityId) return;
       setCheckinStatus(payload.status as 'APPROVED' | 'REJECTED');
       if (payload.status === 'APPROVED' && getCustomerTokenIfPresent()) {
-        customersApi.getMyProfile().then(setProfile).catch(() => {});
-        walletApi.getTransactions(undefined, 1, 0).then((txs) => {
+        // Fetch profile and wallet transactions in parallel
+        Promise.all([
+          customersApi.getMyProfile(),
+          walletApi.getTransactions(undefined, 1, 0)
+        ]).then(([p, txs]) => {
+          setProfile(p);
           if (txs && txs.length > 0 && txs[0].type === 'EARN') {
             const recentTx = txs[0];
             const txTime = new Date(recentTx.createdAt).getTime();

@@ -54,7 +54,7 @@ export function UserProfilePage() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [phone]);
+  }, [phone]); // Only runs on phone change or mount
 
   useEffect(() => {
     const handler = () => {
