@@ -73,7 +73,7 @@ export function UserRequestsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 px-4 pt-2">
+      <div className="max-w-md mx-auto w-full min-w-0">
         <HistorySkeleton />
       </div>
     );
@@ -81,7 +81,7 @@ export function UserRequestsPage() {
 
   if (error) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 px-4 pt-2 pb-8">
+      <div className="max-w-md mx-auto w-full min-w-0">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
           My Requests
         </h1>
@@ -93,7 +93,7 @@ export function UserRequestsPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto w-full min-w-0 px-4 pt-2 pb-8">
+    <div className="max-w-md mx-auto w-full min-w-0">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
           My Requests
