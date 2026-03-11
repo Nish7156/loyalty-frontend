@@ -110,14 +110,29 @@ export function UserRewardsPage() {
                     className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       r.status === 'ACTIVE'
                         ? 'bg-cyan-400/20 text-cyan-600'
+                        : r.status === 'PENDING'
+                        ? 'bg-amber-400/20 text-amber-600'
                         : 'user-text-muted'
                     }`}
-                    style={r.status !== 'ACTIVE' ? { backgroundColor: 'var(--user-hover)' } : undefined}
+                    style={r.status === 'REDEEMED' ? { backgroundColor: 'var(--user-hover)' } : undefined}
                   >
-                    {r.status === 'ACTIVE' ? 'Ready to use' : 'Redeemed'}
+                    {r.status === 'ACTIVE' && 'Ready to use'}
+                    {r.status === 'PENDING' && '⏳ Awaiting staff verification'}
+                    {r.status === 'REDEEMED' && 'Redeemed'}
                   </span>
                   {r.expiryDate && (
                     <p className="user-text-subtle text-sm mt-2">Expires {formatDate(r.expiryDate)}</p>
+                  )}
+                  {r.status === 'PENDING' && r.redemptionCode && (
+                    <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-1">Your redemption code:</p>
+                      <p className="text-lg font-mono font-bold tracking-[0.2em] text-amber-600 dark:text-amber-400">
+                        {r.redemptionCode}
+                      </p>
+                      <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1">
+                        Show this to staff at the store
+                      </p>
+                    </div>
                   )}
                 </div>
                 {r.status === 'ACTIVE' && (

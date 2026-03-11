@@ -111,13 +111,15 @@ export interface Reward {
   id: string;
   customerId: string;
   partnerId: string;
-  status: 'ACTIVE' | 'REDEEMED';
+  status: 'ACTIVE' | 'PENDING' | 'REDEEMED';
   expiryDate?: string;
   createdAt: string;
   redeemedAt?: string;
   redeemedBranchId?: string;
   redemptionCode?: string | null;
   redemptionCompletedAt?: string | null;
+  pointsCost?: number;  // Points cost for POINTS-based rewards
+  source?: 'VISITS' | 'POINTS';  // Source of reward
   customer?: Customer;
   partner?: Partner;
   redeemedBranch?: Branch;
