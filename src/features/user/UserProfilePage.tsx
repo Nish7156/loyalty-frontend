@@ -287,97 +287,140 @@ export function UserProfilePage() {
             // Find wallet for this partner if POINTS or HYBRID
             const wallet = profile.wallets?.find(w => w.partnerId === store.partnerId);
             const pointsBalance = wallet?.balance ?? 0;
-            return (
-              <div
-                key={store.branchId}
-                className={`${cardClass} stagger-2`}
-                style={{ animationDelay: `${0.19 + index * 0.08}s` }}
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold user-text text-lg truncate">{store.partnerName}</p>
-                    <p className={`${descClass} mt-0.5 truncate`}>{store.branchName}</p>
+            // Render different card layouts based on loyalty type
+            if (loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') {
+              // POINTS-BASED CARD - Clean, focused on wallet balance
+              return (
+                <div
+                  key={store.branchId}
+                  className={`${cardClass} stagger-2`}
+                  style={{ animationDelay: `${0.19 + index * 0.08}s` }}
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold user-text text-xl truncate">{store.partnerName}</p>
+                      <p className={`${descClass} truncate`}>{store.branchName}</p>
+                    </div>
+                    <div className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-bold" style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: 'rgb(6, 182, 212)' }}>
+                      💳 POINTS
+                    </div>
                   </div>
-                  <div className="text-right text-sm shrink-0">
-                    <p className={descClass}>{store.visitCount} visit{store.visitCount !== 1 ? 's' : ''}</p>
-                    <p className={descClass}>Last: {formatDate(store.lastVisitAt)}</p>
+
+                  {/* Points Balance - Big and Clear */}
+                  <div className="text-center py-6 rounded-2xl border mb-4" style={{ borderColor: 'rgba(6, 182, 212, 0.3)', backgroundColor: 'rgba(6, 182, 212, 0.05)' }}>
+                    <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'rgb(6, 182, 212)' }}>Your Balance</p>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <p className="text-5xl font-black bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent">
+                        {pointsBalance.toFixed(0)}
+                      </p>
+                      <p className="text-lg font-medium" style={{ color: 'rgb(6, 182, 212)' }}>pts</p>
+                    </div>
+                    <p className={`${descClass} text-xs mt-2`}>💰 Earn points on every purchase</p>
+                  </div>
+
+                  {/* Redeem Button */}
+                  {loadedByToken && pointsBalance >= 50 && (
+                    <>
+                      {redeemSuccess?.partnerId === store.partnerId ? (
+                        <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-center mb-4">
+                          <p className="text-emerald-500 font-bold text-sm">
+                            ✓ Success! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added to your account
+                          </p>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
+                          disabled={!!redeemingPartnerId}
+                          className="w-full min-h-[52px] rounded-xl font-bold transition disabled:opacity-50 touch-manipulation text-white mb-4"
+                          style={{ background: 'linear-gradient(135deg, rgb(6, 182, 212), rgb(14, 165, 233))' }}
+                        >
+                          {redeemingPartnerId === store.partnerId ? '⏳ Redeeming...' : '🎁 Redeem for Rewards'}
+                        </button>
+                      )}
+                    </>
+                  )}
+                  {loadedByToken && pointsBalance < 50 && (
+                    <div className="text-center py-3 rounded-xl mb-4" style={{ backgroundColor: 'rgba(156, 163, 175, 0.1)' }}>
+                      <p className={`${descClass} text-xs`}>Need 50 points minimum to redeem</p>
+                    </div>
+                  )}
+
+                  {/* Visit Stats */}
+                  <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--user-border-subtle)' }}>
+                    <p className={`${descClass} text-xs`}>Total visits: <span className="user-text font-semibold">{store.visitCount}</span></p>
+                    <p className={`${descClass} text-xs`}>Last: {formatDate(store.lastVisitAt)}</p>
                   </div>
                 </div>
-
-                {/* POINTS-based or HYBRID system */}
-                {(loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') && (
-                  <>
-                    <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
-                      <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">Points Balance</p>
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <p className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
-                          {pointsBalance.toFixed(0)}
-                        </p>
-                        <p className="user-reward-box-text text-sm">points</p>
-                      </div>
-                      <p className="user-reward-box-text-strong mt-2 text-sm">
-                        Earn points on every purchase to redeem rewards
-                      </p>
+              );
+            } else {
+              // VISIT-BASED CARD - Focused on progress and streak
+              return (
+                <div
+                  key={store.branchId}
+                  className={`${cardClass} stagger-2`}
+                  style={{ animationDelay: `${0.19 + index * 0.08}s` }}
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold user-text text-xl truncate">{store.partnerName}</p>
+                      <p className={`${descClass} truncate`}>{store.branchName}</p>
                     </div>
+                    <div className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-bold" style={{ backgroundColor: 'rgba(168, 85, 247, 0.15)', color: 'rgb(168, 85, 247)' }}>
+                      📍 VISITS
+                    </div>
+                  </div>
 
-                    {/* Redeem Points Button - only show if logged in */}
-                    {loadedByToken && pointsBalance >= 50 && (
-                      <>
-                        {redeemSuccess?.partnerId === store.partnerId ? (
-                          <div className="mt-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3">
-                            <p className="text-emerald-500 font-semibold text-sm">
-                              ✓ Redeemed! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added
-                            </p>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
-                            disabled={!!redeemingPartnerId}
-                            className="hover-user-bg w-full min-h-[44px] mt-3 rounded-xl border font-medium transition disabled:opacity-50 touch-manipulation"
-                            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
-                          >
-                            {redeemingPartnerId === store.partnerId ? 'Redeeming...' : 'Redeem Points for Rewards'}
-                          </button>
-                        )}
-                      </>
-                    )}
-                    {loadedByToken && pointsBalance < 50 && (
-                      <p className="user-text-subtle text-xs mt-3">Minimum 50 points required to redeem</p>
-                    )}
-                  </>
-                )}
-
-                {/* VISITS-based system */}
-                {loyaltyType === 'VISITS' && threshold > 0 && windowDays > 0 && (
-                  <>
-                    <div className="user-reward-box mt-4 rounded-xl border px-4 py-3 animate-reward-glow">
-                      <p className="user-reward-box-text text-xs font-medium uppercase tracking-wider mb-1">You win when you complete</p>
-                      <p className="user-reward-box-text text-sm font-medium">
+                  {/* Reward Goal */}
+                  {threshold > 0 && windowDays > 0 && (
+                    <div className="rounded-2xl border p-4 mb-4" style={{ borderColor: 'rgba(168, 85, 247, 0.3)', backgroundColor: 'rgba(168, 85, 247, 0.05)' }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">🎯</span>
+                        <p className="font-bold text-sm" style={{ color: 'rgb(168, 85, 247)' }}>Complete the Challenge</p>
+                      </div>
+                      <p className="user-text font-bold text-lg mb-1">
                         {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
                       </p>
-                      <p className="user-reward-box-text-strong mt-1.5 text-base font-semibold">
-                        → {description}
+                      <p className="text-emerald-500 font-semibold">
+                        🎁 {description}
                       </p>
                     </div>
-                    {periodStart && (
-                      <p className="user-text-subtle text-xs mt-2">Period started: {formatDate(periodStart)}</p>
-                    )}
-                    <div className="mt-4 flex items-center gap-3">
-                      <div className="h-2.5 flex-1 max-w-[180px] rounded-full overflow-hidden" style={{ backgroundColor: 'var(--user-hover)' }}>
+                  )}
+
+                  {/* Progress Bar */}
+                  {threshold > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className={`${descClass} text-xs font-medium`}>Your Progress</p>
+                        <p className={`font-bold text-sm tabular-nums ${isComplete ? 'text-emerald-500' : 'text-purple-500'}`}>
+                          {current}/{threshold}
+                        </p>
+                      </div>
+                      <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(168, 85, 247, 0.15)' }}>
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 animate-progress-fill transition-[width] duration-500"
+                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-400 transition-[width] duration-700"
                           style={{ width: `${progressPct}%` }}
                         />
                       </div>
-                      <span className={`font-semibold text-sm tabular-nums ${isComplete ? 'text-emerald-500' : 'user-reward-box-text-strong'}`}>
-                        {current}/{threshold}
-                      </span>
+                      {isComplete && (
+                        <p className="text-emerald-500 font-bold text-xs mt-2 text-center">✓ Challenge Complete!</p>
+                      )}
                     </div>
-                  </>
-                )}
-              </div>
-            );
+                  )}
+
+                  {/* Visit Stats */}
+                  <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--user-border-subtle)' }}>
+                    <p className={`${descClass} text-xs`}>Total visits: <span className="user-text font-semibold">{store.visitCount}</span></p>
+                    <p className={`${descClass} text-xs`}>Last: {formatDate(store.lastVisitAt)}</p>
+                  </div>
+                  {periodStart && (
+                    <p className={`${descClass} text-xs mt-1`}>Started: {formatDate(periodStart)}</p>
+                  )}
+                </div>
+              );
+            }
           })}
         </div>
       )}
