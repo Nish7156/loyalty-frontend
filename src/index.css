@@ -212,6 +212,52 @@ body {
   }
 }
 
+/* Glassmorphic wallet cards */
+.glass-card {
+  background: var(--user-card-subtle);
+  border: 1px solid var(--user-border-subtle);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 212, 200, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 212, 200, 0.08);
+}
+
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Light mode glass cards */
+.user-theme[data-theme="light"] .glass-card {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.user-theme[data-theme="light"] .glass-card::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
+}
+
+.user-theme[data-theme="light"] .glass-card:hover {
+  border-color: rgba(0, 180, 170, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 180, 170, 0.15), 0 0 0 1px rgba(0, 180, 170, 0.12);
+}
+
 /* PWA: animations & micro-interactions */
 @keyframes fade-in-up {
   from {
