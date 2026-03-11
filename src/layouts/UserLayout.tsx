@@ -211,7 +211,7 @@ export function UserLayout() {
       </header>
 
       {/* Scrollable main content */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 safe-area-x" style={{ padding: '20px 18px 10px' }}>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden safe-area-x" style={{ padding: '20px 18px calc(90px + env(safe-area-inset-bottom, 0px)) 18px' }}>
         <Outlet />
       </main>
       {feedbackOpen && (

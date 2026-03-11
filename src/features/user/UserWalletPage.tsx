@@ -52,7 +52,7 @@ export function UserWalletPage() {
   const stores = profile?.storesVisited || [];
 
   return (
-    <div className="max-w-md mx-auto w-full min-w-0 space-y-[13px] pb-8">
+    <div className="max-w-md mx-auto w-full min-w-0" style={{ display: 'flex', flexDirection: 'column', gap: '13px', paddingBottom: '8px' }}>
 
       {/* Page Title - matching HTML exactly */}
       <div className="a1 px-0.5">
