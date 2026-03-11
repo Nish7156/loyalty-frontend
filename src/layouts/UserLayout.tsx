@@ -1,11 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi, walletApi } from '../lib/api';
+import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { PWAInstallButton } from '../components/PWAInstallButton';
-import type { WalletBalance } from '../lib/api';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 const MAX_FEEDBACK_LENGTH = 2000;
@@ -34,7 +33,6 @@ export function UserLayout() {
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState('');
-  const [walletBalances, setWalletBalances] = useState<WalletBalance[]>([]);
   const celebrationEndRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -83,9 +81,6 @@ export function UserLayout() {
         setCustomerName(p.customer.name || null);
       })
       .catch(() => {});
-
-    // Fetch wallet balances
-    walletApi.getAllBalances().then(setWalletBalances).catch(() => {});
   }, [hasToken]);
 
   useEffect(() => {
@@ -108,8 +103,6 @@ export function UserLayout() {
           setShowApprovalCelebration(false);
           celebrationEndRef.current = null;
         }, 2200);
-        // Refresh wallet balances after approval
-        walletApi.getAllBalances().then(setWalletBalances).catch(() => {});
       }
     };
     socket.on('checkin_updated', handler);
@@ -133,23 +126,7 @@ export function UserLayout() {
         <div className="flex items-center justify-between">
           {/* Left: Logo matching HTML exactly */}
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white font-black text-base"
-              style={{ background: 'linear-gradient(135deg, #00D4C8, #007A8A)' }}
-            >
-              +
-            </div>
-            <span className="font-syne text-[17px] font-black tracking-[0.01em]" style={{ color: 'var(--user-text-primary)' }}>
-              LOYALTY
-            </span>
-            <span style={{ fontSize: '16px', marginLeft: '-4px' }}>
-              {resolvedTheme === 'light' ? '☀️' : '🌙'}
-            </span>
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2 shrink-0">
-            {hasToken && (customerPhone || customerName) && (
+          {hasToken && (customerPhone || customerName) && (
               <Link
                 to="/profile"
                 className="block transition touch-manipulation"
@@ -168,29 +145,16 @@ export function UserLayout() {
                 </div>
               </Link>
             )}
-            {hasToken && walletBalances.length > 0 && (() => {
-              const totalPoints = walletBalances.reduce((sum, w) => sum + w.balance, 0);
-              return totalPoints > 0 ? (
-                <Link
-                  to="/wallet"
-                  className="flex items-center gap-1.5 transition-all touch-manipulation"
-                  style={{
-                    background: 'rgba(0, 212, 200, 0.1)',
-                    border: '1px solid rgba(0, 212, 200, 0.22)',
-                    color: 'var(--accent)',
-                    borderRadius: '100px',
-                    padding: '7px 13px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  <span>💰</span>
-                  <span className="whitespace-nowrap">
-                    {totalPoints.toFixed(0)} pts
-                  </span>
-                </Link>
-              ) : null;
-            })()}
+            <span className="font-syne text-[17px] font-black tracking-[0.01em]" style={{ color: 'var(--user-text-primary)' }}>
+              LOYALTY
+            </span>
+          
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+         
+       
             <PWAInstallButton />
             {hasToken && (
               <button
@@ -348,6 +312,46 @@ export function UserLayout() {
           </>
         )}
       </nav>
+
+      {/* Fixed Theme Toggle Button - matching HTML exactly */}
+      <button
+        onClick={() => setSystemDark(!systemDark)}
+        className="fixed z-50 flex items-center justify-center outline-none cursor-pointer"
+        style={{
+          bottom: '28px',
+          right: '28px',
+          width: '54px',
+          height: '54px',
+          borderRadius: '50%',
+          background: 'var(--user-icon-btn-bg)',
+          border: '1.5px solid var(--user-icon-btn-border)',
+          color: 'rgba(255,255,255,0.85)',
+          fontSize: '22px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(16px)',
+          transition: 'all 0.3s cubic-bezier(.34,1.56,.64,1)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.12) rotate(15deg)';
+          e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,212,200,0.35)';
+          e.currentTarget.style.borderColor = 'var(--accent)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+          e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5)';
+          e.currentTarget.style.borderColor = 'var(--user-icon-btn-border)';
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = 'scale(0.96)';
+        }}
+        onMouseUp={(e) => {
+          e.currentTarget.style.transform = 'scale(1.12) rotate(15deg)';
+        }}
+        aria-label="Toggle theme"
+        title="Toggle theme"
+      >
+        {systemDark ? '🌙' : '☀️'}
+      </button>
     </div>
   );
 }
