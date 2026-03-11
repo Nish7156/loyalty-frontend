@@ -493,7 +493,7 @@ export function BranchesPage() {
                       <div className="mt-6 p-5 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Loyalty Settings</h3>
 
-                        {(currentLoyaltyType === 'VISITS' || (isEditing && editLoyaltyType === 'VISITS')) && (
+                        {(currentLoyaltyType === 'VISITS' || currentLoyaltyType === 'HYBRID' || (isEditing && (editLoyaltyType === 'VISITS' || editLoyaltyType === 'HYBRID'))) && (
                           <div className="space-y-4">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1">
@@ -587,7 +587,7 @@ export function BranchesPage() {
                           </div>
                         )}
 
-                        {(currentLoyaltyType === 'POINTS' || (isEditing && editLoyaltyType === 'POINTS')) && (
+                        {(currentLoyaltyType === 'POINTS' || currentLoyaltyType === 'HYBRID' || (isEditing && (editLoyaltyType === 'POINTS' || editLoyaltyType === 'HYBRID'))) && (
                           <div className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                               <div>

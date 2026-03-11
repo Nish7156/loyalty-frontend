@@ -150,6 +150,11 @@ export function AdminBranchesPage() {
                                         💰 Points-Based
                                       </span>
                                     )}
+                                    {loyaltyType === 'HYBRID' && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                        🔄 Hybrid
+                                      </span>
+                                    )}
 
                                     {isLocked ? (
                                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
@@ -197,6 +202,14 @@ export function AdminBranchesPage() {
                                   {loyaltyType === 'POINTS' && (
                                     <>
                                       <div>Points: {branch.settings?.pointsPercentage ?? 5}%</div>
+                                      <div>Expiry: {branch.settings?.pointsExpiryDays ?? 365} days</div>
+                                    </>
+                                  )}
+                                  {loyaltyType === 'HYBRID' && (
+                                    <>
+                                      <div>Visits: {branch.settings?.streakThreshold ?? 5} threshold</div>
+                                      <div>Points: {branch.settings?.pointsPercentage ?? 5}%</div>
+                                      <div>Window: {branch.settings?.rewardWindowDays ?? 30} days</div>
                                       <div>Expiry: {branch.settings?.pointsExpiryDays ?? 365} days</div>
                                     </>
                                   )}

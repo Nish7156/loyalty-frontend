@@ -231,6 +231,11 @@ export function OwnerDashboard() {
                           💰 Points
                         </span>
                       )}
+                      {b.loyaltyType === 'HYBRID' && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          🔄 Hybrid
+                        </span>
+                      )}
                     </div>
                   </div>
                 </li>
