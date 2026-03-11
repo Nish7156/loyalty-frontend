@@ -411,7 +411,6 @@ export function BranchesPage() {
             const currentPointsPercentage = settings?.pointsPercentage ?? 5;
             const currentPointsExpiryDays = settings?.pointsExpiryDays ?? 365;
             const currentPointsToRewardRatio = settings?.pointsToRewardRatio ?? 100;
-            const currentMinimumRedemptionPoints = settings?.minimumRedemptionPoints ?? 50;
             const currentLoyaltyType = b.loyaltyType ?? 'VISITS';
             const isEditing = editingBranchId === b.id;
 
