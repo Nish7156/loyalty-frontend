@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { customersApi, getCustomerTokenIfPresent, clearCustomerToken, walletApi } from '../../lib/api';
+import { customersApi, getCustomerTokenIfPresent, walletApi } from '../../lib/api';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { PhoneInput } from '../../components/PhoneInput';
 import { EmptyState } from '../../components/EmptyState';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { useHaptic } from '../../hooks/useHaptic';
-import type { CustomerProfile, Reward, CustomerHistory } from '../../lib/api';
+import type { CustomerProfile } from '../../lib/api';
 
 const PHONE_KEY = 'loyalty_user_phone';
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
@@ -22,11 +22,9 @@ export function UserProfilePage() {
   const haptic = useHaptic();
   const [phone, setPhone] = useState(() => localStorage.getItem(PHONE_KEY) || DEFAULT_PHONE_PREFIX);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
-  const [history, setHistory] = useState<CustomerHistory | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadedByToken, setLoadedByToken] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [redeemingPartnerId, setRedeemingPartnerId] = useState<string | null>(null);
   const [redeemSuccess, setRedeemSuccess] = useState<{ partnerId: string; rewardsCreated: number } | null>(null);
 
@@ -34,11 +32,10 @@ export function UserProfilePage() {
     if (getCustomerTokenIfPresent()) {
       setLoading(true);
       setError('');
-      Promise.all([customersApi.getMyProfile(), customersApi.getMyHistory()])
-        .then(([p, h]) => {
+      customersApi.getMyProfile()
+        .then((p) => {
           setProfile(p);
           setPhone(p.customer.phoneNumber);
-          setHistory(h);
           setLoadedByToken(true);
         })
         .catch(() => setLoading(false))
@@ -52,7 +49,6 @@ export function UserProfilePage() {
       .getProfile(normalizeIndianPhone(phone))
       .then((p) => {
         setProfile(p);
-        setHistory(null);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -62,7 +58,6 @@ export function UserProfilePage() {
     const handler = () => {
       if (getCustomerTokenIfPresent()) {
         customersApi.getMyProfile().then(setProfile).catch(() => {});
-        customersApi.getMyHistory().then(setHistory).catch(() => {});
       } else if (profile?.customer?.phoneNumber) {
         customersApi.getProfile(profile.customer.phoneNumber).then(setProfile).catch(() => {});
       }
@@ -101,15 +96,6 @@ export function UserProfilePage() {
     }
   };
 
-  const handleLogout = () => {
-    haptic.medium();
-    setShowLogoutConfirm(false);
-    clearCustomerToken();
-    setProfile(null);
-    setHistory(null);
-    setPhone(DEFAULT_PHONE_PREFIX);
-    setLoadedByToken(false);
-  };
 
   if (getCustomerTokenIfPresent() && loading && !profile) {
     return (
@@ -156,11 +142,7 @@ export function UserProfilePage() {
   }
   if (!profile) return null;
 
-  const { customer, storesVisited } = profile;
-  const rewards: Reward[] = customer.rewards ?? [];
-
-  const activeRewards = rewards.filter((r) => r.status === 'ACTIVE');
-  const redeemedFromHistory = history?.redeemedRewards ?? [];
+  const { storesVisited } = profile;
 
   const cardClass = 'glass-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-premium-md card-premium haptic-feedback opacity-0 animate-slide-in-up';
   const sectionTitleClass = 'text-base font-semibold text-gradient-premium mb-1';
@@ -168,21 +150,9 @@ export function UserProfilePage() {
 
   return (
     <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
-      <div className="flex items-center justify-between gap-3 min-w-0 opacity-0 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
-          {loadedByToken ? "You're in the club" : 'My Loyalty Card'}
-        </h1>
-        {loadedByToken && (
-          <button
-            type="button"
-            onClick={() => { haptic.light(); setShowLogoutConfirm(true); }}
-            className="shrink-0 min-h-[44px] px-4 rounded-xl border text-sm font-medium transition-colors-premium touch-manipulation haptic-feedback"
-            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
-          >
-            Log out
-          </button>
-        )}
-      </div>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
+        {loadedByToken ? "Your Loyalty Cards" : 'My Loyalty Card'}
+      </h1>
 
       {error && (
         <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 opacity-0 animate-fade-in-up">
@@ -192,33 +162,6 @@ export function UserProfilePage() {
           </button>
         </div>
       )}
-
-      <div className={`${cardClass} stagger-1`}>
-        {customer.name && (
-          <p className="font-semibold user-text text-lg truncate mb-1">{customer.name}</p>
-        )}
-        <p className={descClass}>Member</p>
-        <p className="font-mono text-base sm:text-lg tracking-wide user-text break-all mt-0.5">{customer.phoneNumber}</p>
-        {loadedByToken && (storesVisited.length > 0 || activeRewards.length > 0) && (
-          <p className="user-reward-box-text text-sm mt-2">Thanks for being a loyal customer.</p>
-        )}
-        <div className="mt-5 flex flex-wrap gap-6 sm:gap-8">
-          <div>
-            <p className={descClass}>Stores visited</p>
-            <p className="font-semibold user-text mt-0.5">{storesVisited.length}</p>
-          </div>
-          <div>
-            <p className={descClass}>Rewards to use</p>
-            <p className="font-semibold user-text mt-0.5">{activeRewards.length}</p>
-          </div>
-          {redeemedFromHistory.length > 0 && (
-            <div>
-              <p className={descClass}>Redeemed</p>
-              <p className="font-semibold user-text mt-0.5">{redeemedFromHistory.length}</p>
-            </div>
-          )}
-        </div>
-      </div>
 
       {profile.wallets && profile.wallets.length > 0 && (
         <>
@@ -425,31 +368,6 @@ export function UserProfilePage() {
         </div>
       )}
 
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Confirm logout">
-          <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={() => setShowLogoutConfirm(false)} />
-          <div className="relative w-full max-w-sm rounded-2xl border p-6 shadow-xl animate-scale-in" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-surface)' }}>
-            <p className="user-text font-medium text-center mb-5">Are you sure you want to log out?</p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowLogoutConfirm(false)}
-                className="hover-user-bg flex-1 min-h-[44px] rounded-xl border text-sm font-medium transition btn-interactive"
-                style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex-1 min-h-[44px] rounded-xl bg-rose-500 text-white text-sm font-semibold hover:bg-rose-400 transition btn-interactive"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

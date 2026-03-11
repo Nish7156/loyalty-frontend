@@ -165,6 +165,17 @@ export function UserLayout() {
           })()}
         </div>
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            {hasToken && customerPhone && (
+              <Link
+                to="/profile"
+                className="p-1 rounded-full transition touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="My Profile"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold shadow-md hover:scale-110 transition-transform">
+                  {(customerPhone || 'U')[0].toUpperCase()}
+                </div>
+              </Link>
+            )}
             <div className="relative">
               <button
                 type="button"

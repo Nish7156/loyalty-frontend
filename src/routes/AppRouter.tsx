@@ -10,6 +10,7 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
 import { UserProfilePage } from '../features/user/UserProfilePage';
+import { UserAccountPage } from '../features/user/UserAccountPage';
 import { UserHistoryPage } from '../features/user/UserHistoryPage';
 import { UserRewardsPage } from '../features/user/UserRewardsPage';
 import { UserRequestsPage } from '../features/user/UserRequestsPage';
@@ -50,6 +51,7 @@ export function AppRouter() {
           <Route path="rewards" element={<UserRewardsPage />} />
           <Route path="requests" element={<UserRequestsPage />} />
           <Route path="wallet" element={<UserWalletPage />} />
+          <Route path="profile" element={<UserAccountPage />} />
           <Route path="me" element={<UserProfilePage />} />
         </Route>
 
