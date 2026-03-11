@@ -17,8 +17,8 @@ export function OwnerLayout() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen min-h-[100dvh] bg-gray-100 md:flex-row">
-      <header className="flex items-center justify-between p-3 bg-slate-800 text-white md:hidden safe-area-top">
+    <div className="flex flex-col h-screen h-[100dvh] bg-gray-100 md:flex-row overflow-hidden">
+      <header className="flex items-center justify-between p-3 bg-slate-800 text-white md:hidden safe-area-top flex-shrink-0">
         <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded hover:bg-slate-700" aria-label="Menu">
           <span className="text-xl">{menuOpen ? '✕' : '☰'}</span>
         </button>
@@ -56,7 +56,7 @@ export function OwnerLayout() {
         </div>
       </aside>
       {menuOpen && <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={() => setMenuOpen(false)} aria-hidden />}
-      <main className="flex-1 overflow-auto p-4 md:p-6 min-w-0">
+      <main className="flex-1 overflow-y-auto min-w-0">
         <Outlet />
       </main>
       <PWAInstallPrompt variant="login" />

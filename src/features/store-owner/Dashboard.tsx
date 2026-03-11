@@ -110,73 +110,248 @@ export function OwnerDashboard() {
   const myPartners = auth?.type === 'platform' && auth?.user?.id ? partners.filter((p) => p.ownerId === auth.user!.id) : partners;
   const myBranches = branches.filter((b) => myPartners.some((p) => p.id === b.partnerId));
 
+  const totalCustomers = customerStats.length;
+  const totalVisits = customerStats.reduce((sum, c) => sum + c.visitCount, 0);
+  const totalRevenue = customerStats.reduce((sum, c) => sum + c.totalPaid, 0);
+  const totalActiveRewards = customerStats.reduce((sum, c) => sum + c.activeRewards, 0);
+
   return (
-    <div className="min-w-0">
-      <h1 className="text-lg font-bold mb-3 md:text-2xl md:mb-4">Owner Dashboard</h1>
-      <div className="grid gap-3 md:grid-cols-2 md:gap-4 mb-4 md:mb-6">
-        <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
-          <h2 className="font-semibold mb-2 text-sm md:text-base">My Store</h2>
-          <ul className="divide-y divide-gray-100">
-            {myPartners.map((p) => (
-              <li key={p.id} className="py-2 text-sm md:text-base truncate">{p.businessName} — {p.industryType}</li>
-            ))}
-          </ul>
+    <div className="min-w-0 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+        <p className="text-gray-600">Welcome back! Here's your business overview</p>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6 mb-6 sm:mb-8">
+        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200/50 rounded-2xl shadow-sm p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-indigo-700 text-sm font-medium">Total Customers</p>
+            <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">👥</span>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 mb-1">{totalCustomers}</p>
+          <p className="text-indigo-600 text-sm">Unique visitors</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
-          <h2 className="font-semibold mb-2 text-sm md:text-base">Branches ({myBranches.length})</h2>
-          <ul className="divide-y divide-gray-100">
-            {myBranches.map((b) => (
-              <li key={b.id} className="py-2 text-sm md:text-base truncate">{b.branchName}</li>
-            ))}
-          </ul>
+
+        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/50 rounded-2xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-emerald-700 text-sm font-medium">Total Visits</p>
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">📊</span>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 mb-1">{totalVisits}</p>
+          <p className="text-emerald-600 text-sm">Check-ins approved</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-violet-50 to-violet-100/50 border border-violet-200/50 rounded-2xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-violet-700 text-sm font-medium">Total Revenue</p>
+            <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">💰</span>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 mb-1">₹{totalRevenue}</p>
+          <p className="text-violet-600 text-sm">Lifetime earnings</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/50 rounded-2xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-amber-700 text-sm font-medium">Active Rewards</p>
+            <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">🎁</span>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 mb-1">{totalActiveRewards}</p>
+          <p className="text-amber-600 text-sm">Pending redemptions</p>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow p-3 md:p-4 min-w-0">
-        <h2 className="font-semibold mb-3 text-sm md:text-base">Customers at my store(s)</h2>
+
+      {/* Business Overview */}
+      <div className="grid gap-3 sm:gap-5 lg:grid-cols-2 lg:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-11 h-11 bg-indigo-100 rounded-xl flex items-center justify-center">
+              <span className="text-xl">🏪</span>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">My Stores</h2>
+          </div>
+          {myPartners.length === 0 ? (
+            <p className="text-gray-500 text-sm">No stores yet</p>
+          ) : (
+            <ul className="space-y-3">
+              {myPartners.map((p) => (
+                <li key={p.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-xl border border-gray-100">
+                  <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-semibold">
+                    {p.businessName.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{p.businessName}</p>
+                    <p className="text-xs text-gray-500">{p.industryType}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-11 h-11 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <span className="text-xl">📍</span>
+            </div>
+            <div className="flex-1 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Branches</h2>
+              <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+                {myBranches.length}
+              </span>
+            </div>
+          </div>
+          {myBranches.length === 0 ? (
+            <p className="text-gray-500 text-sm">No branches yet</p>
+          ) : (
+            <ul className="space-y-3">
+              {myBranches.map((b) => (
+                <li key={b.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-emerald-50/30 rounded-xl border border-gray-100">
+                  <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-semibold">
+                    {b.branchName.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{b.branchName}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      {b.loyaltyType === 'VISITS' && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                          🎫 Visits
+                        </span>
+                      )}
+                      {b.loyaltyType === 'POINTS' && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                          💰 Points
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Customer Activity Table */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 bg-violet-100 rounded-xl flex items-center justify-center">
+              <span className="text-xl">📈</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Customer Activity</h2>
+              <p className="text-sm text-gray-600">Track engagement and revenue</p>
+            </div>
+          </div>
+        </div>
+
         {customerStats.length === 0 ? (
-          <p className="text-gray-500 text-sm">No customer activity yet.</p>
+          <div className="p-12 text-center">
+            <div className="text-6xl mb-4">📊</div>
+            <p className="text-gray-500 text-lg font-medium">No customer activity yet</p>
+            <p className="text-gray-400 text-sm mt-2">Customer visits will appear here once they start checking in</p>
+          </div>
         ) : (
           <>
-            <div className="hidden md:block overflow-x-auto -mx-1">
-              <table className="w-full text-sm min-w-[640px]">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="py-2 pr-4">User (phone)</th>
-                    <th className="py-2 pr-4">Visits</th>
-                    <th className="py-2 pr-4">This month paid</th>
-                    <th className="py-2 pr-4">Last month paid</th>
-                    <th className="py-2 pr-4">Total paid</th>
-                    <th className="py-2 pr-4">Active rewards</th>
-                    <th className="py-2 pr-4">Redeemed</th>
-                    <th className="py-2">Last visit</th>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Visits</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">This Month</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Last Month</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Total Paid</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Active</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Redeemed</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Last Visit</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                   {customerStats.map((s) => (
-                    <tr key={s.phone} className="border-b border-gray-100">
-                      <td className="py-2 pr-4 font-medium">{s.phone}</td>
-                      <td className="py-2 pr-4">{s.visitCount}</td>
-                      <td className="py-2 pr-4">{s.monthlyPaid[thisMonth] ?? 0}</td>
-                      <td className="py-2 pr-4">{s.monthlyPaid[lastMonth] ?? 0}</td>
-                      <td className="py-2 pr-4">{s.totalPaid}</td>
-                      <td className="py-2 pr-4">{s.activeRewards}</td>
-                      <td className="py-2 pr-4">{s.redeemedRewards}</td>
-                      <td className="py-2">{s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}</td>
+                    <tr key={s.phone} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {s.phone.slice(-2)}
+                          </div>
+                          <span className="font-medium text-gray-900 font-mono text-sm">{s.phone}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                          {s.visitCount}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-700">₹{s.monthlyPaid[thisMonth] ?? 0}</td>
+                      <td className="px-6 py-4 text-gray-700">₹{s.monthlyPaid[lastMonth] ?? 0}</td>
+                      <td className="px-6 py-4 font-semibold text-gray-900">₹{s.totalPaid}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                          {s.activeRewards}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                          {s.redeemedRewards}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <ul className="md:hidden space-y-3">
+
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-gray-200">
               {customerStats.map((s) => (
-                <li key={s.phone} className="border border-gray-200 rounded-lg p-3 text-sm">
-                  <p className="font-medium truncate">{s.phone}</p>
-                  <p className="text-gray-600 mt-1">Visits: {s.visitCount} · This month: {s.monthlyPaid[thisMonth] ?? 0} · Last month: {s.monthlyPaid[lastMonth] ?? 0}</p>
-                  <p className="text-gray-600">Total: {s.totalPaid} · Active: {s.activeRewards} · Redeemed: {s.redeemedRewards}</p>
-                  <p className="text-gray-500 text-xs mt-1">Last visit: {s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}</p>
-                </li>
+                <div key={s.phone} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                      {s.phone.slice(-2)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 font-mono text-sm">{s.phone}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Last visit: {s.lastVisitAt ? new Date(s.lastVisitAt).toLocaleDateString() : '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-indigo-50 rounded-xl p-3 border border-indigo-100">
+                      <p className="text-xs text-indigo-600 font-medium mb-0.5">Visits</p>
+                      <p className="text-lg font-bold text-indigo-900">{s.visitCount}</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                      <p className="text-xs text-emerald-600 font-medium mb-0.5">Total Paid</p>
+                      <p className="text-lg font-bold text-emerald-900">₹{s.totalPaid}</p>
+                    </div>
+                    <div className="bg-violet-50 rounded-xl p-3 border border-violet-100">
+                      <p className="text-xs text-violet-600 font-medium mb-0.5">This Month</p>
+                      <p className="text-lg font-bold text-violet-900">₹{s.monthlyPaid[thisMonth] ?? 0}</p>
+                    </div>
+                    <div className="bg-amber-50 rounded-xl p-3 border border-amber-100">
+                      <p className="text-xs text-amber-600 font-medium mb-0.5">Active Rewards</p>
+                      <p className="text-lg font-bold text-amber-900">{s.activeRewards}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </>
         )}
       </div>
