@@ -129,7 +129,7 @@ export function UserLayout() {
 
   return (
     <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] text-[var(--user-text)] safe-area" data-theme={resolvedTheme} style={{ background: 'var(--user-bg)' }}>
-      <header className="shrink-0 safe-area-top safe-area-x" style={{ padding: '18px 20px 0' }}>
+      <header className="sticky top-0 z-30 shrink-0 safe-area-top safe-area-x backdrop-blur-md" style={{ padding: '18px 20px 14px', backgroundColor: 'var(--user-nav-bg)', borderBottom: '1px solid var(--user-nav-border)' }}>
         <div className="flex items-center justify-between">
           {/* Left: Logo matching HTML exactly */}
           <div className="flex items-center gap-2.5">
