@@ -30,7 +30,6 @@ export function AdminBranchesPage() {
       const allBranches = await branchesApi.list();
       const partnerBranches = allBranches.filter((b) => b.partnerId === partnerId);
 
-      // Fetch full details
       const details = await Promise.all(
         partnerBranches.map((br) => branchesApi.get(br.id))
       );
@@ -62,30 +61,29 @@ export function AdminBranchesPage() {
   const toggleLock = async (branchId: string, currentLocked: boolean, partnerId: string) => {
     try {
       await branchesApi.update(branchId, { settingsLocked: !currentLocked });
-      // Reload branches for this partner
       await loadBranches(partnerId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to update lock status');
     }
   };
 
-  if (loading) return <p className="text-sm md:text-base p-2">Loading stores…</p>;
+  if (loading) return <p className="text-sm md:text-base p-2" style={{ color: '#7B5E54' }}>Loading stores…</p>;
 
   return (
     <div className="min-w-0">
       <div className="mb-4">
-        <h1 className="text-lg font-bold mb-1 md:text-2xl">Branch Lock Control</h1>
-        <p className="text-sm text-gray-600">Click on a store to manage branch settings locks</p>
+        <h1 className="text-lg font-bold mb-1 md:text-2xl" style={{ color: '#5D4037' }}>Branch Lock Control</h1>
+        <p className="text-sm" style={{ color: '#7B5E54' }}>Click on a store to manage branch settings locks</p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+        <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: '#FDEEE9', border: '1px solid #F5C4B3', color: '#B03A2A' }}>
           {error}
         </div>
       )}
 
       {partners.length === 0 ? (
-        <p className="text-gray-500">No stores found.</p>
+        <p style={{ color: '#A08880' }}>No stores found.</p>
       ) : (
         <div className="space-y-3">
           {partners.map((partner) => {
@@ -94,32 +92,33 @@ export function AdminBranchesPage() {
             const isLoadingBranches = loadingBranches[partner.id];
 
             return (
-              <div key={partner.id} className="bg-white rounded-lg shadow border border-gray-200">
+              <div key={partner.id} className="rounded-lg" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
                 {/* Store Header - Clickable */}
                 <button
                   onClick={() => togglePartner(partner.id)}
-                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+                  className="w-full p-4 flex items-center justify-between transition-colors text-left rounded-lg"
+                  style={{ color: '#5D4037' }}
                 >
                   <div className="flex-1">
-                    <h2 className="font-semibold text-lg text-gray-900">{partner.businessName}</h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <h2 className="font-semibold text-lg" style={{ color: '#5D4037' }}>{partner.businessName}</h2>
+                    <p className="text-sm mt-1" style={{ color: '#A08880' }}>
                       {partner.industryType} • {branches.length > 0 ? `${branches.length} branches` : 'Click to load branches'}
                     </p>
                   </div>
-                  <div className="text-2xl text-gray-400">
+                  <div className="text-2xl" style={{ color: '#A08880' }}>
                     {isExpanded ? '▼' : '▶'}
                   </div>
                 </button>
 
                 {/* Branches List - Expanded */}
                 {isExpanded && (
-                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                  <div className="p-4" style={{ borderTop: '1px solid #FAECE7', background: '#FAF9F6' }}>
                     {isLoadingBranches && (
-                      <p className="text-sm text-gray-500">Loading branches...</p>
+                      <p className="text-sm" style={{ color: '#A08880' }}>Loading branches...</p>
                     )}
 
                     {!isLoadingBranches && branches.length === 0 && (
-                      <p className="text-sm text-gray-500">No branches for this store.</p>
+                      <p className="text-sm" style={{ color: '#A08880' }}>No branches for this store.</p>
                     )}
 
                     {!isLoadingBranches && branches.length > 0 && (
@@ -131,43 +130,44 @@ export function AdminBranchesPage() {
                           return (
                             <div
                               key={branch.id}
-                              className="bg-white rounded-lg border border-gray-200 p-4"
+                              className="rounded-lg p-4"
+                              style={{ background: '#FFF', border: '1px solid #FAECE7' }}
                             >
                               <div className="flex items-start justify-between gap-4 flex-wrap">
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap mb-2">
-                                    <h3 className="font-semibold text-base text-gray-900">
+                                    <h3 className="font-semibold text-base" style={{ color: '#5D4037' }}>
                                       {branch.branchName}
                                     </h3>
 
                                     {loyaltyType === 'VISITS' && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                        🎫 Visit-Based
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: '#FAECE7', color: '#D85A30', border: '1px solid #F5C4B3' }}>
+                                        <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '12px' }}>confirmation_number</span> Visit-Based
                                       </span>
                                     )}
                                     {loyaltyType === 'POINTS' && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                        💰 Points-Based
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: '#E4F2EB', color: '#2A6040', border: '1px solid rgba(42,96,64,0.2)' }}>
+                                        <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '12px' }}>payments</span> Points-Based
                                       </span>
                                     )}
                                     {loyaltyType === 'HYBRID' && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                                        🔄 Hybrid
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: '#FAECE7', color: '#D85A30', border: '1px solid #F5C4B3' }}>
+                                        <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '12px' }}>sync</span> Hybrid
                                       </span>
                                     )}
 
                                     {isLocked ? (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                                        🔒 Locked
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: '#FDEEE9', color: '#B03A2A', border: '1px solid rgba(176,58,42,0.2)' }}>
+                                        <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '12px' }}>lock</span> Locked
                                       </span>
                                     ) : (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                        🔓 Unlocked
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: '#E4F2EB', color: '#2A6040', border: '1px solid rgba(42,96,64,0.2)' }}>
+                                        <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '12px' }}>lock_open</span> Unlocked
                                       </span>
                                     )}
                                   </div>
 
-                                  <p className="text-xs text-gray-500">ID: {branch.id}</p>
+                                  <p className="text-xs" style={{ color: '#A08880' }}>ID: {branch.id}</p>
                                 </div>
 
                                 <div className="shrink-0">
@@ -176,23 +176,25 @@ export function AdminBranchesPage() {
                                       variant="secondary"
                                       className="min-h-[40px] text-sm"
                                       onClick={() => toggleLock(branch.id, isLocked, partner.id)}
+                                      style={{ border: '1px solid #F5C4B3', color: '#5D4037' }}
                                     >
-                                      🔓 Unlock
+                                      <span className="material-symbols-rounded mr-1" style={{ fontSize: '16px' }}>lock_open</span> Unlock
                                     </Button>
                                   ) : (
                                     <Button
-                                      className="min-h-[40px] text-sm bg-red-600 hover:bg-red-700"
+                                      className="min-h-[40px] text-sm"
                                       onClick={() => toggleLock(branch.id, isLocked, partner.id)}
+                                      style={{ background: '#B03A2A', color: '#FFF' }}
                                     >
-                                      🔒 Lock
+                                      <span className="material-symbols-rounded mr-1" style={{ fontSize: '16px' }}>lock</span> Lock
                                     </Button>
                                   )}
                                 </div>
                               </div>
 
                               {/* Settings Preview */}
-                              <div className="mt-3 pt-3 border-t border-gray-200">
-                                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                              <div className="mt-3 pt-3" style={{ borderTop: '1px solid #FAECE7' }}>
+                                <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: '#7B5E54' }}>
                                   {loyaltyType === 'VISITS' && (
                                     <>
                                       <div>Threshold: {branch.settings?.streakThreshold ?? 5} visits</div>

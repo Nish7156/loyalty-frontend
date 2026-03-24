@@ -41,12 +41,7 @@ function groupHistoryByStore(history: CustomerHistory): StoreHistory[] {
   for (const r of history.redeemedRewards) {
     const id = r.partnerId;
     if (!byPartner.has(id)) {
-      byPartner.set(id, {
-        partnerId: id,
-        partnerName: r.partner?.businessName ?? 'Store',
-        visits: [],
-        redeemed: [],
-      });
+      byPartner.set(id, { partnerId: id, partnerName: r.partner?.businessName ?? 'Store', visits: [], redeemed: [] });
     }
     byPartner.get(id)!.redeemed.push(r);
   }
@@ -61,16 +56,8 @@ function groupHistoryByStore(history: CustomerHistory): StoreHistory[] {
     });
   });
   list.sort((a, b) => {
-    const aLatest = Math.max(
-      ...a.visits.map((v) => new Date(v.createdAt).getTime()),
-      ...a.redeemed.map((r) => new Date(r.redeemedAt ?? r.createdAt).getTime()),
-      0
-    );
-    const bLatest = Math.max(
-      ...b.visits.map((v) => new Date(v.createdAt).getTime()),
-      ...b.redeemed.map((r) => new Date(r.redeemedAt ?? r.createdAt).getTime()),
-      0
-    );
+    const aLatest = Math.max(...a.visits.map((v) => new Date(v.createdAt).getTime()), ...a.redeemed.map((r) => new Date(r.redeemedAt ?? r.createdAt).getTime()), 0);
+    const bLatest = Math.max(...b.visits.map((v) => new Date(v.createdAt).getTime()), ...b.redeemed.map((r) => new Date(r.redeemedAt ?? r.createdAt).getTime()), 0);
     return bLatest - aLatest;
   });
   return list;
@@ -91,99 +78,92 @@ export function UserHistoryPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]';
-  const sectionTitleClass = 'text-sm font-semibold user-text uppercase tracking-wider mb-2';
-  const descClass = 'user-text-muted text-sm';
-  const itemClass = 'user-item-border flex items-start gap-3 py-2.5 border-b last:border-0';
-
   if (loading) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0">
-        <HistorySkeleton />
-      </div>
-    );
+    return <div className="max-w-md mx-auto w-full min-w-0"><HistorySkeleton /></div>;
   }
 
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
-          History
-        </h1>
-        <div className={cardClass}>
-          <p className="text-rose-500 text-sm">{error}</p>
+        <h1 className="text-xl font-bold mb-4" style={{ color: '#5D4037' }}>History</h1>
+        <div className="glass-card rounded-2xl p-5">
+          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
         </div>
       </div>
     );
   }
 
-  const stores = history && (history.activities.length > 0 || history.redeemedRewards.length > 0)
-    ? groupHistoryByStore(history)
-    : [];
+  const stores = history && (history.activities.length > 0 || history.redeemedRewards.length > 0) ? groupHistoryByStore(history) : [];
 
   return (
-    <div className="max-w-md mx-auto space-y-6 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
-        History
-      </h1>
-      <p className="user-text-muted text-sm">Your visits and redeemed rewards by store.</p>
+    <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
+      <div className="a1">
+        <h1 className="text-[22px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>History</h1>
+        <p className="text-sm mt-0.5" style={{ color: '#7B5E54' }}>Your visits and redeemed rewards by store.</p>
+      </div>
 
       {stores.length === 0 ? (
-        <div className={cardClass}>
-          <p className={descClass}>No history yet. Scan a store QR to check in — your visits and rewards will appear here.</p>
+        <div className="glass-card rounded-2xl p-5 a2">
+          <p className="text-sm" style={{ color: '#7B5E54' }}>No history yet. Scan a store QR to check in — your visits and rewards will appear here.</p>
         </div>
       ) : (
-        <div className="space-y-5">
-          {stores.map((store) => (
-            <div key={store.partnerId} className={cardClass}>
-              <h2 className="text-lg font-semibold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent mb-1">
-                {store.partnerName}
-              </h2>
-              <p className={descClass}>
-                {store.visits.length} visit{store.visits.length !== 1 ? 's' : ''}
-                {store.redeemed.length > 0 && ` · ${store.redeemed.length} reward${store.redeemed.length !== 1 ? 's' : ''} redeemed`}
-              </p>
+        <div className="space-y-4">
+          {stores.map((store, storeIdx) => (
+            <div key={store.partnerId} className={`glass-card rounded-2xl overflow-hidden ${storeIdx < 2 ? 'a2' : ''}`}>
+              {/* Store header */}
+              <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid #FAECE7' }}>
+                <h2 className="text-base font-semibold" style={{ color: '#5D4037' }}>{store.partnerName}</h2>
+                <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>
+                  {store.visits.length} visit{store.visits.length !== 1 ? 's' : ''}
+                  {store.redeemed.length > 0 && ` · ${store.redeemed.length} reward${store.redeemed.length !== 1 ? 's' : ''} redeemed`}
+                </p>
+              </div>
 
+              {/* Visits */}
               {store.visits.length > 0 && (
-                <div className="mt-4">
-                  <h3 className={sectionTitleClass}>Visits</h3>
-                  <ul className="user-history-visits-list mt-1 max-h-[260px] overflow-y-auto overflow-x-hidden">
+                <div style={{ padding: '12px 18px' }}>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: '#A08880' }}>Visits</h3>
+                  <ul className="user-history-visits-list max-h-[260px] overflow-y-auto">
                     {store.visits.map((a) => (
-                      <li key={a.id} className={itemClass}>
-                        <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.4)]" />
+                      <li key={a.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid #FAECE7' }}>
+                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E4F2EB' }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#2A6040' }}>check</span>
+                        </div>
                         <div className="min-w-0 flex-1">
-                          <p className="user-text font-medium">{a.branch?.branchName ?? 'Check-in'}</p>
-                          <p className="user-text-subtle text-xs mt-0.5">{formatDateTime(a.createdAt)}</p>
+                          <p className="text-[13px] font-medium" style={{ color: '#5D4037' }}>{a.branch?.branchName ?? 'Check-in'}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>{formatDateTime(a.createdAt)}</p>
                           {a.value != null && a.value > 0 && (
-                            <p className="user-text-subtle text-xs mt-0.5">Amount: {a.value}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>Amount: {a.value}</p>
                           )}
                         </div>
+                        {a.value != null && a.value > 0 && (
+                          <span className="text-[13px] font-semibold shrink-0" style={{ color: '#2A6040' }}>+{a.value}</span>
+                        )}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
 
+              {/* Redeemed rewards */}
               {store.redeemed.length > 0 && (
-                <div className={store.visits.length > 0 ? 'mt-5 pt-4 border-t' : 'mt-4'} style={store.visits.length > 0 ? { borderColor: 'var(--user-border-subtle)' } : undefined}>
-                  <h3 className={sectionTitleClass}>Redeemed rewards</h3>
-                  <ul className="mt-1">
+                <div style={{ padding: '12px 18px', borderTop: store.visits.length > 0 ? '1px solid #FAECE7' : 'none' }}>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: '#A08880' }}>Redeemed rewards</h3>
+                  <ul>
                     {store.redeemed.slice(0, 10).map((r) => (
-                      <li key={r.id} className={itemClass}>
-                        <span className="shrink-0 w-2 h-2 rounded-full mt-1.5 bg-emerald-400/80" />
+                      <li key={r.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid #FAECE7' }}>
+                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FAECE7' }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#D85A30' }}>redeem</span>
+                        </div>
                         <div className="min-w-0 flex-1">
-                          <p className="user-text font-medium">
-                            {r.redeemedBranch?.branchName ?? 'Reward'}
-                          </p>
-                          <p className="user-text-subtle text-xs mt-0.5">
-                            {r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}
-                          </p>
+                          <p className="text-[13px] font-medium" style={{ color: '#5D4037' }}>{r.redeemedBranch?.branchName ?? 'Reward'}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>{r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}</p>
                         </div>
                       </li>
                     ))}
                   </ul>
                   {store.redeemed.length > 10 && (
-                    <p className="user-text-subtle text-xs mt-2">+{store.redeemed.length - 10} more redeemed</p>
+                    <p className="text-[11px] mt-2" style={{ color: '#A08880' }}>+{store.redeemed.length - 10} more redeemed</p>
                   )}
                 </div>
               )}

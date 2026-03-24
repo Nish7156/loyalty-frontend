@@ -124,46 +124,47 @@ export function BranchesPage() {
     }
   };
 
-  if (loading) return <p className="text-sm md:text-base p-2">Loading…</p>;
+  if (loading) return <p className="text-sm md:text-base p-2" style={{ color: '#7B5E54' }}>Loading…</p>;
 
   return (
-    <div className="min-w-0 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="min-w-0 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6" style={{ background: '#FAF9F6' }}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Branches</h1>
-        <p className="text-gray-600">Manage your branch locations and loyalty settings</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#5D4037' }}>Branches</h1>
+        <p style={{ color: '#7B5E54' }}>Manage your branch locations and loyalty settings</p>
       </div>
 
       {!showForm && (
         <div className="mb-6">
-          <Button onClick={() => setShowForm(true)} className="min-h-[44px] bg-indigo-600 hover:bg-indigo-500">
-            <span className="text-lg mr-2">+</span> Add Branch
+          <Button onClick={() => setShowForm(true)} className="min-h-[44px]" style={{ background: '#D85A30', color: '#FFF' }}>
+            <span className="material-symbols-rounded mr-1" style={{ fontSize: '20px' }}>add</span> Add Branch
           </Button>
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm">
+        <div className="mb-6 p-4 rounded-xl text-sm" style={{ background: '#FDEEE9', border: '1px solid #F5C4B3', color: '#B03A2A' }}>
           {error}
         </div>
       )}
 
       {showForm && (
-        <div className="mb-8 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">Create New Branch</h2>
+        <div className="mb-8 rounded-2xl p-6" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: '#5D4037' }}>Create New Branch</h2>
           <form onSubmit={handleCreate} className="max-w-2xl">
             {myPartners.length === 0 && (
-              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+              <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: '#FFF8E1', border: '1px solid #FFE082', color: '#5D4037' }}>
                 Create a store (partner) first from the admin or dashboard.
               </div>
             )}
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Store</label>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Store</label>
                 <select
                   value={partnerId}
                   onChange={(e) => setPartnerId(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2"
+                  style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }}
                   required
                 >
                   {myPartners.map((p) => (
@@ -180,16 +181,19 @@ export function BranchesPage() {
               />
             </div>
 
-            <div className="mt-6 p-5 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
-              <label className="block text-base font-bold text-gray-900 mb-2.5">🎯 Loyalty System Type</label>
-              <p className="text-sm text-gray-600 mb-4">Choose ONE loyalty mechanism for this branch</p>
+            <div className="mt-6 p-5 rounded-xl" style={{ border: '2px solid #F5C4B3', background: '#FAECE7' }}>
+              <label className="block text-base font-bold mb-2.5" style={{ color: '#5D4037' }}>
+                <span className="material-symbols-rounded mr-1" style={{ fontSize: '18px', verticalAlign: 'text-bottom' }}>target</span>
+                Loyalty System Type
+              </label>
+              <p className="text-sm mb-4" style={{ color: '#7B5E54' }}>Choose ONE loyalty mechanism for this branch</p>
 
               <div className="space-y-3">
-                <label className="flex items-start gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md"
+                <label className="flex items-start gap-3 p-4 rounded-xl transition-all cursor-pointer"
                   style={{
-                    borderColor: loyaltyType === 'VISITS' ? '#3b82f6' : '#e5e7eb',
-                    backgroundColor: loyaltyType === 'VISITS' ? '#eff6ff' : 'white',
-                    boxShadow: loyaltyType === 'VISITS' ? '0 4px 6px -1px rgb(59 130 246 / 0.1)' : 'none'
+                    border: loyaltyType === 'VISITS' ? '2px solid #D85A30' : '2px solid #F5C4B3',
+                    background: loyaltyType === 'VISITS' ? '#FFF' : '#FFF',
+                    boxShadow: loyaltyType === 'VISITS' ? '0 4px 6px -1px rgba(216,90,48,0.1)' : 'none'
                   }}>
                   <input
                     type="radio"
@@ -200,17 +204,20 @@ export function BranchesPage() {
                     className="mt-1 w-5 h-5"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-base text-gray-900">🎫 Visit-Based (Stamp Card)</div>
-                    <div className="text-sm text-gray-600 mt-1">Customers earn rewards after X visits</div>
-                    <div className="text-xs text-blue-600 mt-1.5 font-medium">✓ Best for: Coffee shops, salons, small retail</div>
+                    <div className="font-semibold text-base" style={{ color: '#5D4037' }}>
+                      <span className="material-symbols-rounded mr-1" style={{ fontSize: '16px', verticalAlign: 'text-bottom' }}>confirmation_number</span>
+                      Visit-Based (Stamp Card)
+                    </div>
+                    <div className="text-sm mt-1" style={{ color: '#7B5E54' }}>Customers earn rewards after X visits</div>
+                    <div className="text-xs mt-1.5 font-medium" style={{ color: '#D85A30' }}>Best for: Coffee shops, salons, small retail</div>
                   </div>
                 </label>
 
-                <label className="flex items-start gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md"
+                <label className="flex items-start gap-3 p-4 rounded-xl transition-all cursor-pointer"
                   style={{
-                    borderColor: loyaltyType === 'POINTS' ? '#3b82f6' : '#e5e7eb',
-                    backgroundColor: loyaltyType === 'POINTS' ? '#eff6ff' : 'white',
-                    boxShadow: loyaltyType === 'POINTS' ? '0 4px 6px -1px rgb(59 130 246 / 0.1)' : 'none'
+                    border: loyaltyType === 'POINTS' ? '2px solid #D85A30' : '2px solid #F5C4B3',
+                    background: loyaltyType === 'POINTS' ? '#FFF' : '#FFF',
+                    boxShadow: loyaltyType === 'POINTS' ? '0 4px 6px -1px rgba(216,90,48,0.1)' : 'none'
                   }}>
                   <input
                     type="radio"
@@ -221,150 +228,80 @@ export function BranchesPage() {
                     className="mt-1 w-5 h-5"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-base text-gray-900">💰 Points-Based (Wallet)</div>
-                    <div className="text-sm text-gray-600 mt-1">Customers earn points based on spending</div>
-                    <div className="text-xs text-blue-600 mt-1.5 font-medium">✓ Best for: Restaurants, retail, variable spending</div>
+                    <div className="font-semibold text-base" style={{ color: '#5D4037' }}>
+                      <span className="material-symbols-rounded mr-1" style={{ fontSize: '16px', verticalAlign: 'text-bottom' }}>payments</span>
+                      Points-Based (Wallet)
+                    </div>
+                    <div className="text-sm mt-1" style={{ color: '#7B5E54' }}>Customers earn points based on spending</div>
+                    <div className="text-xs mt-1.5 font-medium" style={{ color: '#D85A30' }}>Best for: Restaurants, retail, variable spending</div>
                   </div>
                 </label>
               </div>
             </div>
 
             {loyaltyType === 'VISITS' && (
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mt-4 p-4 rounded-lg" style={{ background: '#FAECE7', border: '1px solid #F5C4B3' }}>
                 <div className="grid gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Cooldown (hours and/or minutes)</label>
-                    <p className="text-xs text-gray-500 mb-2">Next check-in allowed after this from last approved visit</p>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Cooldown (hours and/or minutes)</label>
+                    <p className="text-xs mb-2" style={{ color: '#A08880' }}>Next check-in allowed after this from last approved visit</p>
                     <div className="flex gap-3 items-center">
-                      <input
-                        type="number"
-                        min={0}
-                        max={48}
-                        value={cooldownHours}
-                        onChange={(e) => setCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
-                        className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                      <span className="text-sm font-medium">hrs</span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={59}
-                        value={cooldownMinutes}
-                        onChange={(e) => setCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))}
-                        className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                      <span className="text-sm font-medium">min</span>
+                      <input type="number" min={0} max={48} value={cooldownHours} onChange={(e) => setCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                      <span className="text-sm font-medium" style={{ color: '#5D4037' }}>hrs</span>
+                      <input type="number" min={0} max={59} value={cooldownMinutes} onChange={(e) => setCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                      <span className="text-sm font-medium" style={{ color: '#5D4037' }}>min</span>
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Visits needed for reward</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={streakThreshold}
-                      onChange={(e) => setStreakThreshold(Math.max(1, Number(e.target.value) || 1))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Visits needed for reward</label>
+                    <input type="number" min={1} value={streakThreshold} onChange={(e) => setStreakThreshold(Math.max(1, Number(e.target.value) || 1))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Reward window (days)</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={rewardWindowDays}
-                      onChange={(e) => setRewardWindowDays(Math.max(1, Number(e.target.value) || 1))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Reward window (days)</label>
+                    <input type="number" min={1} value={rewardWindowDays} onChange={(e) => setRewardWindowDays(Math.max(1, Number(e.target.value) || 1))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Reward description</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 1 free coffee"
-                      value={rewardDescription}
-                      onChange={(e) => setRewardDescription(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Reward description</label>
+                    <input type="text" placeholder="e.g. 1 free coffee" value={rewardDescription} onChange={(e) => setRewardDescription(e.target.value)} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
                 </div>
               </div>
             )}
 
             {loyaltyType === 'POINTS' && (
-              <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <div className="mt-4 p-4 rounded-lg" style={{ background: '#E4F2EB', border: '1px solid rgba(42,96,64,0.2)' }}>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Points percentage</label>
-                    <p className="text-xs text-gray-500 mb-2">% of transaction value earned as points</p>
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      step="0.1"
-                      value={pointsPercentage}
-                      onChange={(e) => setPointsPercentage(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Points percentage</label>
+                    <p className="text-xs mb-2" style={{ color: '#A08880' }}>% of transaction value earned as points</p>
+                    <input type="number" min={0} max={100} step="0.1" value={pointsPercentage} onChange={(e) => setPointsPercentage(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Points expiry (days)</label>
-                    <p className="text-xs text-gray-500 mb-2">0 = never expire</p>
-                    <input
-                      type="number"
-                      min={0}
-                      value={pointsExpiryDays}
-                      onChange={(e) => setPointsExpiryDays(Math.max(0, Number(e.target.value) || 0))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Points expiry (days)</label>
+                    <p className="text-xs mb-2" style={{ color: '#A08880' }}>0 = never expire</p>
+                    <input type="number" min={0} value={pointsExpiryDays} onChange={(e) => setPointsExpiryDays(Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Points to reward ratio</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={pointsToRewardRatio}
-                      onChange={(e) => setPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Points to reward ratio</label>
+                    <input type="number" min={1} value={pointsToRewardRatio} onChange={(e) => setPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Minimum redemption points</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={minimumRedemptionPoints}
-                      onChange={(e) => setMinimumRedemptionPoints(Math.max(0, Number(e.target.value) || 0))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Minimum redemption points</label>
+                    <input type="number" min={0} value={minimumRedemptionPoints} onChange={(e) => setMinimumRedemptionPoints(Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
-
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Min check-in amount (optional)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      placeholder="No minimum"
-                      value={minCheckInAmount}
-                      onChange={(e) => setMinCheckInAmount(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: '#5D4037' }}>Min check-in amount (optional)</label>
+                    <input type="number" min={0} step="0.01" placeholder="No minimum" value={minCheckInAmount} onChange={(e) => setMinCheckInAmount(e.target.value)} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                   </div>
                 </div>
               </div>
             )}
 
             <div className="flex gap-3 mt-6">
-              <Button type="submit" disabled={submitting} className="min-h-[44px]">
+              <Button type="submit" disabled={submitting} className="min-h-[44px]" style={{ background: '#D85A30', color: '#FFF' }}>
                 {submitting ? 'Creating...' : 'Create Branch'}
               </Button>
-              <Button type="button" variant="secondary" onClick={() => setShowForm(false)} className="min-h-[44px]">
+              <Button type="button" variant="secondary" onClick={() => setShowForm(false)} className="min-h-[44px]" style={{ border: '1px solid #F5C4B3', color: '#5D4037' }}>
                 Cancel
               </Button>
             </div>
@@ -373,8 +310,8 @@ export function BranchesPage() {
       )}
 
       {branches.length === 0 && !showForm ? (
-        <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
-          <p className="text-gray-500 text-lg">No branches yet. Create your first branch to get started!</p>
+        <div className="text-center py-12 rounded-xl" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+          <p className="text-lg" style={{ color: '#7B5E54' }}>No branches yet. Create your first branch to get started!</p>
         </div>
       ) : (
         <div className="grid gap-6">
@@ -415,52 +352,52 @@ export function BranchesPage() {
             const isEditing = editingBranchId === b.id;
 
             return (
-              <div key={b.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <div key={b.id} className="rounded-xl overflow-hidden transition-shadow hover:shadow-md" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
                 <div className="p-6">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 flex-wrap mb-3">
-                        <h2 className="text-2xl font-bold text-gray-900">{b.branchName}</h2>
+                        <h2 className="text-2xl font-bold" style={{ color: '#5D4037' }}>{b.branchName}</h2>
 
                         {currentLoyaltyType === 'VISITS' && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-300">
-                            🎫 Visit-Based
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ background: '#FAECE7', color: '#D85A30', border: '1px solid #F5C4B3' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>confirmation_number</span> Visit-Based
                           </span>
                         )}
                         {currentLoyaltyType === 'POINTS' && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            💰 Points-Based
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ background: '#E4F2EB', color: '#2A6040', border: '1px solid rgba(42,96,64,0.2)' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>payments</span> Points-Based
                           </span>
                         )}
                         {currentLoyaltyType === 'HYBRID' && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-300">
-                            🔄 Hybrid
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ background: '#FAECE7', color: '#D85A30', border: '1px solid #F5C4B3' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>sync</span> Hybrid
                           </span>
                         )}
                         {b.settingsLocked && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-300">
-                            🔒 Locked
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ background: '#FDEEE9', color: '#B03A2A', border: '1px solid rgba(176,58,42,0.2)' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>lock</span> Locked
                           </span>
                         )}
                       </div>
 
                       <div className="grid gap-3 text-sm mb-4">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span className="font-medium text-gray-900">Store:</span>
+                        <div className="flex items-center gap-2" style={{ color: '#7B5E54' }}>
+                          <span className="font-medium" style={{ color: '#5D4037' }}>Store:</span>
                           <span>{b.partner?.businessName ?? b.partnerId}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span className="font-medium text-gray-900">Staff:</span>
+                        <div className="flex items-center gap-2" style={{ color: '#7B5E54' }}>
+                          <span className="font-medium" style={{ color: '#5D4037' }}>Staff:</span>
                           <span>{staffCount} {staffCount === 1 ? 'member' : 'members'}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span className="font-medium text-gray-900">ID:</span>
+                        <div className="flex items-center gap-2" style={{ color: '#7B5E54' }}>
+                          <span className="font-medium" style={{ color: '#5D4037' }}>ID:</span>
                           <span className="font-mono text-xs">{b.id}</span>
                         </div>
                       </div>
 
                       {auth.type === 'platform' && auth.user.role === 'SUPER_ADMIN' && (
-                        <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors" style={{ background: '#FAF9F6', border: '1px solid #FAECE7' }}>
                           <input
                             type="checkbox"
                             checked={b.settingsLocked ?? false}
@@ -472,36 +409,40 @@ export function BranchesPage() {
                                 alert('Failed to update lock status');
                               }
                             }}
-                            className="w-4 h-4 rounded border-gray-300"
+                            className="w-4 h-4 rounded"
+                            style={{ borderColor: '#F5C4B3' }}
                           />
-                          <span className="text-sm font-medium text-gray-700">
-                            🔐 Lock settings (prevents store owner from editing)
+                          <span className="text-sm font-medium" style={{ color: '#5D4037' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px', verticalAlign: 'text-bottom' }}>lock</span>
+                            Lock settings (prevents store owner from editing)
                           </span>
                         </label>
                       )}
 
                       {b.settingsLocked && !(auth.type === 'platform' && auth.user.role === 'SUPER_ADMIN') && (
-                        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                          <p className="text-sm text-red-800 font-medium">
-                            🔒 Settings are locked by admin. Contact admin to make changes.
+                        <div className="mt-4 p-4 rounded-lg" style={{ background: '#FDEEE9', border: '1px solid #F5C4B3' }}>
+                          <p className="text-sm font-medium" style={{ color: '#B03A2A' }}>
+                            <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '16px', verticalAlign: 'text-bottom' }}>lock</span>
+                            Settings are locked by admin. Contact admin to make changes.
                           </p>
                         </div>
                       )}
 
-                      <div className="mt-6 p-5 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Loyalty Settings</h3>
+                      <div className="mt-6 p-5 rounded-xl" style={{ background: '#FAF9F6', border: '1px solid #FAECE7' }}>
+                        <h3 className="text-lg font-semibold mb-4" style={{ color: '#5D4037' }}>Loyalty Settings</h3>
 
                         {(currentLoyaltyType === 'VISITS' || currentLoyaltyType === 'HYBRID' || (isEditing && (editLoyaltyType === 'VISITS' || editLoyaltyType === 'HYBRID'))) && (
                           <div className="space-y-4">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-700">Cooldown</p>
-                                {!isEditing && <p className="text-sm text-gray-600 mt-1">{cooldownLabel}</p>}
+                                <p className="text-sm font-medium" style={{ color: '#5D4037' }}>Cooldown</p>
+                                {!isEditing && <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>{cooldownLabel}</p>}
                               </div>
                               {!isEditing && (!b.settingsLocked || (auth.type === 'platform' && auth.user.role === 'SUPER_ADMIN')) && (
                                 <Button
                                   variant="secondary"
                                   className="text-sm px-4 py-1.5"
+                                  style={{ border: '1px solid #F5C4B3', color: '#D85A30' }}
                                   onClick={() => {
                                     setEditingBranchId(b.id);
                                     setEditLoyaltyType(currentLoyaltyType);
@@ -516,68 +457,36 @@ export function BranchesPage() {
                                     setEditPointsToRewardRatio(currentPointsToRewardRatio);
                                   }}
                                 >
-                                  Edit
+                                  <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>edit</span> Edit
                                 </Button>
                               )}
                             </div>
 
                             {isEditing && (
                               <div className="flex gap-3 items-center">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  max={48}
-                                  value={editCooldownHours}
-                                  onChange={(e) => setEditCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))}
-                                  className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                                />
-                                <span className="text-sm">hrs</span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  max={59}
-                                  value={editCooldownMinutes}
-                                  onChange={(e) => setEditCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))}
-                                  className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                                />
-                                <span className="text-sm">min</span>
+                                <input type="number" min={0} max={48} value={editCooldownHours} onChange={(e) => setEditCooldownHours(Math.max(0, Math.min(48, Number(e.target.value) ?? 0)))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                                <span className="text-sm" style={{ color: '#5D4037' }}>hrs</span>
+                                <input type="number" min={0} max={59} value={editCooldownMinutes} onChange={(e) => setEditCooldownMinutes(Math.max(0, Math.min(59, Number(e.target.value) ?? 0)))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                                <span className="text-sm" style={{ color: '#5D4037' }}>min</span>
                               </div>
                             )}
 
-                            <div className="pt-4 border-t border-gray-200">
-                              <p className="text-sm font-medium text-gray-700">Reward Rule</p>
+                            <div className="pt-4" style={{ borderTop: '1px solid #FAECE7' }}>
+                              <p className="text-sm font-medium" style={{ color: '#5D4037' }}>Reward Rule</p>
                               {!isEditing && (
-                                <p className="text-sm text-gray-600 mt-1">
+                                <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>
                                   {currentThreshold} purchases in {currentWindowDays} days → {currentRewardDesc || 'Free reward'}
                                 </p>
                               )}
                               {isEditing && (
                                 <div className="mt-2 space-y-3">
                                   <div className="flex gap-2 items-center">
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={editStreakThreshold}
-                                      onChange={(e) => setEditStreakThreshold(Math.max(1, Number(e.target.value) || 1))}
-                                      className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                                    />
-                                    <span className="text-sm">purchases within</span>
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={editRewardWindowDays}
-                                      onChange={(e) => setEditRewardWindowDays(Math.max(1, Number(e.target.value) || 1))}
-                                      className="w-20 border border-gray-300 rounded-lg px-3 py-2"
-                                    />
-                                    <span className="text-sm">days</span>
+                                    <input type="number" min={1} value={editStreakThreshold} onChange={(e) => setEditStreakThreshold(Math.max(1, Number(e.target.value) || 1))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                                    <span className="text-sm" style={{ color: '#5D4037' }}>purchases within</span>
+                                    <input type="number" min={1} value={editRewardWindowDays} onChange={(e) => setEditRewardWindowDays(Math.max(1, Number(e.target.value) || 1))} className="w-20 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                                    <span className="text-sm" style={{ color: '#5D4037' }}>days</span>
                                   </div>
-                                  <input
-                                    type="text"
-                                    placeholder="Reward description"
-                                    value={editRewardDescription}
-                                    onChange={(e) => setEditRewardDescription(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                                  />
+                                  <input type="text" placeholder="Reward description" value={editRewardDescription} onChange={(e) => setEditRewardDescription(e.target.value)} className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                                 </div>
                               )}
                             </div>
@@ -588,49 +497,29 @@ export function BranchesPage() {
                           <div className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Points Percentage</p>
-                                {!isEditing && <p className="text-sm text-gray-600 mt-1">{currentPointsPercentage}% of transaction</p>}
+                                <p className="text-sm font-medium" style={{ color: '#5D4037' }}>Points Percentage</p>
+                                {!isEditing && <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>{currentPointsPercentage}% of transaction</p>}
                                 {isEditing && (
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    step="0.1"
-                                    value={editPointsPercentage}
-                                    onChange={(e) => setEditPointsPercentage(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
-                                    className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2"
-                                  />
+                                  <input type="number" min={0} max={100} step="0.1" value={editPointsPercentage} onChange={(e) => setEditPointsPercentage(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} className="mt-1 w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                                 )}
                               </div>
 
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Points Expiry</p>
-                                {!isEditing && <p className="text-sm text-gray-600 mt-1">{currentPointsExpiryDays === 0 ? 'Never expire' : `${currentPointsExpiryDays} days`}</p>}
+                                <p className="text-sm font-medium" style={{ color: '#5D4037' }}>Points Expiry</p>
+                                {!isEditing && <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>{currentPointsExpiryDays === 0 ? 'Never expire' : `${currentPointsExpiryDays} days`}</p>}
                                 {isEditing && (
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    value={editPointsExpiryDays}
-                                    onChange={(e) => setEditPointsExpiryDays(Math.max(0, Number(e.target.value) || 0))}
-                                    className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2"
-                                  />
+                                  <input type="number" min={0} value={editPointsExpiryDays} onChange={(e) => setEditPointsExpiryDays(Math.max(0, Number(e.target.value) || 0))} className="mt-1 w-full rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
                                 )}
                               </div>
 
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Points Per Reward</p>
-                                <p className="text-xs text-gray-500 mt-0.5">How many points customers need to redeem 1 reward</p>
-                                {!isEditing && <p className="text-sm text-gray-600 mt-1">{currentPointsToRewardRatio} points = 1 reward</p>}
+                                <p className="text-sm font-medium" style={{ color: '#5D4037' }}>Points Per Reward</p>
+                                <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>How many points customers need to redeem 1 reward</p>
+                                {!isEditing && <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>{currentPointsToRewardRatio} points = 1 reward</p>}
                                 {isEditing && (
                                   <div className="mt-1 flex items-center gap-2">
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={editPointsToRewardRatio}
-                                      onChange={(e) => setEditPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))}
-                                      className="w-24 border border-gray-300 rounded-lg px-3 py-2"
-                                    />
-                                    <span className="text-sm text-gray-600">points = 1 reward</span>
+                                    <input type="number" min={1} value={editPointsToRewardRatio} onChange={(e) => setEditPointsToRewardRatio(Math.max(1, Number(e.target.value) || 1))} className="w-24 rounded-lg px-3 py-2" style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FFF' }} />
+                                    <span className="text-sm" style={{ color: '#7B5E54' }}>points = 1 reward</span>
                                   </div>
                                 )}
                               </div>
@@ -640,6 +529,7 @@ export function BranchesPage() {
                               <Button
                                 variant="secondary"
                                 className="text-sm px-4 py-1.5"
+                                style={{ border: '1px solid #F5C4B3', color: '#D85A30' }}
                                 onClick={() => {
                                   setEditingBranchId(b.id);
                                   setEditLoyaltyType(currentLoyaltyType);
@@ -654,14 +544,14 @@ export function BranchesPage() {
                                   setEditPointsToRewardRatio(currentPointsToRewardRatio);
                                 }}
                               >
-                                Edit
+                                <span className="material-symbols-rounded mr-0.5" style={{ fontSize: '14px' }}>edit</span> Edit
                               </Button>
                             )}
                           </div>
                         )}
 
                         {isEditing && (
-                          <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
+                          <div className="flex gap-3 mt-6 pt-6" style={{ borderTop: '1px solid #FAECE7' }}>
                             <Button
                               disabled={editSubmitting}
                               onClick={async () => {
@@ -682,7 +572,7 @@ export function BranchesPage() {
                                       pointsPercentage: editPointsPercentage,
                                       pointsExpiryDays: editPointsExpiryDays,
                                       pointsToRewardRatio: editPointsToRewardRatio,
-                                      minimumRedemptionPoints: editPointsToRewardRatio, // Set to same as ratio for simplicity
+                                      minimumRedemptionPoints: editPointsToRewardRatio,
                                     },
                                   });
                                   setEditingBranchId(null);
@@ -694,10 +584,11 @@ export function BranchesPage() {
                                 }
                               }}
                               className="min-h-[40px]"
+                              style={{ background: '#D85A30', color: '#FFF' }}
                             >
                               {editSubmitting ? 'Saving...' : 'Save Changes'}
                             </Button>
-                            <Button variant="secondary" onClick={() => setEditingBranchId(null)} className="min-h-[40px]">
+                            <Button variant="secondary" onClick={() => setEditingBranchId(null)} className="min-h-[40px]" style={{ border: '1px solid #F5C4B3', color: '#5D4037' }}>
                               Cancel
                             </Button>
                           </div>
@@ -705,12 +596,12 @@ export function BranchesPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200">
-                      <p className="text-sm font-medium text-gray-700 mb-3">Customer Check-in QR</p>
-                      <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex flex-col items-center justify-center p-6 rounded-xl" style={{ background: '#FAF9F6', border: '1px solid #FAECE7' }}>
+                      <p className="text-sm font-medium mb-3" style={{ color: '#5D4037' }}>Customer Check-in QR</p>
+                      <div className="p-4 rounded-lg" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
                         <QRCodeSVG value={scanUrl} size={140} level="M" includeMargin />
                       </div>
-                      <p className="text-xs text-gray-500 mt-3 text-center">Scan to check-in</p>
+                      <p className="text-xs mt-3 text-center" style={{ color: '#A08880' }}>Scan to check-in</p>
                     </div>
                   </div>
                 </div>

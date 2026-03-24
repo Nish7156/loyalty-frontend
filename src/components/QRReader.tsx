@@ -16,8 +16,8 @@ export function QRReader({ onScan, placeholder = 'Scan QR code' }: QRReaderProps
   };
 
   return (
-    <div className="border-2 border-dashed border-[var(--premium-border)] rounded-xl p-6 text-center bg-[var(--premium-card)]">
-      <p className="text-[var(--premium-muted)] mb-4">{placeholder}</p>
+    <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{ borderColor: '#F5C4B3', background: '#FFF' }}>
+      <p className="mb-4" style={{ color: '#A08880' }}>{placeholder}</p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 max-w-xs mx-auto">
         <input
           ref={inputRef}
@@ -25,9 +25,10 @@ export function QRReader({ onScan, placeholder = 'Scan QR code' }: QRReaderProps
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
           placeholder="Or enter code / store ID"
-          className="border border-[var(--premium-border)] rounded-xl px-3 py-2.5 text-center bg-[var(--premium-surface)] text-[var(--premium-cream)] placeholder-[var(--premium-muted)] focus:ring-2 focus:ring-[var(--premium-gold)]"
+          className="rounded-xl px-3 py-2.5 text-center focus:ring-2 focus:ring-orange-300/40"
+          style={{ border: '1px solid #F5C4B3', background: '#FAF9F6', color: '#5D4037' }}
         />
-        <button type="submit" className="px-4 py-2.5 bg-[var(--premium-gold)] text-[var(--premium-bg)] font-medium rounded-xl hover:opacity-90">
+        <button type="submit" className="px-4 py-2.5 font-medium rounded-xl hover:opacity-90" style={{ background: '#D85A30', color: '#FFF' }}>
           Submit
         </button>
       </form>

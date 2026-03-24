@@ -15,6 +15,7 @@ import { UserHistoryPage } from '../features/user/UserHistoryPage';
 import { UserRewardsPage } from '../features/user/UserRewardsPage';
 import { UserRequestsPage } from '../features/user/UserRequestsPage';
 import { UserWalletPage } from '../features/user/UserWalletPage';
+import { StoreDetailPage } from '../features/user/StoreDetailPage';
 
 const AdminDashboard = lazy(() => import('../features/admin/Dashboard').then((m) => ({ default: m.AdminDashboard })));
 const PartnersPage = lazy(() => import('../features/admin/PartnersPage').then((m) => ({ default: m.PartnersPage })));
@@ -52,7 +53,9 @@ export function AppRouter() {
           <Route path="requests" element={<UserRequestsPage />} />
           <Route path="wallet" element={<UserWalletPage />} />
           <Route path="profile" element={<UserAccountPage />} />
-          <Route path="me" element={<UserProfilePage />} />
+          <Route path="me" element={<UserWalletPage />} />
+          <Route path="me/store/:branchId" element={<StoreDetailPage />} />
+          <Route path="loyalty-cards" element={<UserProfilePage />} />
         </Route>
 
         <Route element={<RoleGate allowedRoles={['STAFF']} />}>

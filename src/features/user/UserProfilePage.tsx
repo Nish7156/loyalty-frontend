@@ -47,12 +47,10 @@ export function UserProfilePage() {
     setError('');
     customersApi
       .getProfile(normalizeIndianPhone(phone))
-      .then((p) => {
-        setProfile(p);
-      })
+      .then((p) => setProfile(p))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [phone]); // Only runs on phone change or mount
+  }, [phone]);
 
   useEffect(() => {
     const handler = () => {
@@ -83,11 +81,9 @@ export function UserProfilePage() {
     try {
       const result = await walletApi.redeemPoints(partnerId, branchId);
       setRedeemSuccess({ partnerId, rewardsCreated: result.rewardsCreated });
-      // Refresh profile to show updated wallet balance and rewards
       const p = await customersApi.getMyProfile();
       setProfile(p);
       haptic.medium();
-      // Clear success message after 5 seconds
       setTimeout(() => setRedeemSuccess(null), 5000);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to redeem points');
@@ -96,35 +92,22 @@ export function UserProfilePage() {
     }
   };
 
-
   if (getCustomerTokenIfPresent() && loading && !profile) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0">
-        <SkeletonLoader type="profile" count={1} />
-      </div>
-    );
+    return <div className="max-w-md mx-auto w-full min-w-0"><SkeletonLoader type="profile" count={1} /></div>;
   }
 
   if (!phone && !profile) {
     return (
-      <div className="max-w-md mx-auto w-full min-w-0 py-8 opacity-0 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gradient-premium tracking-tight">
-          My Loyalty Card
-        </h1>
-        <p className="user-text-muted text-sm mb-6">Enter your phone to view your profile and rewards.</p>
-        <form onSubmit={handlePhoneSubmit} className="glass-card rounded-2xl p-5 shadow-premium-md card-premium haptic-feedback">
-          <PhoneInput
-            label="Phone"
-            value={phone}
-            onChange={setPhone}
-            placeholder="98765 43210"
-            required
-            variant="dark"
-          />
+      <div className="max-w-md mx-auto w-full min-w-0 py-8 a1">
+        <h1 className="text-[22px] font-bold mb-2" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>My Loyalty Card</h1>
+        <p className="text-sm mb-6" style={{ color: '#7B5E54' }}>Enter your phone to view your profile and rewards.</p>
+        <form onSubmit={handlePhoneSubmit} className="glass-card rounded-2xl p-5">
+          <PhoneInput label="Phone" value={phone} onChange={setPhone} placeholder="98765 43210" required variant="dark" />
           <button
             type="submit"
             onClick={() => haptic.light()}
-            className="btn-premium text-white w-full min-h-[48px] mt-4 rounded-xl font-medium transition-colors-premium touch-manipulation"
+            className="w-full min-h-[52px] mt-4 rounded-xl font-semibold transition touch-manipulation"
+            style={{ background: '#D85A30', color: '#FFF', fontSize: '15px' }}
           >
             Explore
           </button>
@@ -134,68 +117,55 @@ export function UserProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0">
-        <SkeletonLoader type="profile" count={1} />
-      </div>
-    );
+    return <div className="max-w-md mx-auto w-full min-w-0"><SkeletonLoader type="profile" count={1} /></div>;
   }
   if (!profile) return null;
 
   const { storesVisited } = profile;
 
-  const cardClass = 'glass-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-premium-md card-premium haptic-feedback opacity-0 animate-slide-in-up';
-  const sectionTitleClass = 'text-base font-semibold text-gradient-premium mb-1';
-  const descClass = 'user-text-muted text-sm';
-
   return (
-    <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
-        {loadedByToken ? "Your Loyalty Cards" : 'My Loyalty Card'}
+    <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
+      <h1 className="text-[22px] font-bold a1" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>
+        {loadedByToken ? 'Your Loyalty Cards' : 'My Loyalty Card'}
       </h1>
 
       {error && (
-        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 opacity-0 animate-fade-in-up">
-          <p className="text-rose-500 text-sm">{error}</p>
-          <button type="button" onClick={() => setError('')} className="text-rose-400 text-xs mt-1 hover:text-rose-300">
-            Dismiss
-          </button>
+        <div className="rounded-xl p-3 a2" style={{ background: '#FDEEE9', border: '1px solid rgba(176,58,42,0.18)' }}>
+          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
+          <button type="button" onClick={() => setError('')} className="text-xs mt-1" style={{ color: '#D85A30' }}>Dismiss</button>
         </div>
       )}
 
+      {/* Wallets */}
       {profile.wallets && profile.wallets.length > 0 && (
         <>
-          <div className="opacity-0 animate-fade-in-up stagger-2">
-            <h2 className={sectionTitleClass}>💰 Your Wallet</h2>
-            <p className="user-text-subtle text-sm mt-0.5">Points you've earned from purchases.</p>
+          <div className="a2">
+            <h2 className="text-base font-semibold" style={{ color: '#D85A30' }}>Your Wallet</h2>
+            <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>Points shared across all branch locations.</p>
           </div>
           <div className="space-y-3">
-            {profile.wallets.map((wallet, index) => (
-              <div
-                key={wallet.partnerId}
-                className={`${cardClass} stagger-2`}
-                style={{ animationDelay: `${0.19 + index * 0.08}s` }}
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold user-text text-lg truncate">{wallet.partnerName}</p>
-                    <p className={descClass}>Wallet Balance</p>
+            {profile.wallets.map((wallet) => (
+              <div key={wallet.partnerId} className="glass-card rounded-2xl overflow-hidden a3">
+                <div style={{ padding: '16px 18px' }}>
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-base truncate" style={{ color: '#5D4037' }}>{wallet.partnerName}</p>
+                      <p className="text-xs" style={{ color: '#7B5E54' }}>Wallet Balance</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-2xl font-bold" style={{ color: '#D85A30' }}>{wallet.balance.toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: '#7B5E54' }}>points</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent">
-                      {wallet.balance.toFixed(0)}
-                    </p>
-                    <p className={descClass}>points</p>
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-4 text-sm">
-                  <div>
-                    <p className={descClass}>Earned</p>
-                    <p className="font-semibold user-text mt-0.5">+{wallet.lifetimeEarned.toFixed(0)}</p>
-                  </div>
-                  <div>
-                    <p className={descClass}>Spent</p>
-                    <p className="font-semibold user-text mt-0.5">-{wallet.lifetimeSpent.toFixed(0)}</p>
+                  <div className="mt-4 flex gap-4 text-sm">
+                    <div>
+                      <p className="text-xs" style={{ color: '#A08880' }}>Earned</p>
+                      <p className="font-semibold mt-0.5" style={{ color: '#2A6040' }}>+{wallet.lifetimeEarned.toFixed(0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs" style={{ color: '#A08880' }}>Spent</p>
+                      <p className="font-semibold mt-0.5" style={{ color: '#B03A2A' }}>-{wallet.lifetimeSpent.toFixed(0)}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -204,20 +174,21 @@ export function UserProfilePage() {
         </>
       )}
 
-      <div className="opacity-0 animate-fade-in-up stagger-2">
-        <h2 className={sectionTitleClass}>Stores you use</h2>
-        <p className="user-text-subtle text-sm mt-0.5">Your progress and what you win at each store.</p>
+      {/* Stores */}
+      <div className="a4">
+        <h2 className="text-base font-semibold" style={{ color: '#D85A30' }}>Stores you use</h2>
+        <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>Your progress and what you win at each store.</p>
       </div>
+
       {storesVisited.length === 0 ? (
         <EmptyState
-          icon="🏪"
+          icon="storefront"
           title="No stores visited yet"
-          description="Scan a store QR code to check in and start earning rewards. Your loyalty journey begins with your first visit!"
-          className="stagger-2"
+          description="Scan a store QR code to check in and start earning rewards."
         />
       ) : (
-        <div className="space-y-4">
-          {storesVisited.map((store, index) => {
+        <div className="space-y-3">
+          {storesVisited.map((store) => {
             const loyaltyType = store.loyaltyType || 'VISITS';
             const threshold = store.rewardThreshold ?? 5;
             const windowDays = store.rewardWindowDays ?? 30;
@@ -226,148 +197,125 @@ export function UserProfilePage() {
             const periodStart = store.streakPeriodStartedAt;
             const progressPct = threshold > 0 ? Math.min(100, (current / threshold) * 100) : 0;
             const isComplete = threshold > 0 && current >= threshold;
-
-            // Find wallet for this partner if POINTS or HYBRID
             const wallet = profile.wallets?.find(w => w.partnerId === store.partnerId);
             const pointsBalance = wallet?.balance ?? 0;
-            // Render different card layouts based on loyalty type
+
             if (loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') {
-              // POINTS-BASED CARD - Clean, focused on wallet balance
               return (
-                <div
-                  key={store.branchId}
-                  className={`${cardClass} stagger-2`}
-                  style={{ animationDelay: `${0.19 + index * 0.08}s` }}
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold user-text text-xl truncate">{store.partnerName}</p>
-                      <p className={`${descClass} truncate`}>{store.branchName}</p>
-                    </div>
-                    <div className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-bold" style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: 'rgb(6, 182, 212)' }}>
-                      💳 POINTS
-                    </div>
-                  </div>
-
-                  {/* Points Balance - Big and Clear */}
-                  <div className="text-center py-6 rounded-2xl border mb-4" style={{ borderColor: 'rgba(6, 182, 212, 0.3)', backgroundColor: 'rgba(6, 182, 212, 0.05)' }}>
-                    <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'rgb(6, 182, 212)' }}>Your Balance</p>
-                    <div className="flex items-baseline justify-center gap-2">
-                      <p className="text-5xl font-black bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent">
-                        {pointsBalance.toFixed(0)}
-                      </p>
-                      <p className="text-lg font-medium" style={{ color: 'rgb(6, 182, 212)' }}>pts</p>
-                    </div>
-                    <p className={`${descClass} text-xs mt-2`}>💰 Earn points on every purchase</p>
-                  </div>
-
-                  {/* Redeem Button */}
-                  {loadedByToken && pointsBalance >= 50 && (
-                    <>
-                      {redeemSuccess?.partnerId === store.partnerId ? (
-                        <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-center mb-4">
-                          <p className="text-emerald-500 font-bold text-sm">
-                            ✓ Success! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added to your account
-                          </p>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
-                          disabled={!!redeemingPartnerId}
-                          className="w-full min-h-[52px] rounded-xl font-bold transition disabled:opacity-50 touch-manipulation text-white mb-4"
-                          style={{ background: 'linear-gradient(135deg, rgb(6, 182, 212), rgb(14, 165, 233))' }}
-                        >
-                          {redeemingPartnerId === store.partnerId ? '⏳ Redeeming...' : '🎁 Redeem for Rewards'}
-                        </button>
-                      )}
-                    </>
-                  )}
-                  {loadedByToken && pointsBalance < 50 && (
-                    <div className="text-center py-3 rounded-xl mb-4" style={{ backgroundColor: 'rgba(156, 163, 175, 0.1)' }}>
-                      <p className={`${descClass} text-xs`}>Need 50 points minimum to redeem</p>
-                    </div>
-                  )}
-
-                  {/* Visit Stats */}
-                  <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--user-border-subtle)' }}>
-                    <p className={`${descClass} text-xs`}>Total visits: <span className="user-text font-semibold">{store.visitCount}</span></p>
-                    <p className={`${descClass} text-xs`}>Last: {formatDate(store.lastVisitAt)}</p>
-                  </div>
-                </div>
-              );
-            } else {
-              // VISIT-BASED CARD - Focused on progress and streak
-              return (
-                <div
-                  key={store.branchId}
-                  className={`${cardClass} stagger-2`}
-                  style={{ animationDelay: `${0.19 + index * 0.08}s` }}
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold user-text text-xl truncate">{store.partnerName}</p>
-                      <p className={`${descClass} truncate`}>{store.branchName}</p>
-                    </div>
-                    <div className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-bold" style={{ backgroundColor: 'rgba(168, 85, 247, 0.15)', color: 'rgb(168, 85, 247)' }}>
-                      📍 VISITS
-                    </div>
-                  </div>
-
-                  {/* Reward Goal */}
-                  {threshold > 0 && windowDays > 0 && (
-                    <div className="rounded-2xl border p-4 mb-4" style={{ borderColor: 'rgba(168, 85, 247, 0.3)', backgroundColor: 'rgba(168, 85, 247, 0.05)' }}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">🎯</span>
-                        <p className="font-bold text-sm" style={{ color: 'rgb(168, 85, 247)' }}>Complete the Challenge</p>
+                <div key={`${store.partnerId}-${store.branchId}`} className="glass-card rounded-2xl overflow-hidden a5">
+                  <div style={{ padding: '16px 18px' }}>
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-lg truncate" style={{ color: '#5D4037' }}>{store.partnerName}</p>
+                        <p className="text-xs truncate" style={{ color: '#7B5E54' }}>{store.branchName}</p>
                       </div>
-                      <p className="user-text font-bold text-lg mb-1">
-                        {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
-                      </p>
-                      <p className="text-emerald-500 font-semibold">
-                        🎁 {description}
-                      </p>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: '#FAECE7', color: '#D85A30' }}>
+                        POINTS
+                      </span>
                     </div>
-                  )}
 
-                  {/* Progress Bar */}
-                  {threshold > 0 && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className={`${descClass} text-xs font-medium`}>Your Progress</p>
-                        <p className={`font-bold text-sm tabular-nums ${isComplete ? 'text-emerald-500' : 'text-purple-500'}`}>
-                          {current}/{threshold}
-                        </p>
+                    {/* Balance */}
+                    <div className="text-center py-5 rounded-xl mb-4" style={{ background: '#FAECE7', border: '1px solid #F5C4B3' }}>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: '#D85A30' }}>Your Balance</p>
+                      <div className="flex items-baseline justify-center gap-1.5">
+                        <p className="text-4xl font-bold" style={{ color: '#D85A30', letterSpacing: '-0.04em' }}>{pointsBalance.toFixed(0)}</p>
+                        <p className="text-base font-medium" style={{ color: '#D85A30', opacity: 0.7 }}>pts</p>
                       </div>
-                      <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(168, 85, 247, 0.15)' }}>
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-400 transition-[width] duration-700"
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
-                      {isComplete && (
-                        <p className="text-emerald-500 font-bold text-xs mt-2 text-center">✓ Challenge Complete!</p>
-                      )}
+                      <p className="text-xs mt-2" style={{ color: '#7B5E54' }}>Valid at all {store.partnerName} locations</p>
                     </div>
-                  )}
 
-                  {/* Visit Stats */}
-                  <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--user-border-subtle)' }}>
-                    <p className={`${descClass} text-xs`}>Total visits: <span className="user-text font-semibold">{store.visitCount}</span></p>
-                    <p className={`${descClass} text-xs`}>Last: {formatDate(store.lastVisitAt)}</p>
+                    {/* Redeem */}
+                    {loadedByToken && pointsBalance >= 50 && (
+                      <>
+                        {redeemSuccess?.partnerId === store.partnerId ? (
+                          <div className="rounded-xl p-3 text-center mb-4" style={{ background: '#E4F2EB', border: '1px solid #A8D4BA' }}>
+                            <p className="text-sm font-semibold" style={{ color: '#2A6040' }}>
+                              Success! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added
+                            </p>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
+                            disabled={!!redeemingPartnerId}
+                            className="w-full min-h-[52px] rounded-xl font-bold text-sm transition disabled:opacity-50 touch-manipulation mb-4"
+                            style={{ background: '#D85A30', color: '#FFF' }}
+                          >
+                            {redeemingPartnerId === store.partnerId ? 'Redeeming...' : 'Redeem for Rewards'}
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {loadedByToken && pointsBalance < 50 && (
+                      <div className="text-center py-3 rounded-xl mb-4" style={{ background: '#EDEFEE' }}>
+                        <p className="text-xs font-medium" style={{ color: '#A08880' }}>50 points minimum to redeem</p>
+                        <p className="text-xs mt-1" style={{ color: '#A08880' }}>{Math.ceil(50 - pointsBalance)} more to go</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid #FAECE7' }}>
+                      <p className="text-xs" style={{ color: '#A08880' }}>All-time: <span className="font-semibold" style={{ color: '#5D4037' }}>{store.visitCount}</span></p>
+                      <p className="text-xs" style={{ color: '#A08880' }}>Last: {formatDate(store.lastVisitAt)}</p>
+                    </div>
                   </div>
-                  {periodStart && (
-                    <p className={`${descClass} text-xs mt-1`}>Started: {formatDate(periodStart)}</p>
-                  )}
                 </div>
               );
             }
+
+            // VISITS card
+            return (
+              <div key={`${store.partnerId}-${store.branchId}`} className="glass-card rounded-2xl overflow-hidden a5">
+                <div style={{ padding: '16px 18px' }}>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-lg truncate" style={{ color: '#5D4037' }}>{store.partnerName}</p>
+                      <p className="text-xs truncate" style={{ color: '#7B5E54' }}>{store.branchName}</p>
+                    </div>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: '#EDEFEE', color: '#7B5E54' }}>
+                      VISITS
+                    </span>
+                  </div>
+
+                  {threshold > 0 && windowDays > 0 && (
+                    <div className="rounded-xl p-4 mb-4" style={{ background: '#FAECE7', border: '1px solid #F5C4B3' }}>
+                      <p className="font-bold text-sm mb-1" style={{ color: '#D85A30' }}>Complete the Challenge</p>
+                      <p className="font-bold text-base mb-1" style={{ color: '#5D4037' }}>
+                        {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: '#2A6040' }}>{description}</p>
+                    </div>
+                  )}
+
+                  {threshold > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-medium" style={{ color: '#A08880' }}>Window Progress</p>
+                        <p className="text-sm font-bold tabular-nums" style={{ color: isComplete ? '#2A6040' : '#D85A30' }}>{current}/{threshold}</p>
+                      </div>
+                      <div className="h-[5px] rounded-full overflow-hidden" style={{ background: '#EDEFEE' }}>
+                        <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${progressPct}%`, background: '#D85A30' }} />
+                      </div>
+                      {isComplete ? (
+                        <p className="text-xs font-bold mt-2 text-center" style={{ color: '#2A6040' }}>Complete! Next visit earns reward</p>
+                      ) : (
+                        <p className="text-xs mt-2 text-center" style={{ color: '#A08880' }}>{windowDays}-day challenge</p>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid #FAECE7' }}>
+                    <p className="text-xs" style={{ color: '#A08880' }}>All-time: <span className="font-semibold" style={{ color: '#5D4037' }}>{store.visitCount}</span></p>
+                    <p className="text-xs" style={{ color: '#A08880' }}>Last: {formatDate(store.lastVisitAt)}</p>
+                  </div>
+                  {periodStart && (
+                    <p className="text-xs mt-1" style={{ color: '#A08880' }}>Window started: {formatDate(periodStart)}</p>
+                  )}
+                </div>
+              </div>
+            );
           })}
         </div>
       )}
-
     </div>
   );
 }

@@ -43,21 +43,21 @@ export function StaffRewardsPage() {
   };
 
   return (
-    <div className="min-w-0 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 sm:pb-24">
+    <div className="min-w-0 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 sm:pb-24" style={{ background: '#FAF9F6' }}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reward Redemptions</h1>
-        <p className="text-gray-600">Process customer reward redemptions by entering their code</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#5D4037' }}>Reward Redemptions</h1>
+        <p style={{ color: '#7B5E54' }}>Process customer reward redemptions by entering their code</p>
       </div>
 
       {/* Code Entry Card */}
-      <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200/50 rounded-2xl shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8" style={{ background: '#FAECE7', border: '1px solid #F5C4B3', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center text-2xl">
-            🎁
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(216,90,48,0.1)' }}>
+            <span className="material-symbols-rounded" style={{ color: '#D85A30', fontSize: '28px' }}>redeem</span>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Quick Redemption</h2>
-            <p className="text-sm text-gray-600">Enter the customer's 8-character reward code</p>
+            <h2 className="text-xl font-bold" style={{ color: '#5D4037' }}>Quick Redemption</h2>
+            <p className="text-sm" style={{ color: '#7B5E54' }}>Enter the customer's 8-character reward code</p>
           </div>
         </div>
 
@@ -68,50 +68,54 @@ export function StaffRewardsPage() {
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 8))}
               placeholder="ABC12XYZ"
-              className="w-full min-h-[56px] rounded-xl border-2 border-gray-300 px-4 font-mono uppercase text-2xl tracking-wider text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[56px] rounded-xl px-4 font-mono uppercase text-2xl tracking-wider text-center focus:outline-none focus:ring-2"
+              style={{ border: '2px solid #F5C4B3', color: '#5D4037', background: '#FFF' }}
               maxLength={8}
             />
-            <p className="text-xs text-gray-500 mt-2 text-center">Customer will show this code on their device</p>
+            <p className="text-xs mt-2 text-center" style={{ color: '#A08880' }}>Customer will show this code on their device</p>
           </div>
           <Button
             onClick={() => handleCompleteByCode(codeInput)}
             disabled={!codeInput.trim() || completingCode !== null}
-            className="min-h-[56px] px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-lg"
+            className="min-h-[56px] px-8 font-semibold text-lg"
+            style={{ background: '#2A6040', color: '#FFF' }}
           >
-            {completingCode ? 'Processing...' : '✓ Complete Redemption'}
+            <span className="material-symbols-rounded mr-1" style={{ fontSize: '20px' }}>check</span>
+            {completingCode ? 'Processing...' : 'Complete Redemption'}
           </Button>
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+          <div className="mt-4 p-4 rounded-lg text-sm" style={{ background: '#FDEEE9', border: '1px solid rgba(176,58,42,0.2)', color: '#B03A2A' }}>
             {error}
           </div>
         )}
 
         {successMessage && (
-          <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-sm font-medium">
-            ✓ {successMessage}
+          <div className="mt-4 p-4 rounded-lg text-sm font-medium" style={{ background: '#E4F2EB', border: '1px solid rgba(42,96,64,0.2)', color: '#2A6040' }}>
+            <span className="material-symbols-rounded mr-1" style={{ fontSize: '16px', verticalAlign: 'text-bottom' }}>check_circle</span>
+            {successMessage}
           </div>
         )}
       </div>
 
       {/* Pending Rewards Section */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Pending Redemptions</h2>
-        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+        <h2 className="text-xl font-bold" style={{ color: '#5D4037' }}>Pending Redemptions</h2>
+        <span className="px-3 py-1 rounded-full text-sm font-semibold" style={{ background: '#FAECE7', color: '#D85A30' }}>
           {pendingRewards.length} {pendingRewards.length === 1 ? 'reward' : 'rewards'}
         </span>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
-          <p className="text-gray-500">Loading rewards...</p>
+        <div className="text-center py-12 rounded-xl" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+          <p style={{ color: '#7B5E54' }}>Loading rewards...</p>
         </div>
       ) : pendingRewards.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-gray-200 rounded-xl">
-          <div className="text-6xl mb-4">🎉</div>
-          <p className="text-gray-500 text-lg font-medium mb-2">All rewards processed!</p>
-          <p className="text-gray-400 text-sm">No pending reward redemptions at the moment</p>
+        <div className="text-center py-16 rounded-xl" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+          <span className="material-symbols-rounded" style={{ fontSize: '64px', color: '#2A6040' }}>celebration</span>
+          <p className="text-lg font-medium mb-2" style={{ color: '#7B5E54' }}>All rewards processed!</p>
+          <p className="text-sm" style={{ color: '#A08880' }}>No pending reward redemptions at the moment</p>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -119,25 +123,25 @@ export function StaffRewardsPage() {
             const code = r.redemptionCode ?? '';
             const isCompleting = completingCode === code;
             return (
-              <div key={r.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <div key={r.id} className="rounded-xl overflow-hidden transition-shadow hover:shadow-md" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}>
                 <div className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ background: 'linear-gradient(135deg, #D85A30, #E8784E)' }}>
                         {r.customer?.name ? r.customer.name.charAt(0).toUpperCase() : '?'}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-mono font-bold text-xl rounded-lg tracking-wider">
+                          <span className="px-4 py-2 font-mono font-bold text-xl rounded-lg tracking-wider" style={{ background: '#D85A30', color: '#FFF' }}>
                             {code}
                           </span>
                         </div>
                         {r.customer?.name && (
-                          <p className="text-base font-semibold text-gray-900">{r.customer.name}</p>
+                          <p className="text-base font-semibold" style={{ color: '#5D4037' }}>{r.customer.name}</p>
                         )}
-                        <p className="text-sm text-gray-600 mt-1">{r.partner?.businessName}</p>
+                        <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>{r.partner?.businessName}</p>
                         {r.customer?.phoneNumber && (
-                          <p className="text-xs text-gray-500 font-mono mt-1">{r.customer.phoneNumber}</p>
+                          <p className="text-xs font-mono mt-1" style={{ color: '#A08880' }}>{r.customer.phoneNumber}</p>
                         )}
                       </div>
                     </div>
@@ -145,9 +149,11 @@ export function StaffRewardsPage() {
                     <Button
                       onClick={() => handleCompleteByCode(code)}
                       disabled={isCompleting}
-                      className="min-h-[52px] px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shrink-0"
+                      className="min-h-[52px] px-8 font-semibold shrink-0"
+                      style={{ background: '#2A6040', color: '#FFF' }}
                     >
-                      {isCompleting ? 'Processing...' : '✓ Mark Complete'}
+                      <span className="material-symbols-rounded mr-1" style={{ fontSize: '18px' }}>check</span>
+                      {isCompleting ? 'Processing...' : 'Mark Complete'}
                     </Button>
                   </div>
                 </div>

@@ -1,64 +1,114 @@
 import { useState } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/Button';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { PWAInstallButton } from '../components/PWAInstallButton';
 
 export function OwnerLayout() {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const phone = auth.type === 'platform' ? auth.user.phone : '';
+  const pathname = location.pathname;
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const isActive = (path: string) => pathname.startsWith(path);
+
+  const sidebarItems = [
+    { path: '/owner/dashboard', icon: 'dashboard', label: 'Dashboard' },
+    { path: '/owner/branches', icon: 'storefront', label: 'Branches' },
+    { path: '/owner/staff', icon: 'group', label: 'Staff' },
+  ];
+
   return (
-    <div className="flex flex-col h-screen h-[100dvh] bg-gray-100 md:flex-row overflow-hidden">
-      <header className="flex items-center justify-between p-3 bg-slate-800 text-white md:hidden safe-area-top flex-shrink-0">
-        <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded hover:bg-slate-700" aria-label="Menu">
-          <span className="text-xl">{menuOpen ? '✕' : '☰'}</span>
+    <div className="partner-theme flex flex-col h-screen h-[100dvh] md:flex-row overflow-hidden" style={{ background: '#FAF9F6' }}>
+      {/* Mobile Header */}
+      <header className="flex items-center justify-between p-3 md:hidden safe-area-top flex-shrink-0" style={{ background: '#FFF', borderBottom: '1px solid #FAECE7' }}>
+        <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded" aria-label="Menu">
+          <span className="material-symbols-rounded" style={{ color: '#5D4037' }}>{menuOpen ? 'close' : 'menu'}</span>
         </button>
-        <span className="font-bold">Store Owner</span>
+        <span className="font-bold" style={{ color: '#5D4037', letterSpacing: '-0.03em' }}>loyale. partner</span>
         <span className="w-10" />
       </header>
+
+      {/* Light Sidebar - matching wireframe 14 (partner sidebar) */}
       <aside
-        className={`fixed inset-0 z-40 flex flex-col w-56 max-w-[85vw] bg-slate-800 text-white transform transition-transform duration-200 ease-out md:static md:inset-auto md:z-auto md:max-w-none md:transform-none md:shrink-0 ${
+        className={`fixed inset-0 z-40 flex flex-col w-[220px] max-w-[85vw] transform transition-transform duration-200 ease-out md:static md:inset-auto md:z-auto md:max-w-none md:transform-none md:shrink-0 ${
           menuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
+        style={{ background: '#FFF', borderRight: '1px solid #FAECE7' }}
       >
-        <div className="p-4 border-b border-slate-700 flex items-center justify-between md:block">
-          <div>
-            <h1 className="font-bold text-lg">Store Owner</h1>
-            <p className="text-sm text-slate-400 truncate">{phone}</p>
+        {/* Sidebar header */}
+        <div className="p-4 flex items-center justify-between md:block" style={{ borderBottom: '1px solid #FAECE7' }}>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: '#FAECE7',
+                border: '1.5px solid #F5C4B3',
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#D85A30' }}>person</span>
+            </div>
+            <div>
+              <h1 className="text-[18px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.03em' }}>loyale.</h1>
+              <p className="text-[11px]" style={{ color: '#A08880' }}>Partner · {phone}</p>
+            </div>
           </div>
-          <button type="button" onClick={() => setMenuOpen(false)} className="p-2 md:hidden" aria-label="Close">✕</button>
+          <button type="button" onClick={() => setMenuOpen(false)} className="p-2 md:hidden" aria-label="Close" style={{ color: '#A08880' }}>
+            <span className="material-symbols-rounded">close</span>
+          </button>
         </div>
+
+        {/* Nav items */}
         <nav className="flex-1 p-2 overflow-auto">
-          <Link to="/owner/dashboard" className="block px-3 py-2.5 rounded hover:bg-slate-700 min-h-[44px] flex items-center" onClick={() => setMenuOpen(false)}>
-            Dashboard
-          </Link>
-          <Link to="/owner/branches" className="block px-3 py-2.5 rounded hover:bg-slate-700 min-h-[44px] flex items-center" onClick={() => setMenuOpen(false)}>
-            Branches
-          </Link>
-          <Link to="/owner/staff" className="block px-3 py-2.5 rounded hover:bg-slate-700 min-h-[44px] flex items-center" onClick={() => setMenuOpen(false)}>
-            Staff
-          </Link>
+          {sidebarItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg min-h-[44px] transition-colors mb-0.5"
+              style={{
+                background: isActive(item.path) ? '#FAECE7' : 'transparent',
+                color: isActive(item.path) ? '#D85A30' : '#7B5E54',
+              }}
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>{item.icon}</span>
+              <span className="text-[13.5px] font-semibold">{item.label}</span>
+            </Link>
+          ))}
         </nav>
-        <div className="p-2 border-t border-slate-700 space-y-2">
+
+        {/* Footer */}
+        <div className="p-2" style={{ borderTop: '1px solid #FAECE7' }}>
           <PWAInstallButton />
-          <Button variant="ghost" className="w-full text-left text-white min-h-[44px]" onClick={handleLogout}>
-            Logout
-          </Button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg min-h-[44px] text-left transition-colors"
+            style={{ color: '#B03A2A' }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>logout</span>
+            <span className="text-[13.5px] font-medium">Logout</span>
+          </button>
         </div>
       </aside>
-      {menuOpen && <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={() => setMenuOpen(false)} aria-hidden />}
+
+      {/* Mobile overlay */}
+      {menuOpen && <div className="fixed inset-0 z-30 md:hidden" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setMenuOpen(false)} aria-hidden />}
+
+      {/* Main content */}
       <main className="flex-1 overflow-y-auto min-w-0">
         <Outlet />
       </main>
+
       <PWAInstallPrompt variant="login" />
     </div>
   );

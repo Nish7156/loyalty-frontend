@@ -28,27 +28,29 @@ export function SuccessOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-scale-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-scale-in"
+      style={{ backgroundColor: 'rgba(93,64,55,0.3)' }}
       onClick={onClose}
     >
       <div
-        className="glass-card rounded-3xl p-8 max-w-sm w-full text-center shadow-premium-lg animate-success-bounce"
+        className="rounded-3xl p-8 max-w-sm w-full text-center shadow-xl animate-success-bounce"
+        style={{ background: '#FFF', border: '1px solid #FAECE7' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-7xl mb-4 animate-spring">{icon}</div>
 
-        <h2 className="text-2xl font-bold text-gradient-premium mb-3">
+        <h2 className="text-2xl font-bold mb-3" style={{ color: '#D85A30' }}>
           {title}
         </h2>
 
-        <p className="user-text-muted text-base leading-relaxed">
+        <p className="text-base leading-relaxed" style={{ color: '#7B5E54' }}>
           {message}
         </p>
 
         <div className="mt-6">
           <svg className="w-16 h-16 mx-auto" viewBox="0 0 52 52">
             <circle
-              className="stroke-emerald-500/30"
+              style={{ stroke: 'rgba(42,96,64,0.3)' }}
               cx="26"
               cy="26"
               r="24"
@@ -56,12 +58,13 @@ export function SuccessOverlay({
               strokeWidth="3"
             />
             <path
-              className="checkmark-path stroke-emerald-500"
+              style={{ stroke: '#2A6040' }}
               fill="none"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M14 27l7 7 16-16"
+              className="checkmark-path"
             />
           </svg>
         </div>

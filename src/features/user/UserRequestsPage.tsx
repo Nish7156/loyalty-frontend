@@ -17,27 +17,27 @@ function StatusBadge({ status }: { status: string }) {
   const s = status.toUpperCase();
   if (s === 'PENDING') {
     return (
-      <span className="user-request-badge-pending inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+      <span className="user-request-badge-pending inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: '#FFF8E1', color: '#F9A825', border: '1px solid #FFE082' }}>
         Pending
       </span>
     );
   }
   if (s === 'APPROVED') {
     return (
-      <span className="user-request-badge-approved inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+      <span className="user-request-badge-approved inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: '#E4F2EB', color: '#2A6040', border: '1px solid rgba(42,96,64,0.2)' }}>
         Approved
       </span>
     );
   }
   if (s === 'REJECTED') {
     return (
-      <span className="user-request-badge-rejected inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
+      <span className="user-request-badge-rejected inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: '#FDEEE9', color: '#B03A2A', border: '1px solid rgba(176,58,42,0.2)' }}>
         Rejected
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: '#FAF9F6', color: '#7B5E54', border: '1px solid #FAECE7' }}>
       {status}
     </span>
   );
@@ -68,9 +68,6 @@ export function UserRequestsPage() {
     return () => window.removeEventListener(CHECKIN_UPDATED_EVENT, handler);
   }, []);
 
-  const emptyCardClass =
-    'user-card user-request-card rounded-2xl p-6 sm:p-8 text-center border border-[var(--user-border-subtle)]';
-
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0">
@@ -82,11 +79,11 @@ export function UserRequestsPage() {
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight" style={{ color: '#D85A30' }}>
           My Requests
         </h1>
-        <div className={emptyCardClass}>
-          <p className="text-rose-500 text-sm">{error}</p>
+        <div className="rounded-2xl p-6 sm:p-8 text-center" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
         </div>
       </div>
     );
@@ -95,61 +92,60 @@ export function UserRequestsPage() {
   return (
     <div className="max-w-md mx-auto w-full min-w-0">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ color: '#D85A30' }}>
           My Requests
         </h1>
-        <p className="user-text-muted text-sm mt-1.5">Pending, approved, or rejected — staff approve when free.</p>
+        <p className="text-sm mt-1.5" style={{ color: '#7B5E54' }}>Pending, approved, or rejected — staff approve when free.</p>
       </div>
 
       {requests.length === 0 ? (
-        <div className={emptyCardClass}>
-          <p className="user-text-muted text-sm">No check-in requests yet. Scan a store QR to check in — your requests will appear here.</p>
+        <div className="rounded-2xl p-6 sm:p-8 text-center" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+          <p className="text-sm" style={{ color: '#A08880' }}>No check-in requests yet. Scan a store QR to check in — your requests will appear here.</p>
         </div>
       ) : (
         <ul className="grid gap-4 list-none p-0 m-0">
           {requests.map((a) => {
             const status = a.status.toUpperCase();
-            const accent =
+            const accentColor =
               status === 'PENDING'
-                ? 'from-amber-500 to-amber-400'
+                ? '#F9A825'
                 : status === 'APPROVED'
-                  ? 'from-emerald-500 to-emerald-400'
-                  : 'from-rose-500 to-rose-400';
+                  ? '#2A6040'
+                  : '#B03A2A';
             return (
               <li
                 key={a.id}
-                className="user-card user-request-card rounded-2xl overflow-hidden border border-[var(--user-border-subtle)] transition"
+                className="rounded-2xl overflow-hidden transition"
+                style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' }}
               >
-                <div className={`h-1 w-full bg-gradient-to-r ${accent}`} aria-hidden />
+                <div className="h-1 w-full" style={{ background: accentColor }} aria-hidden />
                 <div className="p-5 sm:p-6 flex gap-4 items-start justify-between">
                   <div className="flex gap-4 items-start min-w-0 flex-1">
-                    <div className="user-request-avatar shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-[var(--user-hover)]">
-                      <span className="text-lg font-semibold text-cyan-500" aria-hidden>
+                    <div className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: '#FAECE7' }}>
+                      <span className="text-lg font-semibold" style={{ color: '#D85A30' }} aria-hidden>
                         {(a.branch?.branchName ?? '?').charAt(0)}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="user-text font-semibold text-base">{a.branch?.branchName ?? 'Check-in'}</p>
+                        <p className="font-semibold text-base" style={{ color: '#5D4037' }}>{a.branch?.branchName ?? 'Check-in'}</p>
                         <StatusBadge status={a.status} />
                       </div>
                       {a.partner?.businessName && (
                         <div className="flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                          <span className="user-text-subtle text-sm">{a.partner.businessName}</span>
+                          <span className="material-symbols-rounded shrink-0 opacity-70" style={{ fontSize: '14px', color: '#A08880' }}>apartment</span>
+                          <span className="text-sm" style={{ color: '#A08880' }}>{a.partner.businessName}</span>
                         </div>
                       )}
                       {a.value != null && a.value > 0 && (
-                        <div className="user-request-amount inline-flex items-baseline gap-1.5 rounded-lg px-2.5 py-1 bg-[var(--user-hover)]">
-                          <span className="user-text-subtle text-xs uppercase tracking-wide">Amount</span>
-                          <span className="user-text font-semibold text-sm">${Number(a.value).toFixed(2)}</span>
+                        <div className="inline-flex items-baseline gap-1.5 rounded-lg px-2.5 py-1" style={{ background: '#FAECE7' }}>
+                          <span className="text-xs uppercase tracking-wide" style={{ color: '#A08880' }}>Amount</span>
+                          <span className="font-semibold text-sm" style={{ color: '#5D4037' }}>₹{Number(a.value).toFixed(2)}</span>
                         </div>
                       )}
                     </div>
                   </div>
-                  <p className="user-text-subtle text-xs shrink-0 text-right whitespace-nowrap">{formatDateTime(a.createdAt)}</p>
+                  <p className="text-xs shrink-0 text-right whitespace-nowrap" style={{ color: '#A08880' }}>{formatDateTime(a.createdAt)}</p>
                 </div>
               </li>
             );

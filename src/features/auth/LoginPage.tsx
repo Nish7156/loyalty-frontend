@@ -59,12 +59,23 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center bg-gray-100 p-3 sm:p-4">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-3 sm:p-4" style={{ background: '#FAF9F6' }}>
       <div className="absolute top-4 right-4">
         <PWAInstallButton />
       </div>
-      <div className="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6">
-        <h1 className="text-lg font-bold text-center mb-4 sm:text-xl sm:mb-6">Login</h1>
+      <div className="w-full max-w-sm rounded-2xl p-5 sm:p-6" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 4px 24px rgba(93,64,55,0.07)' }}>
+        {/* Badge */}
+        <div className="flex justify-center mb-4">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] rounded-full px-3 py-1.5" style={{ background: '#FAECE7', color: '#D85A30' }}>
+            <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>shield</span>
+            Staff / Partner Portal
+          </span>
+        </div>
+
+        {/* Wordmark */}
+        <h1 className="text-center mb-6" style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '26px', fontWeight: 700, color: '#5D4037', letterSpacing: '-0.03em' }}>
+          loyale.
+        </h1>
 
         {step === 'phone' ? (
           <form onSubmit={handleSendOtp} className="space-y-4">
@@ -76,14 +87,14 @@ export function LoginPage() {
               required
               autoComplete="tel"
             />
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>}
             <Button type="submit" fullWidth disabled={loading}>
-              {loading ? 'Sending…' : 'Send OTP'}
+              {loading ? 'Sending...' : 'Send OTP'}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleLogin} className="space-y-4">
-            <p className="text-sm text-gray-600">Code sent to {normalizeIndianPhone(phone)}</p>
+            <p className="text-sm" style={{ color: '#7B5E54' }}>Code sent to {normalizeIndianPhone(phone)}</p>
             <Input
               label="OTP"
               type="text"
@@ -93,9 +104,9 @@ export function LoginPage() {
               required
               autoComplete="one-time-code"
             />
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>}
             <Button type="submit" fullWidth disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Button
               type="button"

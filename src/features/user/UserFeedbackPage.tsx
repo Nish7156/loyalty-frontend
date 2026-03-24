@@ -32,31 +32,35 @@ export function UserFeedbackPage() {
     }
   };
 
-  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] opacity-0 animate-fade-in-up';
-  const inputClass = 'w-full min-h-[120px] rounded-xl border px-4 py-3 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition resize-y';
+  const cardStyle = {
+    background: '#FFF',
+    border: '1px solid #FAECE7',
+    boxShadow: '0 1px 3px rgba(26,24,22,0.05)',
+  };
 
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight opacity-0 animate-fade-in-up" style={{ color: '#D85A30' }}>
         Feedback
       </h1>
-      <p className="user-text-muted text-sm -mt-2 opacity-0 animate-fade-in-up">Tell us what we can improve. We track your feedback so we can serve you better.</p>
+      <p className="text-sm -mt-2 opacity-0 animate-fade-in-up" style={{ color: '#7B5E54' }}>Tell us what we can improve. We track your feedback so we can serve you better.</p>
 
       {sent ? (
-        <div className={`${cardClass} border-emerald-500/30 bg-emerald-500/10`}>
-          <p className="text-emerald-600 font-medium">Thank you!</p>
-          <p className="user-text-muted text-sm mt-1">Your feedback has been sent.</p>
+        <div className="rounded-2xl p-5 sm:p-6 min-w-0 opacity-0 animate-fade-in-up" style={{ background: '#E4F2EB', border: '1px solid rgba(42,96,64,0.2)' }}>
+          <p className="font-medium" style={{ color: '#2A6040' }}>Thank you!</p>
+          <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>Your feedback has been sent.</p>
           <button
             type="button"
             onClick={() => setSent(false)}
-            className="mt-3 text-sm text-cyan-600 font-medium hover:text-cyan-500"
+            className="mt-3 text-sm font-medium"
+            style={{ color: '#D85A30' }}
           >
             Send another
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className={cardClass}>
-          <label htmlFor="feedback-message" className="block text-sm font-medium user-text-muted mb-2">
+        <form onSubmit={handleSubmit} className="rounded-2xl p-5 sm:p-6 min-w-0 opacity-0 animate-fade-in-up" style={cardStyle}>
+          <label htmlFor="feedback-message" className="block text-sm font-medium mb-2" style={{ color: '#7B5E54' }}>
             Your feedback / What we can improve
           </label>
           <textarea
@@ -64,19 +68,19 @@ export function UserFeedbackPage() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="e.g. Faster check-in, better rewards..."
-            className={inputClass}
-            style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-input-bg)', color: 'var(--user-text)' }}
+            className="w-full min-h-[120px] rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-300/40 outline-none transition resize-y"
+            style={{ border: '1px solid #F5C4B3', background: '#FAF9F6', color: '#5D4037' }}
             maxLength={2000}
             rows={4}
             disabled={sending}
           />
-          <p className="user-text-subtle text-xs mt-1">{message.length}/2000</p>
-          {error && <p className="text-rose-500 text-sm mt-2">{error}</p>}
+          <p className="text-xs mt-1" style={{ color: '#A08880' }}>{message.length}/2000</p>
+          {error && <p className="text-sm mt-2" style={{ color: '#B03A2A' }}>{error}</p>}
           <button
             type="submit"
             disabled={sending || !message.trim()}
-            className="hover-user-bg w-full min-h-[48px] mt-4 rounded-xl border font-medium transition disabled:opacity-50 disabled:pointer-events-none"
-            style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
+            className="w-full min-h-[48px] mt-4 rounded-xl font-medium transition disabled:opacity-50 disabled:pointer-events-none"
+            style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FAF9F6' }}
           >
             {sending ? 'Sending…' : 'Send feedback'}
           </button>

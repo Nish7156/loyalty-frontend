@@ -22,16 +22,13 @@ export function CustomerLoginPage() {
       const normalized = normalizeIndianPhone(phone.trim());
       const res = await authApi.sendOtp(normalized);
 
-      // Check if customer is verified and can skip OTP
       if (res.skipOtp) {
-        // Verified customer - login directly without OTP
         const loginRes = await authApi.customerLogin(normalized);
         setCustomerToken(loginRes.access_token);
         navigate('/me', { replace: true });
         return;
       }
 
-      // New/unverified customer - show OTP screen
       setMpin(res.otp ?? '');
       setStep('otp');
       setOtp('');
@@ -60,11 +57,15 @@ export function CustomerLoginPage() {
 
   if (getCustomerTokenIfPresent()) {
     return (
-      <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden">
-        <div className="rounded-2xl border p-4 sm:p-6 shadow-[0_0_40px_-12px_rgba(0,0,0,0.15)]" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
-          <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">Welcome</h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--user-text-muted)' }}>You’re logged in. Scan a store QR to check in or view your profile.</p>
-          <Link to="/me" className="hover-user-bg block w-full min-h-[48px] rounded-xl border font-medium flex items-center justify-center transition" style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}>
+      <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden" style={{ paddingTop: '40px' }}>
+        <div className="rounded-2xl p-5" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 4px 24px rgba(93,64,55,0.07)' }}>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>Welcome back</h1>
+          <p className="text-sm mb-6" style={{ color: '#7B5E54' }}>You're logged in. Scan a store QR to check in or view your profile.</p>
+          <Link
+            to="/me"
+            className="block w-full min-h-[52px] rounded-xl font-semibold flex items-center justify-center transition"
+            style={{ background: '#D85A30', color: '#FFF', fontSize: '15px' }}
+          >
             My profile
           </Link>
         </div>
@@ -73,13 +74,22 @@ export function CustomerLoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden">
-      <h1 className="text-xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight break-words">Login or Register</h1>
-      <p className="text-sm mb-4 sm:mb-6 break-words" style={{ color: 'var(--user-text-muted)' }}>Enter your phone number to continue.</p>
+    <div className="max-w-md mx-auto pb-20 w-full min-w-0 overflow-hidden" style={{ paddingTop: '40px' }}>
+      {/* Wordmark */}
+      <div className="text-center mb-8 a1">
+        <h1 style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '28px', fontWeight: 700, color: '#5D4037', letterSpacing: '-0.03em' }}>
+          loyale.
+        </h1>
+      </div>
 
       {step === 'phone' && (
-        <form onSubmit={handlePhoneSubmit} className="space-y-5">
-          <div className="rounded-2xl border p-4 sm:p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] min-w-0" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
+        <form onSubmit={handlePhoneSubmit} className="space-y-5 a2">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>
+              Welcome.<br />What's your number?
+            </h2>
+          </div>
+          <div className="rounded-2xl p-5" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 4px 24px rgba(93,64,55,0.07)' }}>
             <PhoneInput
               label="Phone"
               value={phone}
@@ -89,25 +99,48 @@ export function CustomerLoginPage() {
               autoComplete="tel"
               variant="dark"
             />
-            {error && <p className="text-rose-500 text-sm mt-2">{error}</p>}
+            {error && <p className="text-sm mt-2" style={{ color: '#B03A2A' }}>{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="hover-user-bg w-full min-h-[48px] mt-4 rounded-xl border font-medium transition disabled:opacity-50"
-              style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
+              className="w-full min-h-[52px] mt-4 rounded-xl font-semibold transition disabled:opacity-50"
+              style={{ background: '#D85A30', color: '#FFF', fontSize: '15px' }}
             >
-              {loading ? 'Sending…' : 'Continue'}
+              {loading ? 'Sending...' : 'Continue'}
+            </button>
+          </div>
+          <div className="text-center">
+            <p className="text-xs" style={{ color: '#A08880' }}>or sign in with</p>
+            <button
+              type="button"
+              className="w-full min-h-[52px] mt-3 rounded-xl font-medium transition"
+              style={{ background: '#FFF', border: '1.5px solid #F5C4B3', color: '#7B5E54', fontSize: '15px' }}
+            >
+              Use email instead
             </button>
           </div>
         </form>
       )}
 
       {step === 'otp' && (
-        <form onSubmit={handleOtpSubmit} className="space-y-5">
-          <div className="rounded-2xl border p-4 sm:p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] min-w-0" style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-card-subtle)' }}>
-            <p className="text-sm mb-1" style={{ color: 'var(--user-text-muted)' }}>Your 4-digit verification code</p>
-            {mpin && <p className="text-2xl font-mono font-bold text-cyan-500 tracking-[0.4em] mb-4">{mpin}</p>}
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--user-text-muted)' }}>Enter code</label>
+        <form onSubmit={handleOtpSubmit} className="space-y-5 a2">
+          {/* OTP Icon */}
+          <div className="flex justify-center">
+            <div className="flex items-center justify-center" style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#FAECE7' }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '28px', color: '#D85A30' }}>sms</span>
+            </div>
+          </div>
+          <div className="text-center mb-2">
+            <h2 className="text-xl font-bold" style={{ color: '#5D4037' }}>Enter the 4-digit code</h2>
+            <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>Sent to {phone}</p>
+          </div>
+          <div className="rounded-2xl p-5" style={{ background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 4px 24px rgba(93,64,55,0.07)' }}>
+            {mpin && (
+              <p className="text-2xl font-bold tracking-[0.4em] mb-4 text-center" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#D85A30' }}>
+                {mpin}
+              </p>
+            )}
+            <label className="block text-xs font-medium uppercase tracking-[0.02em] mb-2" style={{ color: '#7B5E54' }}>Enter code</label>
             <input
               type="text"
               inputMode="numeric"
@@ -117,29 +150,40 @@ export function CustomerLoginPage() {
               placeholder="0000"
               required
               autoComplete="one-time-code"
-              className="w-full min-h-[48px] rounded-xl border px-4 focus:ring-2 focus:ring-cyan-400/40 focus:border-cyan-400/50 outline-none transition text-center text-lg tracking-widest"
-              style={{ borderColor: 'var(--user-border-subtle)', backgroundColor: 'var(--user-input-bg)', color: 'var(--user-text)' }}
+              className="w-full min-h-[50px] rounded-xl border px-4 outline-none transition text-center text-lg tracking-widest"
+              style={{
+                borderColor: otp ? '#D85A30' : '#F5C4B3',
+                backgroundColor: '#FAF9F6',
+                color: '#5D4037',
+                fontFamily: "'JetBrains Mono', monospace",
+                boxShadow: otp ? '0 0 0 3px #FAECE7' : 'none',
+              }}
             />
-            {error && <p className="text-rose-500 text-sm mt-2">{error}</p>}
+            {error && <p className="text-sm mt-2" style={{ color: '#B03A2A' }}>{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="hover-user-bg w-full min-h-[48px] mt-4 rounded-xl border font-medium transition disabled:opacity-50"
-              style={{ borderColor: 'var(--user-border-subtle)', color: 'var(--user-text)' }}
+              className="w-full min-h-[52px] mt-4 rounded-xl font-semibold transition disabled:opacity-50"
+              style={{ background: '#D85A30', color: '#FFF', fontSize: '15px' }}
             >
-              {loading ? 'Verifying…' : 'Send'}
+              {loading ? 'Verifying...' : 'Verify & Continue'}
             </button>
             <button
               type="button"
               onClick={() => { setStep('phone'); setError(''); }}
-              className="hover-user-bg w-full mt-2 min-h-[44px] rounded-xl text-sm font-medium transition"
-              style={{ color: 'var(--user-text-subtle)' }}
+              className="w-full mt-2 min-h-[44px] rounded-xl text-sm font-medium transition"
+              style={{ color: '#D85A30' }}
             >
-              Change number
+              Wrong number?
             </button>
           </div>
         </form>
       )}
+
+      {/* Terms footer */}
+      <p className="text-center text-[11px] mt-8" style={{ color: '#A08880' }}>
+        By continuing you agree to our Terms of Service and Privacy Policy.
+      </p>
     </div>
   );
 }

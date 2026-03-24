@@ -49,101 +49,93 @@ export function UserRewardsPage() {
   };
 
   const rewards: Reward[] = profile?.customer?.rewards ?? [];
-  const cardClass = 'user-card rounded-2xl p-5 sm:p-6 min-w-0 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)] card-interactive tap-scale opacity-0 animate-fade-in-up';
-  const descClass = 'user-text-muted text-sm';
 
   if (loading) {
-    return (
-      <div className="max-w-md mx-auto w-full min-w-0">
-        <RewardsSkeleton />
-      </div>
-    );
+    return <div className="max-w-md mx-auto w-full min-w-0"><RewardsSkeleton /></div>;
   }
 
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent tracking-tight">
-          Rewards
-        </h1>
-        <div className="user-card rounded-2xl p-5 shadow-[0_0_30px_-10px_rgba(0,0,0,0.15)]">
-          <p className="text-rose-500 text-sm">{error}</p>
+        <h1 className="text-xl font-bold mb-4" style={{ color: '#5D4037' }}>Rewards</h1>
+        <div className="glass-card rounded-2xl p-5">
+          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6 sm:space-y-8 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-600 to-cyan-500 bg-clip-text text-transparent opacity-0 animate-fade-in-up">
-        Rewards
-      </h1>
-      <p className="user-text-muted text-sm -mt-2">Use your rewards at the store — tap Redeem and show the code to staff.</p>
+    <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
+      <div className="a1">
+        <h1 className="text-[22px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>Rewards</h1>
+        <p className="text-sm mt-0.5" style={{ color: '#7B5E54' }}>Use your rewards at the store — tap Redeem and show the code to staff.</p>
+      </div>
 
       {lastRedeemedCode && (
-        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5 opacity-0 animate-fade-in-up">
-          <p className="text-sm user-text mb-1">Your reward code — show this to staff at the store</p>
-          <p className="text-2xl font-mono font-bold tracking-[0.3em] text-emerald-500">{lastRedeemedCode}</p>
-          <p className="text-xs user-text-subtle mt-2">Staff will enter this code to give you your reward.</p>
-          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm text-cyan-600 font-medium hover:text-cyan-500">
+        <div className="rounded-2xl p-5 a2" style={{ background: '#E4F2EB', border: '1.5px solid #A8D4BA' }}>
+          <p className="text-sm mb-1" style={{ color: '#5D4037' }}>Your reward code — show this to staff</p>
+          <p className="text-2xl font-bold tracking-[0.3em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#2A6040' }}>{lastRedeemedCode}</p>
+          <p className="text-xs mt-2" style={{ color: '#7B5E54' }}>Staff will enter this code to give you your reward.</p>
+          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm font-medium" style={{ color: '#D85A30' }}>
             Dismiss
           </button>
         </div>
       )}
 
       {rewards.length === 0 ? (
-        <div className={`${cardClass} stagger-1`}>
-          <p className={descClass}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
+        <div className="glass-card rounded-2xl p-5 a2">
+          <p className="text-sm" style={{ color: '#7B5E54' }}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {rewards.map((r, index) => (
             <div
               key={r.id}
-              className={cardClass}
-              style={{ animationDelay: `${0.12 + index * 0.08}s` }}
+              className={`glass-card rounded-2xl overflow-hidden ${index < 3 ? 'a2' : ''}`}
             >
-              <div className="flex flex-wrap justify-between items-start gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold user-text text-lg truncate">{r.partner?.businessName ?? 'Store'}</p>
-                  <span
-                    className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      r.status === 'ACTIVE'
-                        ? 'bg-cyan-400/20 text-cyan-600'
-                        : r.status === 'PENDING'
-                        ? 'bg-amber-400/20 text-amber-600'
-                        : 'user-text-muted'
-                    }`}
-                    style={r.status === 'REDEEMED' ? { backgroundColor: 'var(--user-hover)' } : undefined}
-                  >
-                    {r.status === 'ACTIVE' && 'Ready to use'}
-                    {r.status === 'PENDING' && '⏳ Awaiting staff verification'}
-                    {r.status === 'REDEEMED' && 'Redeemed'}
-                  </span>
-                  {r.expiryDate && (
-                    <p className="user-text-subtle text-sm mt-2">Expires {formatDate(r.expiryDate)}</p>
-                  )}
-                  {r.status === 'PENDING' && r.redemptionCode && (
-                    <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-1">Your redemption code:</p>
-                      <p className="text-lg font-mono font-bold tracking-[0.2em] text-amber-600 dark:text-amber-400">
-                        {r.redemptionCode}
-                      </p>
-                      <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1">
-                        Show this to staff at the store
-                      </p>
-                    </div>
+              <div style={{ padding: '16px 18px' }}>
+                <div className="flex flex-wrap justify-between items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-base truncate" style={{ color: '#5D4037' }}>{r.partner?.businessName ?? 'Store'}</p>
+                    <span
+                      className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                      style={
+                        r.status === 'ACTIVE'
+                          ? { background: '#E4F2EB', color: '#2A6040' }
+                          : r.status === 'PENDING'
+                          ? { background: '#FEF3C7', color: '#B45309' }
+                          : { background: '#EDEFEE', color: '#A08880' }
+                      }
+                    >
+                      {r.status === 'ACTIVE' && 'Ready to use'}
+                      {r.status === 'PENDING' && 'Awaiting staff verification'}
+                      {r.status === 'REDEEMED' && 'Redeemed'}
+                    </span>
+                    {r.expiryDate && (
+                      <p className="text-xs mt-2" style={{ color: '#A08880' }}>Expires {formatDate(r.expiryDate)}</p>
+                    )}
+                    {r.status === 'PENDING' && r.redemptionCode && (
+                      <div className="mt-3 p-3 rounded-xl" style={{ background: '#FEF3C7', border: '1px solid rgba(180,83,9,0.18)' }}>
+                        <p className="text-xs mb-1" style={{ color: '#B45309' }}>Your redemption code:</p>
+                        <p className="text-lg font-bold tracking-[0.2em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#B45309' }}>
+                          {r.redemptionCode}
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: 'rgba(180,83,9,0.7)' }}>Show this to staff at the store</p>
+                      </div>
+                    )}
+                  </div>
+                  {r.status === 'ACTIVE' && (
+                    <Button
+                      onClick={() => handleRedeem(r.id)}
+                      disabled={!!redeemingId}
+                      className="shrink-0 min-h-[40px] rounded-lg font-semibold text-sm"
+                      style={{ background: '#D85A30', color: '#FFF', border: 'none' }}
+                    >
+                      {redeemingId === r.id ? 'Redeeming...' : 'Redeem'}
+                    </Button>
                   )}
                 </div>
-                {r.status === 'ACTIVE' && (
-                  <Button
-                    onClick={() => handleRedeem(r.id)}
-                    disabled={!!redeemingId}
-                    className="shrink-0 min-h-[44px] bg-cyan-500/90 hover:bg-cyan-400 text-black font-semibold"
-                  >
-                    {redeemingId === r.id ? 'Redeeming…' : 'Redeem'}
-                  </Button>
-                )}
               </div>
             </div>
           ))}

@@ -10,18 +10,26 @@ export function Button({
   fullWidth,
   className = '',
   children,
+  style,
   ...props
 }: ButtonProps) {
   const base = 'px-4 py-2.5 rounded-xl font-medium transition disabled:opacity-50';
   const variants: Record<string, string> = {
-    primary: 'bg-[var(--premium-gold)] text-[var(--premium-bg)] hover:opacity-90',
-    secondary: 'bg-[var(--premium-card)] text-[var(--premium-cream)] border border-[var(--premium-border)] hover:bg-[var(--premium-border)]',
-    danger: 'bg-rose-600 text-white hover:bg-rose-700',
-    ghost: 'bg-transparent text-[var(--premium-muted)] hover:bg-[var(--premium-card)] hover:text-[var(--premium-cream)]',
+    primary: 'text-white',
+    secondary: 'border',
+    danger: 'text-white',
+    ghost: '',
+  };
+  const variantStyles: Record<string, React.CSSProperties> = {
+    primary: { background: '#D85A30', color: '#FFF' },
+    secondary: { background: '#FFF', borderColor: '#F5C4B3', color: '#7B5E54' },
+    danger: { background: '#B03A2A', color: '#FFF' },
+    ghost: { background: 'transparent', color: '#7B5E54' },
   };
   return (
     <button
       className={`${base} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      style={{ ...variantStyles[variant], ...style }}
       {...props}
     >
       {children}
