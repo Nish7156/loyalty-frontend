@@ -110,7 +110,7 @@ export function UserLayout() {
       <header
         className="fixed top-0 left-0 right-0 z-30 safe-area-top safe-area-x"
         style={{
-          padding: '14px 20px',
+          padding: '14px 14px',
           backgroundColor: 'var(--s)',
           borderBottom: '1px solid var(--bdl)',
         }}
@@ -179,8 +179,8 @@ export function UserLayout() {
         className="flex-1 overflow-y-auto overflow-x-hidden safe-area-x"
         style={{
           paddingTop: 'calc(62px + env(safe-area-inset-top, 0px))',
-          paddingLeft: '20px',
-          paddingRight: '20px',
+          paddingLeft: '12px',
+          paddingRight: '12px',
           paddingBottom: 'calc(94px + env(safe-area-inset-bottom, 0px))',
         }}
       >
