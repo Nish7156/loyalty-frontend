@@ -17,7 +17,7 @@ export function UserLayout() {
   const isMe = pathname === '/me';
   const isHistory = pathname === '/history';
   const isRewards = pathname === '/rewards';
-  const isRequests = pathname === '/requests';
+  const isScan = pathname === '/scan' || pathname === '/requests';
   const isProfile = pathname === '/profile' || pathname === '/account';
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
@@ -117,17 +117,19 @@ export function UserLayout() {
       >
         <div className="max-w-md mx-auto w-full min-w-0 flex items-center justify-between">
           {/* Left: Wordmark */}
-          <span
+          <Link
+            to="/me"
             style={{
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '22px',
               fontWeight: 700,
               letterSpacing: '-0.03em',
               color: 'var(--t)',
+              textDecoration: 'none',
             }}
           >
-            loyale.
-          </span>
+            Loyalty
+          </Link>
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2 shrink-0">
@@ -263,18 +265,38 @@ export function UserLayout() {
             <>
               {/* Cards */}
               <Link to="/me" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation" title="Cards">
-                <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isMe) }}>loyalty</span>
+                <span
+                  className="flex items-center justify-center transition-all"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: isMe ? 'rgba(216,90,48,0.12)' : 'transparent',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isMe) }}>loyalty</span>
+                </span>
                 <span className="text-[10px] font-semibold" style={navItemStyle(isMe)}>Cards</span>
               </Link>
 
               {/* Wallet */}
               <Link to="/rewards" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation" title="Rewards">
-                <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isRewards) }}>account_balance_wallet</span>
+                <span
+                  className="flex items-center justify-center transition-all"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: isRewards ? 'rgba(216,90,48,0.12)' : 'transparent',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isRewards) }}>account_balance_wallet</span>
+                </span>
                 <span className="text-[10px] font-semibold" style={navItemStyle(isRewards)}>Wallet</span>
               </Link>
 
               {/* Scan Button (center, prominent) */}
-              <Link to="/requests" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation relative" title="Scan">
+              <Link to="/scan" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation relative" title="Scan">
                 <span
                   className="flex items-center justify-center scan-btn-breath"
                   style={{
@@ -283,24 +305,44 @@ export function UserLayout() {
                     borderRadius: '50%',
                     background: 'var(--a)',
                     color: 'var(--s)',
-                    boxShadow: '0 3px 10px rgba(216,90,48,0.28)',
+                    boxShadow: isScan ? '0 4px 14px rgba(216,90,48,0.4)' : '0 3px 10px rgba(216,90,48,0.28)',
                     marginTop: '-12px',
                   }}
                 >
                   <span className="material-symbols-rounded" style={{ fontSize: '24px' }}>qr_code_scanner</span>
                 </span>
-                <span className="text-[10px] font-semibold" style={navItemStyle(isRequests)}>Scan</span>
+                <span className="text-[10px] font-semibold" style={navItemStyle(isScan)}>Scan</span>
               </Link>
 
               {/* History */}
               <Link to="/history" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation" title="History">
-                <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isHistory) }}>history</span>
+                <span
+                  className="flex items-center justify-center transition-all"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: isHistory ? 'rgba(216,90,48,0.12)' : 'transparent',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isHistory) }}>history</span>
+                </span>
                 <span className="text-[10px] font-semibold" style={navItemStyle(isHistory)}>History</span>
               </Link>
 
               {/* Profile */}
               <Link to="/account" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation" title="Profile">
-                <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isProfile) }}>person</span>
+                <span
+                  className="flex items-center justify-center transition-all"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: isProfile ? 'rgba(216,90,48,0.12)' : 'transparent',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isProfile) }}>person</span>
+                </span>
                 <span className="text-[10px] font-semibold" style={navItemStyle(isProfile)}>Profile</span>
               </Link>
             </>

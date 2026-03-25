@@ -78,7 +78,7 @@ export function CustomerLoginPage() {
       {/* Wordmark */}
       <div className="text-center mb-8 a1">
         <h1 style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '28px', fontWeight: 700, color: 'var(--t)', letterSpacing: '-0.03em' }}>
-          loyale.
+          Loyalty
         </h1>
       </div>
 

@@ -32,7 +32,7 @@ export function OwnerLayout() {
         <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded" aria-label="Menu">
           <span className="material-symbols-rounded" style={{ color: 'var(--t)' }}>{menuOpen ? 'close' : 'menu'}</span>
         </button>
-        <span className="font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>loyale. partner</span>
+        <span className="font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>Loyalty Partner</span>
         <span className="w-10" />
       </header>
 
@@ -59,7 +59,7 @@ export function OwnerLayout() {
               <span className="material-symbols-rounded" style={{ fontSize: '14px', color: 'var(--a)' }}>person</span>
             </div>
             <div>
-              <h1 className="text-[18px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>loyale.</h1>
+              <h1 className="text-[18px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>Loyalty</h1>
               <p className="text-[11px]" style={{ color: 'var(--t3)' }}>Partner · {phone}</p>
             </div>
           </div>

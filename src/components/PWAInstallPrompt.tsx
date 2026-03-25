@@ -5,8 +5,8 @@ const DELAY_MS = 40 * 1000;  // 40s
 const MAX_SHOW_COUNT = 2;
 
 const COPY = {
-  default: { title: 'Install Loyale', subtitle: 'Add to your home screen for a better experience.' },
-  login: { title: 'Install Loyale', subtitle: 'Add to home screen for quick login (owners & staff).' },
+  default: { title: 'Install Loyalty', subtitle: 'Add to your home screen for a better experience.' },
+  login: { title: 'Install Loyalty', subtitle: 'Add to home screen for quick login (owners & staff).' },
 } as const;
 
 export function PWAInstallPrompt({ variant = 'default' }: { variant?: 'default' | 'login' } = {}) {

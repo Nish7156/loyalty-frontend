@@ -120,7 +120,7 @@ export function UserAccountPage() {
           style={{ padding: '14px 18px', color: 'var(--t2)' }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: '20px', color: 'var(--t3)' }}>info</span>
-          <span className="text-[13px] font-medium">About loyale.</span>
+          <span className="text-[13px] font-medium">About Loyalty</span>
           <span className="material-symbols-rounded ml-auto" style={{ fontSize: '18px', color: 'var(--bdl)' }}>chevron_right</span>
         </button>
       </div>

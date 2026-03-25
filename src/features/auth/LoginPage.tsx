@@ -74,7 +74,7 @@ export function LoginPage() {
 
         {/* Wordmark */}
         <h1 className="text-center mb-6" style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '26px', fontWeight: 700, color: 'var(--t)', letterSpacing: '-0.03em' }}>
-          loyale.
+          Loyalty
         </h1>
 
         {step === 'phone' ? (

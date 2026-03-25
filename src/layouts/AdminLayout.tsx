@@ -32,7 +32,7 @@ export function AdminLayout() {
         <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded" aria-label="Menu">
           <span className="material-symbols-rounded" style={{ color: 'rgba(255,255,255,0.85)' }}>{menuOpen ? 'close' : 'menu'}</span>
         </button>
-        <span className="font-bold" style={{ color: 'rgba(255,255,255,0.85)' }}>loyale. admin</span>
+        <span className="font-bold" style={{ color: 'rgba(255,255,255,0.85)' }}>Loyalty Admin</span>
         <span className="w-10" />
       </header>
 
@@ -46,7 +46,7 @@ export function AdminLayout() {
         {/* Sidebar header */}
         <div className="p-4 flex items-center justify-between md:block" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div>
-            <h1 className="font-bold text-lg" style={{ color: '#FFF', letterSpacing: '-0.03em' }}>loyale.</h1>
+            <h1 className="font-bold text-lg" style={{ color: '#FFF', letterSpacing: '-0.03em' }}>Loyalty</h1>
             <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Admin · {phone}</p>
           </div>
           <button type="button" onClick={() => setMenuOpen(false)} className="p-2 md:hidden" aria-label="Close" style={{ color: 'rgba(255,255,255,0.6)' }}>

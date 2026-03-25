@@ -76,19 +76,19 @@ export function UserWalletPage() {
         </h1>
       </div>
 
-      {/* Dark wallet strip - matching wireframe 03 */}
+      {/* Wallet strip — uses bdl/bd for theme-safe contrast */}
       <div
         className="a2 rounded-[18px] overflow-hidden relative"
         style={{
-          background: 'var(--t)',
+          background: 'var(--bdl)',
+          border: '1.5px solid var(--bd)',
           padding: '20px 22px',
-          color: 'var(--s)',
         }}
       >
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Total Coins</p>
-            <p className="text-[30px] font-bold leading-none mt-1" style={{ letterSpacing: '-0.04em' }}>{formatPoints(totalPoints)}</p>
+            <p className="text-xs" style={{ color: 'var(--t3)' }}>Total Coins</p>
+            <p className="text-[30px] font-bold leading-none mt-1" style={{ letterSpacing: '-0.04em', color: 'var(--a)' }}>{formatPoints(totalPoints)}</p>
           </div>
           <button
             onClick={() => navigate('/rewards')}
@@ -104,7 +104,7 @@ export function UserWalletPage() {
       {/* Quick action buttons - matching wireframe 03 */}
       <div className="a3 flex gap-3">
         <button
-          onClick={() => navigate('/requests')}
+          onClick={() => navigate('/scan')}
           className="flex-1 flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
           style={{ height: '40px', background: 'var(--a)', color: 'var(--s)' }}
         >

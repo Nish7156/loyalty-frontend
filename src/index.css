@@ -110,7 +110,7 @@
 
 /* User theme hover states */
 .user-theme .nav-tab:hover {
-  background-color: var(--user-hover);
+  background-color: transparent !important;
 }
 .user-theme .hover-user-bg:hover {
   background-color: var(--user-hover);
@@ -432,7 +432,7 @@ body {
 .card-interactive:active { transform: translateY(0) scale(0.995); }
 .btn-interactive { transition: transform 0.15s ease, background-color 0.2s ease; }
 .btn-interactive:active { transform: scale(0.97); }
-.nav-tab { transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease; }
+.nav-tab { transition: transform 0.2s ease, color 0.2s ease; background-color: transparent !important; }
 .nav-tab:active { transform: scale(0.95); }
 
 /* Loader (warm accent) */
