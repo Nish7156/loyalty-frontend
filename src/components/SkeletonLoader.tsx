@@ -5,7 +5,7 @@ interface SkeletonLoaderProps {
 }
 
 const skeletonBg = 'rgba(250,236,231,0.6)';
-const cardStyle = { background: '#FFF', border: '1px solid #FAECE7', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' };
+const cardStyle = { background: 'var(--s)', border: '1px solid var(--bdl)', boxShadow: '0 1px 3px rgba(26,24,22,0.05)' };
 
 export function SkeletonLoader({ type = 'card', count = 3, className = '' }: SkeletonLoaderProps) {
   const items = Array.from({ length: count }, (_, i) => i);

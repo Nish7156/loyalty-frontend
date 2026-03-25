@@ -21,10 +21,10 @@ export function Button({
     ghost: '',
   };
   const variantStyles: Record<string, React.CSSProperties> = {
-    primary: { background: '#D85A30', color: '#FFF' },
-    secondary: { background: '#FFF', borderColor: '#F5C4B3', color: '#7B5E54' },
-    danger: { background: '#B03A2A', color: '#FFF' },
-    ghost: { background: 'transparent', color: '#7B5E54' },
+    primary: { background: 'var(--a)', color: 'var(--s)' },
+    secondary: { background: 'var(--s)', borderColor: 'var(--bd)', color: 'var(--t2)' },
+    danger: { background: 'var(--re)', color: 'var(--s)' },
+    ghost: { background: 'transparent', color: 'var(--t2)' },
   };
   return (
     <button

@@ -10,7 +10,7 @@ export function Input({ label, error, className = '', id, ...props }: InputProps
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.02em] mb-1.5" style={{ color: '#7B5E54' }}>
+        <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.02em] mb-1.5" style={{ color: 'var(--t2)' }}>
           {label}
         </label>
       )}
@@ -18,13 +18,13 @@ export function Input({ label, error, className = '', id, ...props }: InputProps
         id={inputId}
         className={`w-full min-h-[44px] border rounded-xl px-3 py-2.5 outline-none transition ${error ? 'border-[#B03A2A]' : ''} ${className}`}
         style={{
-          background: '#FAF9F6',
-          borderColor: error ? '#B03A2A' : '#F5C4B3',
-          color: '#5D4037',
+          background: 'var(--bg)',
+          borderColor: error ? 'var(--re)' : 'var(--bd)',
+          color: 'var(--t)',
         }}
         {...props}
       />
-      {error && <p className="mt-1 text-sm" style={{ color: '#B03A2A' }}>{error}</p>}
+      {error && <p className="mt-1 text-sm" style={{ color: 'var(--re)' }}>{error}</p>}
     </div>
   );
 }

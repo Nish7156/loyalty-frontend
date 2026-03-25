@@ -27,35 +27,35 @@ export function SellerLayout() {
   const isActive = (path: string) => pathname.startsWith(path);
 
   const navItemStyle = (active: boolean) => ({
-    color: active ? '#D85A30' : '#A08880',
+    color: active ? 'var(--a)' : 'var(--t3)',
   });
 
   return (
-    <div className="flex flex-col h-screen h-[100dvh] overflow-hidden" style={{ background: '#FAF9F6' }}>
+    <div className="flex flex-col h-screen h-[100dvh] overflow-hidden" style={{ background: 'var(--bg)' }}>
       {/* Staff Header - matching wireframe 11 */}
-      <header className="flex-shrink-0" style={{ background: '#FFF', borderBottom: '1px solid #FAECE7' }}>
+      <header className="flex-shrink-0" style={{ background: 'var(--s)', borderBottom: '1px solid var(--bdl)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 {storeName && (
                   <span className="status-pill live">
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2A6040', display: 'inline-block' }} />
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--gr)', display: 'inline-block' }} />
                     Live
                   </span>
                 )}
-                <h1 className="font-semibold text-base truncate" style={{ color: '#5D4037' }}>
+                <h1 className="font-semibold text-base truncate" style={{ color: 'var(--t)' }}>
                   {storeName || 'Staff Dashboard'}
                 </h1>
               </div>
-              {name && <p className="text-xs truncate" style={{ color: '#A08880' }}>{name}</p>}
+              {name && <p className="text-xs truncate" style={{ color: 'var(--t3)' }}>{name}</p>}
             </div>
             <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-4">
               <PWAInstallButton />
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 min-h-[38px] px-3 rounded-lg text-sm font-medium transition"
-                style={{ color: '#B03A2A', background: '#FDEEE9' }}
+                style={{ color: 'var(--re)', background: 'var(--rebg)' }}
               >
                 <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>logout</span>
                 Logout
@@ -73,7 +73,7 @@ export function SellerLayout() {
       <PWAInstallPrompt variant="login" />
 
       {/* Bottom Navigation - matching wireframe 11 */}
-      <nav className="fixed bottom-0 left-0 right-0 flex-shrink-0 safe-area-pb z-50" style={{ background: '#FFF', borderTop: '1px solid #FAECE7', height: '80px', padding: '0 8px 14px' }}>
+      <nav className="fixed bottom-0 left-0 right-0 flex-shrink-0 safe-area-pb z-50" style={{ background: 'var(--s)', borderTop: '1px solid var(--bdl)', height: '80px', padding: '0 8px 14px' }}>
         <div className="max-w-md mx-auto flex justify-around items-center h-full">
           <Link to="/seller/dashboard" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation">
             <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isActive('/seller/dashboard')) }}>checklist</span>

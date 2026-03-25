@@ -26,13 +26,13 @@ export function OwnerLayout() {
   ];
 
   return (
-    <div className="partner-theme flex flex-col h-screen h-[100dvh] md:flex-row overflow-hidden" style={{ background: '#FAF9F6' }}>
+    <div className="partner-theme flex flex-col h-screen h-[100dvh] md:flex-row overflow-hidden" style={{ background: 'var(--bg)' }}>
       {/* Mobile Header */}
-      <header className="flex items-center justify-between p-3 md:hidden safe-area-top flex-shrink-0" style={{ background: '#FFF', borderBottom: '1px solid #FAECE7' }}>
+      <header className="flex items-center justify-between p-3 md:hidden safe-area-top flex-shrink-0" style={{ background: 'var(--s)', borderBottom: '1px solid var(--bdl)' }}>
         <button type="button" onClick={() => setMenuOpen((o) => !o)} className="p-2 -m-2 rounded" aria-label="Menu">
-          <span className="material-symbols-rounded" style={{ color: '#5D4037' }}>{menuOpen ? 'close' : 'menu'}</span>
+          <span className="material-symbols-rounded" style={{ color: 'var(--t)' }}>{menuOpen ? 'close' : 'menu'}</span>
         </button>
-        <span className="font-bold" style={{ color: '#5D4037', letterSpacing: '-0.03em' }}>loyale. partner</span>
+        <span className="font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>loyale. partner</span>
         <span className="w-10" />
       </header>
 
@@ -41,10 +41,10 @@ export function OwnerLayout() {
         className={`fixed inset-0 z-40 flex flex-col w-[220px] max-w-[85vw] transform transition-transform duration-200 ease-out md:static md:inset-auto md:z-auto md:max-w-none md:transform-none md:shrink-0 ${
           menuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
-        style={{ background: '#FFF', borderRight: '1px solid #FAECE7' }}
+        style={{ background: 'var(--s)', borderRight: '1px solid var(--bdl)' }}
       >
         {/* Sidebar header */}
-        <div className="p-4 flex items-center justify-between md:block" style={{ borderBottom: '1px solid #FAECE7' }}>
+        <div className="p-4 flex items-center justify-between md:block" style={{ borderBottom: '1px solid var(--bdl)' }}>
           <div className="flex items-center gap-2.5">
             <div
               className="flex items-center justify-center"
@@ -52,18 +52,18 @@ export function OwnerLayout() {
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                background: '#FAECE7',
-                border: '1.5px solid #F5C4B3',
+                background: 'var(--bdl)',
+                border: '1.5px solid var(--bd)',
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#D85A30' }}>person</span>
+              <span className="material-symbols-rounded" style={{ fontSize: '14px', color: 'var(--a)' }}>person</span>
             </div>
             <div>
-              <h1 className="text-[18px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.03em' }}>loyale.</h1>
-              <p className="text-[11px]" style={{ color: '#A08880' }}>Partner · {phone}</p>
+              <h1 className="text-[18px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.03em' }}>loyale.</h1>
+              <p className="text-[11px]" style={{ color: 'var(--t3)' }}>Partner · {phone}</p>
             </div>
           </div>
-          <button type="button" onClick={() => setMenuOpen(false)} className="p-2 md:hidden" aria-label="Close" style={{ color: '#A08880' }}>
+          <button type="button" onClick={() => setMenuOpen(false)} className="p-2 md:hidden" aria-label="Close" style={{ color: 'var(--t3)' }}>
             <span className="material-symbols-rounded">close</span>
           </button>
         </div>
@@ -76,8 +76,8 @@ export function OwnerLayout() {
               to={item.path}
               className="flex items-center gap-2.5 px-3 py-2 rounded-lg min-h-[44px] transition-colors mb-0.5"
               style={{
-                background: isActive(item.path) ? '#FAECE7' : 'transparent',
-                color: isActive(item.path) ? '#D85A30' : '#7B5E54',
+                background: isActive(item.path) ? 'var(--bdl)' : 'transparent',
+                color: isActive(item.path) ? 'var(--a)' : 'var(--t2)',
               }}
               onClick={() => setMenuOpen(false)}
             >
@@ -88,12 +88,12 @@ export function OwnerLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="p-2" style={{ borderTop: '1px solid #FAECE7' }}>
+        <div className="p-2" style={{ borderTop: '1px solid var(--bdl)' }}>
           <PWAInstallButton />
           <button
             onClick={handleLogout}
             className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg min-h-[44px] text-left transition-colors"
-            style={{ color: '#B03A2A' }}
+            style={{ color: 'var(--re)' }}
           >
             <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>logout</span>
             <span className="text-[13.5px] font-medium">Logout</span>

@@ -99,15 +99,15 @@ export function UserProfilePage() {
   if (!phone && !profile) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8 a1">
-        <h1 className="text-[22px] font-bold mb-2" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>My Loyalty Card</h1>
-        <p className="text-sm mb-6" style={{ color: '#7B5E54' }}>Enter your phone to view your profile and rewards.</p>
+        <h1 className="text-[22px] font-bold mb-2" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>My Loyalty Card</h1>
+        <p className="text-sm mb-6" style={{ color: 'var(--t2)' }}>Enter your phone to view your profile and rewards.</p>
         <form onSubmit={handlePhoneSubmit} className="glass-card rounded-2xl p-5">
           <PhoneInput label="Phone" value={phone} onChange={setPhone} placeholder="98765 43210" required variant="dark" />
           <button
             type="submit"
             onClick={() => haptic.light()}
             className="w-full min-h-[52px] mt-4 rounded-xl font-semibold transition touch-manipulation"
-            style={{ background: '#D85A30', color: '#FFF', fontSize: '15px' }}
+            style={{ background: 'var(--a)', color: 'var(--s)', fontSize: '15px' }}
           >
             Explore
           </button>
@@ -125,14 +125,14 @@ export function UserProfilePage() {
 
   return (
     <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
-      <h1 className="text-[22px] font-bold a1" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>
+      <h1 className="text-[22px] font-bold a1" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>
         {loadedByToken ? 'Your Loyalty Cards' : 'My Loyalty Card'}
       </h1>
 
       {error && (
-        <div className="rounded-xl p-3 a2" style={{ background: '#FDEEE9', border: '1px solid rgba(176,58,42,0.18)' }}>
-          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
-          <button type="button" onClick={() => setError('')} className="text-xs mt-1" style={{ color: '#D85A30' }}>Dismiss</button>
+        <div className="rounded-xl p-3 a2" style={{ background: 'var(--rebg)', border: '1px solid rgba(176,58,42,0.18)' }}>
+          <p className="text-sm" style={{ color: 'var(--re)' }}>{error}</p>
+          <button type="button" onClick={() => setError('')} className="text-xs mt-1" style={{ color: 'var(--a)' }}>Dismiss</button>
         </div>
       )}
 
@@ -140,8 +140,8 @@ export function UserProfilePage() {
       {profile.wallets && profile.wallets.length > 0 && (
         <>
           <div className="a2">
-            <h2 className="text-base font-semibold" style={{ color: '#D85A30' }}>Your Wallet</h2>
-            <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>Points shared across all branch locations.</p>
+            <h2 className="text-base font-semibold" style={{ color: 'var(--a)' }}>Your Wallet</h2>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--t3)' }}>Points shared across all branch locations.</p>
           </div>
           <div className="space-y-3">
             {profile.wallets.map((wallet) => (
@@ -149,22 +149,22 @@ export function UserProfilePage() {
                 <div style={{ padding: '16px 18px' }}>
                   <div className="flex justify-between items-start gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-base truncate" style={{ color: '#5D4037' }}>{wallet.partnerName}</p>
-                      <p className="text-xs" style={{ color: '#7B5E54' }}>Wallet Balance</p>
+                      <p className="font-semibold text-base truncate" style={{ color: 'var(--t)' }}>{wallet.partnerName}</p>
+                      <p className="text-xs" style={{ color: 'var(--t2)' }}>Wallet Balance</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-2xl font-bold" style={{ color: '#D85A30' }}>{wallet.balance.toFixed(0)}</p>
-                      <p className="text-xs" style={{ color: '#7B5E54' }}>points</p>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--a)' }}>{wallet.balance.toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: 'var(--t2)' }}>points</p>
                     </div>
                   </div>
                   <div className="mt-4 flex gap-4 text-sm">
                     <div>
-                      <p className="text-xs" style={{ color: '#A08880' }}>Earned</p>
-                      <p className="font-semibold mt-0.5" style={{ color: '#2A6040' }}>+{wallet.lifetimeEarned.toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: 'var(--t3)' }}>Earned</p>
+                      <p className="font-semibold mt-0.5" style={{ color: 'var(--gr)' }}>+{wallet.lifetimeEarned.toFixed(0)}</p>
                     </div>
                     <div>
-                      <p className="text-xs" style={{ color: '#A08880' }}>Spent</p>
-                      <p className="font-semibold mt-0.5" style={{ color: '#B03A2A' }}>-{wallet.lifetimeSpent.toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: 'var(--t3)' }}>Spent</p>
+                      <p className="font-semibold mt-0.5" style={{ color: 'var(--re)' }}>-{wallet.lifetimeSpent.toFixed(0)}</p>
                     </div>
                   </div>
                 </div>
@@ -176,8 +176,8 @@ export function UserProfilePage() {
 
       {/* Stores */}
       <div className="a4">
-        <h2 className="text-base font-semibold" style={{ color: '#D85A30' }}>Stores you use</h2>
-        <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>Your progress and what you win at each store.</p>
+        <h2 className="text-base font-semibold" style={{ color: 'var(--a)' }}>Stores you use</h2>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--t3)' }}>Your progress and what you win at each store.</p>
       </div>
 
       {storesVisited.length === 0 ? (
@@ -206,56 +206,67 @@ export function UserProfilePage() {
                   <div style={{ padding: '16px 18px' }}>
                     <div className="flex items-start justify-between gap-3 mb-4">
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-lg truncate" style={{ color: '#5D4037' }}>{store.partnerName}</p>
-                        <p className="text-xs truncate" style={{ color: '#7B5E54' }}>{store.branchName}</p>
+                        <p className="font-bold text-lg truncate" style={{ color: 'var(--t)' }}>{store.partnerName}</p>
+                        <p className="text-xs truncate" style={{ color: 'var(--t2)' }}>{store.branchName}</p>
                       </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: '#FAECE7', color: '#D85A30' }}>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: 'var(--bdl)', color: 'var(--a)' }}>
                         POINTS
                       </span>
                     </div>
 
                     {/* Balance */}
-                    <div className="text-center py-5 rounded-xl mb-4" style={{ background: '#FAECE7', border: '1px solid #F5C4B3' }}>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: '#D85A30' }}>Your Balance</p>
+                    <div className="text-center py-5 rounded-xl mb-4" style={{ background: 'var(--bdl)', border: '1px solid var(--bd)' }}>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: 'var(--a)' }}>Your Balance</p>
                       <div className="flex items-baseline justify-center gap-1.5">
-                        <p className="text-4xl font-bold" style={{ color: '#D85A30', letterSpacing: '-0.04em' }}>{pointsBalance.toFixed(0)}</p>
-                        <p className="text-base font-medium" style={{ color: '#D85A30', opacity: 0.7 }}>pts</p>
+                        <p className="text-4xl font-bold" style={{ color: 'var(--a)', letterSpacing: '-0.04em' }}>{pointsBalance.toFixed(0)}</p>
+                        <p className="text-base font-medium" style={{ color: 'var(--a)', opacity: 0.7 }}>pts</p>
                       </div>
-                      <p className="text-xs mt-2" style={{ color: '#7B5E54' }}>Valid at all {store.partnerName} locations</p>
+                      <p className="text-xs mt-2" style={{ color: 'var(--t2)' }}>Valid at all {store.partnerName} locations</p>
                     </div>
 
-                    {/* Redeem */}
-                    {loadedByToken && pointsBalance >= 50 && (
-                      <>
-                        {redeemSuccess?.partnerId === store.partnerId ? (
-                          <div className="rounded-xl p-3 text-center mb-4" style={{ background: '#E4F2EB', border: '1px solid #A8D4BA' }}>
-                            <p className="text-sm font-semibold" style={{ color: '#2A6040' }}>
-                              Success! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added
-                            </p>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
-                            disabled={!!redeemingPartnerId}
-                            className="w-full min-h-[52px] rounded-xl font-bold text-sm transition disabled:opacity-50 touch-manipulation mb-4"
-                            style={{ background: '#D85A30', color: '#FFF' }}
-                          >
-                            {redeemingPartnerId === store.partnerId ? 'Redeeming...' : 'Redeem for Rewards'}
-                          </button>
-                        )}
-                      </>
-                    )}
-                    {loadedByToken && pointsBalance < 50 && (
-                      <div className="text-center py-3 rounded-xl mb-4" style={{ background: '#EDEFEE' }}>
-                        <p className="text-xs font-medium" style={{ color: '#A08880' }}>50 points minimum to redeem</p>
-                        <p className="text-xs mt-1" style={{ color: '#A08880' }}>{Math.ceil(50 - pointsBalance)} more to go</p>
+                    {/* Coin earning rate */}
+                    {store.amountPerCoin && (
+                      <div className="rounded-xl p-3 mb-4" style={{ background: 'var(--bdl)', border: '1px solid var(--bd)' }}>
+                        <p className="text-xs font-semibold" style={{ color: 'var(--a)' }}>
+                          Earn 1 coin for every ₹{store.amountPerCoin} spent
+                        </p>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid #FAECE7' }}>
-                      <p className="text-xs" style={{ color: '#A08880' }}>All-time: <span className="font-semibold" style={{ color: '#5D4037' }}>{store.visitCount}</span></p>
-                      <p className="text-xs" style={{ color: '#A08880' }}>Last: {formatDate(store.lastVisitAt)}</p>
+                    {/* Redeem */}
+                    {(() => {
+                      const minRedeem = store.minimumRedemptionPoints ?? 50;
+                      return loadedByToken && pointsBalance >= minRedeem ? (
+                        <>
+                          {redeemSuccess?.partnerId === store.partnerId ? (
+                            <div className="rounded-xl p-3 text-center mb-4" style={{ background: 'var(--grbg)', border: '1px solid var(--grbd)' }}>
+                              <p className="text-sm font-semibold" style={{ color: 'var(--gr)' }}>
+                                Success! {redeemSuccess.rewardsCreated} reward{redeemSuccess.rewardsCreated !== 1 ? 's' : ''} added
+                              </p>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleRedeemPoints(store.partnerId, store.branchId)}
+                              disabled={!!redeemingPartnerId}
+                              className="w-full min-h-[52px] rounded-xl font-bold text-sm transition disabled:opacity-50 touch-manipulation mb-4"
+                              style={{ background: 'var(--a)', color: 'var(--s)' }}
+                            >
+                              {redeemingPartnerId === store.partnerId ? 'Redeeming...' : 'Redeem for Rewards'}
+                            </button>
+                          )}
+                        </>
+                      ) : loadedByToken ? (
+                        <div className="text-center py-3 rounded-xl mb-4" style={{ background: 'var(--s2)' }}>
+                          <p className="text-xs font-medium" style={{ color: 'var(--t3)' }}>{minRedeem} coins minimum to redeem</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--t3)' }}>{Math.ceil(minRedeem - pointsBalance)} more to go</p>
+                        </div>
+                      ) : null;
+                    })()}
+
+                    <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid var(--bdl)' }}>
+                      <p className="text-xs" style={{ color: 'var(--t3)' }}>All-time: <span className="font-semibold" style={{ color: 'var(--t)' }}>{store.visitCount}</span></p>
+                      <p className="text-xs" style={{ color: 'var(--t3)' }}>Last: {formatDate(store.lastVisitAt)}</p>
                     </div>
                   </div>
                 </div>
@@ -268,47 +279,47 @@ export function UserProfilePage() {
                 <div style={{ padding: '16px 18px' }}>
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-lg truncate" style={{ color: '#5D4037' }}>{store.partnerName}</p>
-                      <p className="text-xs truncate" style={{ color: '#7B5E54' }}>{store.branchName}</p>
+                      <p className="font-bold text-lg truncate" style={{ color: 'var(--t)' }}>{store.partnerName}</p>
+                      <p className="text-xs truncate" style={{ color: 'var(--t2)' }}>{store.branchName}</p>
                     </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: '#EDEFEE', color: '#7B5E54' }}>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.05em] rounded-full px-2.5 py-1" style={{ background: 'var(--s2)', color: 'var(--t2)' }}>
                       VISITS
                     </span>
                   </div>
 
                   {threshold > 0 && windowDays > 0 && (
-                    <div className="rounded-xl p-4 mb-4" style={{ background: '#FAECE7', border: '1px solid #F5C4B3' }}>
-                      <p className="font-bold text-sm mb-1" style={{ color: '#D85A30' }}>Complete the Challenge</p>
-                      <p className="font-bold text-base mb-1" style={{ color: '#5D4037' }}>
+                    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--bdl)', border: '1px solid var(--bd)' }}>
+                      <p className="font-bold text-sm mb-1" style={{ color: 'var(--a)' }}>Complete the Challenge</p>
+                      <p className="font-bold text-base mb-1" style={{ color: 'var(--t)' }}>
                         {threshold} visit{threshold !== 1 ? 's' : ''} in {windowDays} days
                       </p>
-                      <p className="text-sm font-semibold" style={{ color: '#2A6040' }}>{description}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--gr)' }}>{description}</p>
                     </div>
                   )}
 
                   {threshold > 0 && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-medium" style={{ color: '#A08880' }}>Window Progress</p>
-                        <p className="text-sm font-bold tabular-nums" style={{ color: isComplete ? '#2A6040' : '#D85A30' }}>{current}/{threshold}</p>
+                        <p className="text-xs font-medium" style={{ color: 'var(--t3)' }}>Window Progress</p>
+                        <p className="text-sm font-bold tabular-nums" style={{ color: isComplete ? 'var(--gr)' : 'var(--a)' }}>{current}/{threshold}</p>
                       </div>
-                      <div className="h-[5px] rounded-full overflow-hidden" style={{ background: '#EDEFEE' }}>
-                        <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${progressPct}%`, background: '#D85A30' }} />
+                      <div className="h-[5px] rounded-full overflow-hidden" style={{ background: 'var(--s2)' }}>
+                        <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${progressPct}%`, background: 'var(--a)' }} />
                       </div>
                       {isComplete ? (
-                        <p className="text-xs font-bold mt-2 text-center" style={{ color: '#2A6040' }}>Complete! Next visit earns reward</p>
+                        <p className="text-xs font-bold mt-2 text-center" style={{ color: 'var(--gr)' }}>Complete! Next visit earns reward</p>
                       ) : (
-                        <p className="text-xs mt-2 text-center" style={{ color: '#A08880' }}>{windowDays}-day challenge</p>
+                        <p className="text-xs mt-2 text-center" style={{ color: 'var(--t3)' }}>{windowDays}-day challenge</p>
                       )}
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid #FAECE7' }}>
-                    <p className="text-xs" style={{ color: '#A08880' }}>All-time: <span className="font-semibold" style={{ color: '#5D4037' }}>{store.visitCount}</span></p>
-                    <p className="text-xs" style={{ color: '#A08880' }}>Last: {formatDate(store.lastVisitAt)}</p>
+                  <div className="flex items-center justify-between gap-2 pt-3" style={{ borderTop: '1px solid var(--bdl)' }}>
+                    <p className="text-xs" style={{ color: 'var(--t3)' }}>All-time: <span className="font-semibold" style={{ color: 'var(--t)' }}>{store.visitCount}</span></p>
+                    <p className="text-xs" style={{ color: 'var(--t3)' }}>Last: {formatDate(store.lastVisitAt)}</p>
                   </div>
                   {periodStart && (
-                    <p className="text-xs mt-1" style={{ color: '#A08880' }}>Window started: {formatDate(periodStart)}</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--t3)' }}>Window started: {formatDate(periodStart)}</p>
                   )}
                 </div>
               </div>

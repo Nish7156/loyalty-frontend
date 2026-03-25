@@ -12,7 +12,7 @@ export function SkeletonLine({ className = '' }: SkeletonProps) {
 
 export function SkeletonCard({ className = '' }: SkeletonProps) {
   return (
-    <div className={`user-skeleton-card rounded-2xl p-5 sm:p-6 ${className}`} style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+    <div className={`user-skeleton-card rounded-2xl p-5 sm:p-6 ${className}`} style={{ background: 'var(--s)', border: '1px solid var(--bdl)' }}>
       <Skeleton className="h-5 w-2/3 mb-3" />
       <SkeletonLine className="w-full mb-2" />
       <SkeletonLine className="w-[85%] mb-2" />
@@ -66,7 +66,7 @@ export function ScanSkeleton() {
   return (
     <div className="max-w-md mx-auto w-full min-w-0 space-y-5">
       <Skeleton className="h-9 w-40 mb-4" />
-      <div className="user-skeleton-card rounded-2xl p-5 space-y-4" style={{ background: '#FFF', border: '1px solid #FAECE7' }}>
+      <div className="user-skeleton-card rounded-2xl p-5 space-y-4" style={{ background: 'var(--s)', border: '1px solid var(--bdl)' }}>
         <SkeletonLine className="w-16" />
         <Skeleton className="h-12 w-full rounded-xl" />
         <Skeleton className="h-12 w-full rounded-xl" />

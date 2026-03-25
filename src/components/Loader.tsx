@@ -20,7 +20,7 @@ export function Loader({ message, className = '', useDots = false }: LoaderProps
         </div>
       )}
       {message && (
-        <p className="text-sm font-medium tracking-wide animate-pulse-soft" style={{ color: '#7B5E54' }}>
+        <p className="text-sm font-medium tracking-wide animate-pulse-soft" style={{ color: 'var(--t2)' }}>
           {message}
         </p>
       )}

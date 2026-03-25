@@ -100,18 +100,18 @@ export function UserLayout() {
   }
 
   const navItemStyle = (active: boolean) => ({
-    color: active ? '#D85A30' : '#A08880',
+    color: active ? 'var(--a)' : 'var(--t3)',
   });
 
   return (
-    <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] safe-area" style={{ background: '#FAF9F6', color: '#5D4037' }}>
+    <div className="user-theme flex flex-col min-h-screen min-h-[100dvh] safe-area" style={{ background: 'var(--bg)', color: 'var(--t)' }}>
       {/* Header - warm style matching wireframe 03 */}
       <header
         className="fixed top-0 left-0 right-0 z-30 safe-area-top safe-area-x"
         style={{
           padding: '14px 20px',
-          backgroundColor: '#FFF',
-          borderBottom: '1px solid #FAECE7',
+          backgroundColor: 'var(--s)',
+          borderBottom: '1px solid var(--bdl)',
         }}
       >
         <div className="max-w-md mx-auto w-full min-w-0 flex items-center justify-between">
@@ -122,7 +122,7 @@ export function UserLayout() {
               fontSize: '22px',
               fontWeight: 700,
               letterSpacing: '-0.03em',
-              color: '#5D4037',
+              color: 'var(--t)',
             }}
           >
             loyale.
@@ -140,9 +140,9 @@ export function UserLayout() {
                   width: '34px',
                   height: '34px',
                   borderRadius: '50%',
-                  background: '#FAECE7',
-                  border: '1.5px solid #F5C4B3',
-                  color: '#D85A30',
+                  background: 'var(--bdl)',
+                  border: '1.5px solid var(--bd)',
+                  color: 'var(--a)',
                 }}
                 aria-label="Feedback"
               >
@@ -157,9 +157,9 @@ export function UserLayout() {
                   width: '34px',
                   height: '34px',
                   borderRadius: '50%',
-                  background: '#FAECE7',
-                  border: '2px solid #F5C4B3',
-                  color: '#D85A30',
+                  background: 'var(--bdl)',
+                  border: '2px solid var(--bd)',
+                  color: 'var(--a)',
                   fontSize: '13px',
                   fontWeight: 600,
                 }}
@@ -189,40 +189,40 @@ export function UserLayout() {
       {/* Feedback Modal */}
       {feedbackOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Feedback">
-          <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'rgba(93,64,55,0.4)' }} aria-hidden="true" onClick={closeFeedbackModal} />
-          <div className="relative w-full max-w-sm rounded-2xl border p-4 sm:p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto safe-area-x min-w-0" style={{ backgroundColor: '#FFF', borderColor: '#FAECE7' }} onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={closeFeedbackModal} />
+          <div className="relative w-full max-w-sm rounded-2xl border p-4 sm:p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto safe-area-x min-w-0" style={{ backgroundColor: 'var(--s)', borderColor: 'var(--bdl)' }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold" style={{ color: '#5D4037' }}>Feedback</h2>
-              <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="p-2 -m-2 rounded-lg disabled:opacity-50" style={{ color: '#A08880' }} aria-label="Close">
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--t)' }}>Feedback</h2>
+              <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="p-2 -m-2 rounded-lg disabled:opacity-50" style={{ color: 'var(--t3)' }} aria-label="Close">
                 <span className="material-symbols-rounded">close</span>
               </button>
             </div>
             {feedbackSent ? (
               <div className="py-2">
-                <p className="font-medium" style={{ color: '#2A6040' }}>Thank you!</p>
-                <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>Your feedback has been sent.</p>
-                <button type="button" onClick={() => setFeedbackSent(false)} className="mt-3 text-sm font-medium" style={{ color: '#D85A30' }}>Send another</button>
-                <button type="button" onClick={closeFeedbackModal} className="block mt-2 text-sm" style={{ color: '#A08880' }}>Close</button>
+                <p className="font-medium" style={{ color: 'var(--gr)' }}>Thank you!</p>
+                <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>Your feedback has been sent.</p>
+                <button type="button" onClick={() => setFeedbackSent(false)} className="mt-3 text-sm font-medium" style={{ color: 'var(--a)' }}>Send another</button>
+                <button type="button" onClick={closeFeedbackModal} className="block mt-2 text-sm" style={{ color: 'var(--t3)' }}>Close</button>
               </div>
             ) : (
               <form onSubmit={handleFeedbackSubmit}>
-                <label htmlFor="feedback-modal-message" className="block text-sm font-medium mb-2" style={{ color: '#7B5E54' }}>What we can improve</label>
+                <label htmlFor="feedback-modal-message" className="block text-sm font-medium mb-2" style={{ color: 'var(--t2)' }}>What we can improve</label>
                 <textarea
                   id="feedback-modal-message"
                   value={feedbackMessage}
                   onChange={(e) => setFeedbackMessage(e.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
                   placeholder="e.g. Faster check-in, better rewards..."
                   className="w-full min-h-[100px] rounded-xl border px-4 py-3 outline-none transition resize-y"
-                  style={{ backgroundColor: '#FAF9F6', borderColor: '#F5C4B3', color: '#5D4037' }}
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--t)' }}
                   maxLength={MAX_FEEDBACK_LENGTH}
                   rows={3}
                   disabled={feedbackSending}
                 />
-                <p className="text-xs mt-1" style={{ color: '#A08880' }}>{feedbackMessage.length}/{MAX_FEEDBACK_LENGTH}</p>
-                {feedbackError && <p className="text-sm mt-2" style={{ color: '#B03A2A' }}>{feedbackError}</p>}
+                <p className="text-xs mt-1" style={{ color: 'var(--t3)' }}>{feedbackMessage.length}/{MAX_FEEDBACK_LENGTH}</p>
+                {feedbackError && <p className="text-sm mt-2" style={{ color: 'var(--re)' }}>{feedbackError}</p>}
                 <div className="flex gap-2 mt-4">
-                  <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="flex-1 min-h-[44px] rounded-xl border text-sm font-medium disabled:opacity-50" style={{ borderColor: '#F5C4B3', color: '#7B5E54' }}>Cancel</button>
-                  <button type="submit" disabled={feedbackSending || !feedbackMessage.trim()} className="flex-1 min-h-[52px] rounded-xl text-white text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none" style={{ background: '#D85A30' }}>
+                  <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="flex-1 min-h-[44px] rounded-xl border text-sm font-medium disabled:opacity-50" style={{ borderColor: 'var(--bd)', color: 'var(--t2)' }}>Cancel</button>
+                  <button type="submit" disabled={feedbackSending || !feedbackMessage.trim()} className="flex-1 min-h-[52px] rounded-xl text-white text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none" style={{ background: 'var(--a)' }}>
                     {feedbackSending ? 'Sending...' : 'Send'}
                   </button>
                 </div>
@@ -234,13 +234,13 @@ export function UserLayout() {
 
       {/* Approval Celebration */}
       {showApprovalCelebration && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" style={{ backgroundColor: 'rgba(93,64,55,0.4)' }} aria-live="polite">
-          <div className="rounded-2xl border px-8 py-6 text-center shadow-xl animate-scale-in" style={{ backgroundColor: '#FFF', borderColor: '#FAECE7' }}>
-            <div className="flex items-center justify-center mb-3" style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#E4F2EB', margin: '0 auto' }}>
-              <span className="material-symbols-rounded" style={{ fontSize: '32px', color: '#2A6040' }}>check_circle</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-live="polite">
+          <div className="rounded-2xl border px-8 py-6 text-center shadow-xl animate-scale-in" style={{ backgroundColor: 'var(--s)', borderColor: 'var(--bdl)' }}>
+            <div className="flex items-center justify-center mb-3" style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--grbg)', margin: '0 auto' }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '32px', color: 'var(--gr)' }}>check_circle</span>
             </div>
-            <p className="text-xl font-bold" style={{ color: '#2A6040' }}>Check-in approved!</p>
-            <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>Thanks for checking in.</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--gr)' }}>Check-in approved!</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>Thanks for checking in.</p>
           </div>
         </div>
       )}
@@ -251,8 +251,8 @@ export function UserLayout() {
       <nav
         className="fixed bottom-0 left-0 right-0 z-20 safe-area-bottom"
         style={{
-          backgroundColor: '#FFF',
-          borderTop: '1px solid #FAECE7',
+          backgroundColor: 'var(--s)',
+          borderTop: '1px solid var(--bdl)',
           padding: '0 8px 14px',
           height: '80px',
         }}
@@ -280,8 +280,8 @@ export function UserLayout() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '50%',
-                    background: '#D85A30',
-                    color: '#FFF',
+                    background: 'var(--a)',
+                    color: 'var(--s)',
                     boxShadow: '0 3px 10px rgba(216,90,48,0.28)',
                     marginTop: '-12px',
                   }}
@@ -311,13 +311,13 @@ export function UserLayout() {
                 return (
                   <span key={icon} className="flex flex-col items-center gap-0.5 cursor-not-allowed pointer-events-none select-none opacity-50">
                     {isScan ? (
-                      <span className="flex items-center justify-center" style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#F5C4B3', color: '#FFF', marginTop: '-12px' }}>
+                      <span className="flex items-center justify-center" style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--bd)', color: 'var(--s)', marginTop: '-12px' }}>
                         <span className="material-symbols-rounded" style={{ fontSize: '24px' }}>{icon}</span>
                       </span>
                     ) : (
-                      <span className="material-symbols-rounded" style={{ fontSize: '22px', color: '#A08880' }}>{icon}</span>
+                      <span className="material-symbols-rounded" style={{ fontSize: '22px', color: 'var(--t3)' }}>{icon}</span>
                     )}
-                    <span className="text-[10px] font-semibold" style={{ color: '#A08880' }}>{labels[i]}</span>
+                    <span className="text-[10px] font-semibold" style={{ color: 'var(--t3)' }}>{labels[i]}</span>
                   </span>
                 );
               })}

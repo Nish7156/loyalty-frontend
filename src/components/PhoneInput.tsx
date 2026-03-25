@@ -48,20 +48,20 @@ export function PhoneInput({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.02em] mb-2" style={{ color: '#7B5E54' }}>
+        <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.02em] mb-2" style={{ color: 'var(--t2)' }}>
           {label}
         </label>
       )}
       <div
         className="flex min-h-[52px] rounded-xl border overflow-hidden transition-shadow"
         style={{
-          borderColor: '#F5C4B3',
-          boxShadow: displayDigits ? '0 0 0 3px #FAECE7' : 'none',
+          borderColor: 'var(--bd)',
+          boxShadow: displayDigits ? '0 0 0 3px var(--bdl)' : 'none',
         }}
       >
         <span
           className="inline-flex items-center px-3 py-2.5 select-none border-r shrink-0 text-sm font-medium"
-          style={{ background: '#FAECE7', borderColor: '#F5C4B3', color: '#7B5E54' }}
+          style={{ background: 'var(--bdl)', borderColor: 'var(--bd)', color: 'var(--t2)' }}
           aria-hidden
         >
           +91
@@ -78,7 +78,7 @@ export function PhoneInput({
           required={required}
           autoComplete={autoComplete}
           className="flex-1 min-w-0 px-3 py-2.5 outline-none text-[14.5px]"
-          style={{ background: '#FFF', color: '#5D4037' }}
+          style={{ background: 'var(--s)', color: 'var(--t)' }}
         />
       </div>
     </div>

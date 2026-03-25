@@ -34,16 +34,16 @@ export function SuccessOverlay({
     >
       <div
         className="rounded-3xl p-8 max-w-sm w-full text-center shadow-xl animate-success-bounce"
-        style={{ background: '#FFF', border: '1px solid #FAECE7' }}
+        style={{ background: 'var(--s)', border: '1px solid var(--bdl)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-7xl mb-4 animate-spring">{icon}</div>
 
-        <h2 className="text-2xl font-bold mb-3" style={{ color: '#D85A30' }}>
+        <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--a)' }}>
           {title}
         </h2>
 
-        <p className="text-base leading-relaxed" style={{ color: '#7B5E54' }}>
+        <p className="text-base leading-relaxed" style={{ color: 'var(--t2)' }}>
           {message}
         </p>
 
@@ -58,7 +58,7 @@ export function SuccessOverlay({
               strokeWidth="3"
             />
             <path
-              style={{ stroke: '#2A6040' }}
+              style={{ stroke: 'var(--gr)' }}
               fill="none"
               strokeWidth="3"
               strokeLinecap="round"

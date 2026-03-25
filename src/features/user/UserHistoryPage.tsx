@@ -85,9 +85,9 @@ export function UserHistoryPage() {
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-xl font-bold mb-4" style={{ color: '#5D4037' }}>History</h1>
+        <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--t)' }}>History</h1>
         <div className="glass-card rounded-2xl p-5">
-          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
+          <p className="text-sm" style={{ color: 'var(--re)' }}>{error}</p>
         </div>
       </div>
     );
@@ -98,22 +98,22 @@ export function UserHistoryPage() {
   return (
     <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
       <div className="a1">
-        <h1 className="text-[22px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>History</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#7B5E54' }}>Your visits and redeemed rewards by store.</p>
+        <h1 className="text-[22px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>History</h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--t2)' }}>Your visits and redeemed rewards by store.</p>
       </div>
 
       {stores.length === 0 ? (
         <div className="glass-card rounded-2xl p-5 a2">
-          <p className="text-sm" style={{ color: '#7B5E54' }}>No history yet. Scan a store QR to check in — your visits and rewards will appear here.</p>
+          <p className="text-sm" style={{ color: 'var(--t2)' }}>No history yet. Scan a store QR to check in — your visits and rewards will appear here.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {stores.map((store, storeIdx) => (
             <div key={store.partnerId} className={`glass-card rounded-2xl overflow-hidden ${storeIdx < 2 ? 'a2' : ''}`}>
               {/* Store header */}
-              <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid #FAECE7' }}>
-                <h2 className="text-base font-semibold" style={{ color: '#5D4037' }}>{store.partnerName}</h2>
-                <p className="text-xs mt-0.5" style={{ color: '#A08880' }}>
+              <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid var(--bdl)' }}>
+                <h2 className="text-base font-semibold" style={{ color: 'var(--t)' }}>{store.partnerName}</h2>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--t3)' }}>
                   {store.visits.length} visit{store.visits.length !== 1 ? 's' : ''}
                   {store.redeemed.length > 0 && ` · ${store.redeemed.length} reward${store.redeemed.length !== 1 ? 's' : ''} redeemed`}
                 </p>
@@ -122,22 +122,22 @@ export function UserHistoryPage() {
               {/* Visits */}
               {store.visits.length > 0 && (
                 <div style={{ padding: '12px 18px' }}>
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: '#A08880' }}>Visits</h3>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: 'var(--t3)' }}>Visits</h3>
                   <ul className="user-history-visits-list max-h-[260px] overflow-y-auto">
                     {store.visits.map((a) => (
-                      <li key={a.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid #FAECE7' }}>
-                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E4F2EB' }}>
-                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#2A6040' }}>check</span>
+                      <li key={a.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid var(--bdl)' }}>
+                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--grbg)' }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: 'var(--gr)' }}>check</span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-medium" style={{ color: '#5D4037' }}>{a.branch?.branchName ?? 'Check-in'}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>{formatDateTime(a.createdAt)}</p>
+                          <p className="text-[13px] font-medium" style={{ color: 'var(--t)' }}>{a.branch?.branchName ?? 'Check-in'}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: 'var(--t3)' }}>{formatDateTime(a.createdAt)}</p>
                           {a.value != null && a.value > 0 && (
-                            <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>Amount: {a.value}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: 'var(--t3)' }}>Amount: {a.value}</p>
                           )}
                         </div>
                         {a.value != null && a.value > 0 && (
-                          <span className="text-[13px] font-semibold shrink-0" style={{ color: '#2A6040' }}>+{a.value}</span>
+                          <span className="text-[13px] font-semibold shrink-0" style={{ color: 'var(--gr)' }}>+{a.value}</span>
                         )}
                       </li>
                     ))}
@@ -147,23 +147,23 @@ export function UserHistoryPage() {
 
               {/* Redeemed rewards */}
               {store.redeemed.length > 0 && (
-                <div style={{ padding: '12px 18px', borderTop: store.visits.length > 0 ? '1px solid #FAECE7' : 'none' }}>
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: '#A08880' }}>Redeemed rewards</h3>
+                <div style={{ padding: '12px 18px', borderTop: store.visits.length > 0 ? '1px solid var(--bdl)' : 'none' }}>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.05em] mb-2" style={{ color: 'var(--t3)' }}>Redeemed rewards</h3>
                   <ul>
                     {store.redeemed.slice(0, 10).map((r) => (
-                      <li key={r.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid #FAECE7' }}>
-                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FAECE7' }}>
-                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: '#D85A30' }}>redeem</span>
+                      <li key={r.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid var(--bdl)' }}>
+                        <div className="shrink-0 flex items-center justify-center mt-0.5" style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--bdl)' }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '14px', color: 'var(--a)' }}>redeem</span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-medium" style={{ color: '#5D4037' }}>{r.redeemedBranch?.branchName ?? 'Reward'}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: '#A08880' }}>{r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}</p>
+                          <p className="text-[13px] font-medium" style={{ color: 'var(--t)' }}>{r.redeemedBranch?.branchName ?? 'Reward'}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: 'var(--t3)' }}>{r.redeemedAt ? formatDateTime(r.redeemedAt) : formatDate(r.createdAt)}</p>
                         </div>
                       </li>
                     ))}
                   </ul>
                   {store.redeemed.length > 10 && (
-                    <p className="text-[11px] mt-2" style={{ color: '#A08880' }}>+{store.redeemed.length - 10} more redeemed</p>
+                    <p className="text-[11px] mt-2" style={{ color: 'var(--t3)' }}>+{store.redeemed.length - 10} more redeemed</p>
                   )}
                 </div>
               )}

@@ -31,9 +31,9 @@ export function PWAInstallButton() {
       style={{
         padding: '7px 13px',
         fontSize: '12px',
-        background: '#FAECE7',
-        border: '1px solid #F5C4B3',
-        color: '#D85A30',
+        background: 'var(--bdl)',
+        border: '1px solid var(--bd)',
+        color: 'var(--a)',
       }}
       aria-label="Download app"
     >

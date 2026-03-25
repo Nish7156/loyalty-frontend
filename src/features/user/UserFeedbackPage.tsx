@@ -33,34 +33,34 @@ export function UserFeedbackPage() {
   };
 
   const cardStyle = {
-    background: '#FFF',
-    border: '1px solid #FAECE7',
+    background: 'var(--s)',
+    border: '1px solid var(--bdl)',
     boxShadow: '0 1px 3px rgba(26,24,22,0.05)',
   };
 
   return (
     <div className="max-w-md mx-auto space-y-6 pb-8 w-full min-w-0">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight opacity-0 animate-fade-in-up" style={{ color: '#D85A30' }}>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight opacity-0 animate-fade-in-up" style={{ color: 'var(--a)' }}>
         Feedback
       </h1>
-      <p className="text-sm -mt-2 opacity-0 animate-fade-in-up" style={{ color: '#7B5E54' }}>Tell us what we can improve. We track your feedback so we can serve you better.</p>
+      <p className="text-sm -mt-2 opacity-0 animate-fade-in-up" style={{ color: 'var(--t2)' }}>Tell us what we can improve. We track your feedback so we can serve you better.</p>
 
       {sent ? (
-        <div className="rounded-2xl p-5 sm:p-6 min-w-0 opacity-0 animate-fade-in-up" style={{ background: '#E4F2EB', border: '1px solid rgba(42,96,64,0.2)' }}>
-          <p className="font-medium" style={{ color: '#2A6040' }}>Thank you!</p>
-          <p className="text-sm mt-1" style={{ color: '#7B5E54' }}>Your feedback has been sent.</p>
+        <div className="rounded-2xl p-5 sm:p-6 min-w-0 opacity-0 animate-fade-in-up" style={{ background: 'var(--grbg)', border: '1px solid rgba(42,96,64,0.2)' }}>
+          <p className="font-medium" style={{ color: 'var(--gr)' }}>Thank you!</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>Your feedback has been sent.</p>
           <button
             type="button"
             onClick={() => setSent(false)}
             className="mt-3 text-sm font-medium"
-            style={{ color: '#D85A30' }}
+            style={{ color: 'var(--a)' }}
           >
             Send another
           </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="rounded-2xl p-5 sm:p-6 min-w-0 opacity-0 animate-fade-in-up" style={cardStyle}>
-          <label htmlFor="feedback-message" className="block text-sm font-medium mb-2" style={{ color: '#7B5E54' }}>
+          <label htmlFor="feedback-message" className="block text-sm font-medium mb-2" style={{ color: 'var(--t2)' }}>
             Your feedback / What we can improve
           </label>
           <textarea
@@ -69,18 +69,18 @@ export function UserFeedbackPage() {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="e.g. Faster check-in, better rewards..."
             className="w-full min-h-[120px] rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-300/40 outline-none transition resize-y"
-            style={{ border: '1px solid #F5C4B3', background: '#FAF9F6', color: '#5D4037' }}
+            style={{ border: '1px solid var(--bd)', background: 'var(--bg)', color: 'var(--t)' }}
             maxLength={2000}
             rows={4}
             disabled={sending}
           />
-          <p className="text-xs mt-1" style={{ color: '#A08880' }}>{message.length}/2000</p>
-          {error && <p className="text-sm mt-2" style={{ color: '#B03A2A' }}>{error}</p>}
+          <p className="text-xs mt-1" style={{ color: 'var(--t3)' }}>{message.length}/2000</p>
+          {error && <p className="text-sm mt-2" style={{ color: 'var(--re)' }}>{error}</p>}
           <button
             type="submit"
             disabled={sending || !message.trim()}
             className="w-full min-h-[48px] mt-4 rounded-xl font-medium transition disabled:opacity-50 disabled:pointer-events-none"
-            style={{ border: '1px solid #F5C4B3', color: '#5D4037', background: '#FAF9F6' }}
+            style={{ border: '1px solid var(--bd)', color: 'var(--t)', background: 'var(--bg)' }}
           >
             {sending ? 'Sending…' : 'Send feedback'}
           </button>

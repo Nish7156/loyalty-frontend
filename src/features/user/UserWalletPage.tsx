@@ -54,9 +54,9 @@ export function UserWalletPage() {
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-xl font-bold mb-4" style={{ color: '#5D4037' }}>My Cards</h1>
+        <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--t)' }}>My Cards</h1>
         <div className="glass-card rounded-2xl p-5">
-          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
+          <p className="text-sm" style={{ color: 'var(--re)' }}>{error}</p>
         </div>
       </div>
     );
@@ -70,8 +70,8 @@ export function UserWalletPage() {
 
       {/* Greeting + Wallet Strip - matching wireframe 03 */}
       <div className="a1 px-0.5">
-        <p className="text-xs mb-1" style={{ color: '#7B5E54' }}>Welcome back</p>
-        <h1 className="text-[22px] font-bold leading-tight" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>
+        <p className="text-xs mb-1" style={{ color: 'var(--t2)' }}>Welcome back</p>
+        <h1 className="text-[22px] font-bold leading-tight" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>
           My Loyalty Cards
         </h1>
       </div>
@@ -80,9 +80,9 @@ export function UserWalletPage() {
       <div
         className="a2 rounded-[18px] overflow-hidden relative"
         style={{
-          background: '#5D4037',
+          background: 'var(--t)',
           padding: '20px 22px',
-          color: '#FFF',
+          color: 'var(--s)',
         }}
       >
         <div className="flex justify-between items-start">
@@ -92,7 +92,7 @@ export function UserWalletPage() {
           </div>
           <button
             className="flex items-center gap-1.5 rounded-full text-xs font-semibold"
-            style={{ background: '#D85A30', color: '#FFF', padding: '8px 16px' }}
+            style={{ background: 'var(--a)', color: 'var(--s)', padding: '8px 16px' }}
           >
             <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>redeem</span>
             Redeem
@@ -104,21 +104,21 @@ export function UserWalletPage() {
       <div className="a3 flex gap-3">
         <button
           className="flex-1 flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
-          style={{ height: '40px', background: '#D85A30', color: '#FFF' }}
+          style={{ height: '40px', background: 'var(--a)', color: 'var(--s)' }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>qr_code_scanner</span>
           Scan QR
         </button>
         <button
           className="flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
-          style={{ height: '40px', background: '#FFF', border: '1.5px solid #F5C4B3', color: '#7B5E54', padding: '0 16px' }}
+          style={{ height: '40px', background: 'var(--s)', border: '1.5px solid var(--bd)', color: 'var(--t2)', padding: '0 16px' }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>account_balance_wallet</span>
           Wallet
         </button>
         <button
           className="flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
-          style={{ height: '40px', background: '#FFF', border: '1.5px solid #F5C4B3', color: '#7B5E54', padding: '0 16px' }}
+          style={{ height: '40px', background: 'var(--s)', border: '1.5px solid var(--bd)', color: 'var(--t2)', padding: '0 16px' }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>history</span>
           History
@@ -127,16 +127,16 @@ export function UserWalletPage() {
 
       {/* My Loyalty Cards section - matching wireframe 03 */}
       <div className="a4">
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: '#A08880' }}>MY LOYALTY CARDS</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: 'var(--t3)' }}>MY LOYALTY CARDS</p>
       </div>
 
       {stores.length === 0 ? (
         <div className="glass-card rounded-2xl p-6 text-center a5">
           <div className="flex justify-center mb-3">
-            <span className="material-symbols-rounded" style={{ fontSize: '48px', color: '#F5C4B3' }}>storefront</span>
+            <span className="material-symbols-rounded" style={{ fontSize: '48px', color: 'var(--bd)' }}>storefront</span>
           </div>
-          <p className="font-semibold mb-2" style={{ color: '#5D4037' }}>No Stores Yet</p>
-          <p className="text-sm" style={{ color: '#7B5E54' }}>Scan a QR code at a store to check in and start earning!</p>
+          <p className="font-semibold mb-2" style={{ color: 'var(--t)' }}>No Stores Yet</p>
+          <p className="text-sm" style={{ color: 'var(--t2)' }}>Scan a QR code at a store to check in and start earning!</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
@@ -160,33 +160,33 @@ export function UserWalletPage() {
               >
                 <div style={{ padding: '14px' }}>
                   {/* Brand label */}
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.06em] mb-1.5" style={{ color: '#A08880' }}>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.06em] mb-1.5" style={{ color: 'var(--t3)' }}>
                     {store.partnerName}
                   </p>
                   {/* Branch */}
-                  <p className="text-[12px] font-medium truncate" style={{ color: '#5D4037' }}>{store.branchName}</p>
+                  <p className="text-[12px] font-medium truncate" style={{ color: 'var(--t)' }}>{store.branchName}</p>
 
                   {/* Balance or visits */}
                   <div className="mt-3">
                     {loyaltyType === 'POINTS' || loyaltyType === 'HYBRID' ? (
                       <>
-                        <p className="text-[20px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.04em' }}>
+                        <p className="text-[20px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.04em' }}>
                           {formatPoints(balance)}
                         </p>
-                        <p className="text-[10.5px]" style={{ color: '#A08880' }}>coins</p>
+                        <p className="text-[10.5px]" style={{ color: 'var(--t3)' }}>coins</p>
                       </>
                     ) : (
                       <>
-                        <p className="text-[20px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.04em' }}>
+                        <p className="text-[20px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.04em' }}>
                           {current}/{threshold}
                         </p>
-                        <p className="text-[10.5px]" style={{ color: '#A08880' }}>visits</p>
+                        <p className="text-[10.5px]" style={{ color: 'var(--t3)' }}>visits</p>
                       </>
                     )}
                   </div>
 
                   {/* Progress bar */}
-                  <div className="mt-2 h-[4px] rounded-full overflow-hidden" style={{ background: '#EDEFEE' }}>
+                  <div className="mt-2 h-[4px] rounded-full overflow-hidden" style={{ background: 'var(--s2)' }}>
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -196,8 +196,13 @@ export function UserWalletPage() {
                     />
                   </div>
 
-                  {/* Last visit */}
-                  <p className="text-[10px] mt-2" style={{ color: '#A08880' }}>
+                  {/* Earning rate & last visit */}
+                  {store.amountPerCoin && (loyaltyType === 'POINTS' || loyaltyType === 'HYBRID') && (
+                    <p className="text-[10px] mt-1.5 font-medium" style={{ color: 'var(--a)' }}>
+                      ₹{store.amountPerCoin} = 1 coin
+                    </p>
+                  )}
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--t3)' }}>
                     Last: {formatDate(store.lastVisitAt)}
                   </p>
                 </div>
@@ -213,15 +218,15 @@ export function UserWalletPage() {
           <div className="flex items-center gap-3" style={{ padding: '16px 18px' }}>
             <div
               className="shrink-0 flex items-center justify-center"
-              style={{ width: '44px', height: '44px', background: '#FAECE7', border: '1px solid #F5C4B3', borderRadius: '14px' }}
+              style={{ width: '44px', height: '44px', background: 'var(--bdl)', border: '1px solid var(--bd)', borderRadius: '14px' }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '22px', color: '#D85A30' }}>generating_tokens</span>
+              <span className="material-symbols-rounded" style={{ fontSize: '22px', color: 'var(--a)' }}>generating_tokens</span>
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-sm" style={{ color: '#5D4037' }}>Earn on Every Purchase</p>
-              <p className="text-xs mt-0.5" style={{ color: '#7B5E54' }}>Points added automatically</p>
+              <p className="font-semibold text-sm" style={{ color: 'var(--t)' }}>Earn on Every Purchase</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--t2)' }}>Points added automatically</p>
             </div>
-            <span className="material-symbols-rounded" style={{ fontSize: '20px', color: '#F5C4B3' }}>chevron_right</span>
+            <span className="material-symbols-rounded" style={{ fontSize: '20px', color: 'var(--bd)' }}>chevron_right</span>
           </div>
         </div>
       )}

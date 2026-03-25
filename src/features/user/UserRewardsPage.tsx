@@ -57,9 +57,9 @@ export function UserRewardsPage() {
   if (error) {
     return (
       <div className="max-w-md mx-auto w-full min-w-0 py-8">
-        <h1 className="text-xl font-bold mb-4" style={{ color: '#5D4037' }}>Rewards</h1>
+        <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--t)' }}>Rewards</h1>
         <div className="glass-card rounded-2xl p-5">
-          <p className="text-sm" style={{ color: '#B03A2A' }}>{error}</p>
+          <p className="text-sm" style={{ color: 'var(--re)' }}>{error}</p>
         </div>
       </div>
     );
@@ -68,16 +68,16 @@ export function UserRewardsPage() {
   return (
     <div className="max-w-md mx-auto space-y-5 pb-8 w-full min-w-0" style={{ paddingTop: '20px' }}>
       <div className="a1">
-        <h1 className="text-[22px] font-bold" style={{ color: '#5D4037', letterSpacing: '-0.02em' }}>Rewards</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#7B5E54' }}>Use your rewards at the store — tap Redeem and show the code to staff.</p>
+        <h1 className="text-[22px] font-bold" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>Rewards</h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--t2)' }}>Use your rewards at the store — tap Redeem and show the code to staff.</p>
       </div>
 
       {lastRedeemedCode && (
-        <div className="rounded-2xl p-5 a2" style={{ background: '#E4F2EB', border: '1.5px solid #A8D4BA' }}>
-          <p className="text-sm mb-1" style={{ color: '#5D4037' }}>Your reward code — show this to staff</p>
-          <p className="text-2xl font-bold tracking-[0.3em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#2A6040' }}>{lastRedeemedCode}</p>
-          <p className="text-xs mt-2" style={{ color: '#7B5E54' }}>Staff will enter this code to give you your reward.</p>
-          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm font-medium" style={{ color: '#D85A30' }}>
+        <div className="rounded-2xl p-5 a2" style={{ background: 'var(--grbg)', border: '1.5px solid var(--grbd)' }}>
+          <p className="text-sm mb-1" style={{ color: 'var(--t)' }}>Your reward code — show this to staff</p>
+          <p className="text-2xl font-bold tracking-[0.3em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: 'var(--gr)' }}>{lastRedeemedCode}</p>
+          <p className="text-xs mt-2" style={{ color: 'var(--t2)' }}>Staff will enter this code to give you your reward.</p>
+          <button type="button" onClick={() => setLastRedeemedCode(null)} className="mt-3 text-sm font-medium" style={{ color: 'var(--a)' }}>
             Dismiss
           </button>
         </div>
@@ -85,7 +85,7 @@ export function UserRewardsPage() {
 
       {rewards.length === 0 ? (
         <div className="glass-card rounded-2xl p-5 a2">
-          <p className="text-sm" style={{ color: '#7B5E54' }}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
+          <p className="text-sm" style={{ color: 'var(--t2)' }}>No rewards yet. Keep visiting your favorite stores — you'll earn rewards before you know it.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -97,15 +97,15 @@ export function UserRewardsPage() {
               <div style={{ padding: '16px 18px' }}>
                 <div className="flex flex-wrap justify-between items-start gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-base truncate" style={{ color: '#5D4037' }}>{r.partner?.businessName ?? 'Store'}</p>
+                    <p className="font-semibold text-base truncate" style={{ color: 'var(--t)' }}>{r.partner?.businessName ?? 'Store'}</p>
                     <span
                       className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
                       style={
                         r.status === 'ACTIVE'
-                          ? { background: '#E4F2EB', color: '#2A6040' }
+                          ? { background: 'var(--grbg)', color: 'var(--gr)' }
                           : r.status === 'PENDING'
-                          ? { background: '#FEF3C7', color: '#B45309' }
-                          : { background: '#EDEFEE', color: '#A08880' }
+                          ? { background: 'var(--ambg)', color: 'var(--am)' }
+                          : { background: 'var(--s2)', color: 'var(--t3)' }
                       }
                     >
                       {r.status === 'ACTIVE' && 'Ready to use'}
@@ -113,12 +113,12 @@ export function UserRewardsPage() {
                       {r.status === 'REDEEMED' && 'Redeemed'}
                     </span>
                     {r.expiryDate && (
-                      <p className="text-xs mt-2" style={{ color: '#A08880' }}>Expires {formatDate(r.expiryDate)}</p>
+                      <p className="text-xs mt-2" style={{ color: 'var(--t3)' }}>Expires {formatDate(r.expiryDate)}</p>
                     )}
                     {r.status === 'PENDING' && r.redemptionCode && (
-                      <div className="mt-3 p-3 rounded-xl" style={{ background: '#FEF3C7', border: '1px solid rgba(180,83,9,0.18)' }}>
-                        <p className="text-xs mb-1" style={{ color: '#B45309' }}>Your redemption code:</p>
-                        <p className="text-lg font-bold tracking-[0.2em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#B45309' }}>
+                      <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--ambg)', border: '1px solid rgba(180,83,9,0.18)' }}>
+                        <p className="text-xs mb-1" style={{ color: 'var(--am)' }}>Your redemption code:</p>
+                        <p className="text-lg font-bold tracking-[0.2em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: 'var(--am)' }}>
                           {r.redemptionCode}
                         </p>
                         <p className="text-xs mt-1" style={{ color: 'rgba(180,83,9,0.7)' }}>Show this to staff at the store</p>
@@ -130,7 +130,7 @@ export function UserRewardsPage() {
                       onClick={() => handleRedeem(r.id)}
                       disabled={!!redeemingId}
                       className="shrink-0 min-h-[40px] rounded-lg font-semibold text-sm"
-                      style={{ background: '#D85A30', color: '#FFF', border: 'none' }}
+                      style={{ background: 'var(--a)', color: 'var(--s)', border: 'none' }}
                     >
                       {redeemingId === r.id ? 'Redeeming...' : 'Redeem'}
                     </Button>
