@@ -20,6 +20,7 @@ export function UserLayout() {
   const isRequests = pathname === '/requests';
   const isProfile = pathname === '/profile' || pathname === '/account';
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState<string | null>(null);
   const [showApprovalCelebration, setShowApprovalCelebration] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -58,7 +59,7 @@ export function UserLayout() {
     const phone = getCustomerPhoneFromToken();
     if (phone) setCustomerPhone(phone);
     customersApi.getMyProfile()
-      .then((p) => setCustomerPhone(p.customer.phoneNumber))
+      .then((p) => { setCustomerPhone(p.customer.phoneNumber); if (p.customer.name) setCustomerName(p.customer.name); })
       .catch(() => {});
   }, [hasToken]);
 
@@ -157,14 +158,14 @@ export function UserLayout() {
                   width: '34px',
                   height: '34px',
                   borderRadius: '50%',
-                  background: 'var(--bdl)',
-                  border: '2px solid var(--bd)',
-                  color: 'var(--a)',
+                  background: customerName ? 'var(--a)' : 'var(--bdl)',
+                  border: customerName ? 'none' : '2px solid var(--bd)',
+                  color: customerName ? 'var(--s)' : 'var(--a)',
                   fontSize: '13px',
-                  fontWeight: 600,
+                  fontWeight: 700,
                 }}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>person</span>
+                {customerName ? customerName.charAt(0).toUpperCase() : <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>person</span>}
               </Link>
             )}
           </div>

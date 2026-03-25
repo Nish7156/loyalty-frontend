@@ -70,7 +70,7 @@ export function UserWalletPage() {
 
       {/* Greeting + Wallet Strip - matching wireframe 03 */}
       <div className="a1 px-0.5">
-        <p className="text-xs mb-1" style={{ color: 'var(--t2)' }}>Welcome back</p>
+        <p className="text-xs mb-1" style={{ color: 'var(--t2)' }}>Welcome back{profile?.customer?.name ? `, ${profile.customer.name}` : ''}</p>
         <h1 className="text-[22px] font-bold leading-tight" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>
           My Loyalty Cards
         </h1>
@@ -91,6 +91,7 @@ export function UserWalletPage() {
             <p className="text-[30px] font-bold leading-none mt-1" style={{ letterSpacing: '-0.04em' }}>{formatPoints(totalPoints)}</p>
           </div>
           <button
+            onClick={() => navigate('/rewards')}
             className="flex items-center gap-1.5 rounded-full text-xs font-semibold"
             style={{ background: 'var(--a)', color: 'var(--s)', padding: '8px 16px' }}
           >
@@ -103,6 +104,7 @@ export function UserWalletPage() {
       {/* Quick action buttons - matching wireframe 03 */}
       <div className="a3 flex gap-3">
         <button
+          onClick={() => navigate('/requests')}
           className="flex-1 flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
           style={{ height: '40px', background: 'var(--a)', color: 'var(--s)' }}
         >
@@ -110,6 +112,7 @@ export function UserWalletPage() {
           Scan QR
         </button>
         <button
+          onClick={() => navigate('/rewards')}
           className="flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
           style={{ height: '40px', background: 'var(--s)', border: '1.5px solid var(--bd)', color: 'var(--t2)', padding: '0 16px' }}
         >
@@ -117,6 +120,7 @@ export function UserWalletPage() {
           Wallet
         </button>
         <button
+          onClick={() => navigate('/history')}
           className="flex items-center justify-center gap-2 rounded-[10px] font-semibold text-sm"
           style={{ height: '40px', background: 'var(--s)', border: '1.5px solid var(--bd)', color: 'var(--t2)', padding: '0 16px' }}
         >

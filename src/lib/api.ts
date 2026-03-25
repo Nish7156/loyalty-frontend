@@ -283,6 +283,7 @@ export const branchesApi = {
       rewardDescription?: string;
       minCheckInAmount?: number;
       walletEnabled?: boolean;
+      amountPerCoin?: number;
       pointsPercentage?: number;
       pointsExpiryDays?: number;
       pointsToRewardRatio?: number;
@@ -304,6 +305,7 @@ export const branchesApi = {
         rewardDescription?: string;
         minCheckInAmount?: number;
         walletEnabled?: boolean;
+        amountPerCoin?: number;
         pointsPercentage?: number;
         pointsExpiryDays?: number;
         pointsToRewardRatio?: number;
