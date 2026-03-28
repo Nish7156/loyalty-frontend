@@ -10,7 +10,7 @@ export function CustomerLoginPage() {
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
   const [name, setName] = useState('');
-  const [isNew, setIsNew] = useState(false);
+  const [needsName, setNeedsName] = useState(false);
   const [step, setStep] = useState<'phone' | 'otp' | 'name'>('phone');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +32,7 @@ export function CustomerLoginPage() {
       }
 
       setMpin(res.otp ?? '');
-      setIsNew(!!res.isNew);
+      setNeedsName(!!res.needsName);
       setStep('otp');
       setOtp('');
     } catch (e) {
@@ -47,8 +47,8 @@ export function CustomerLoginPage() {
     if (!phone.trim() || !otp.trim()) return;
     setError('');
 
-    // If new customer, go to name step first
-    if (isNew) {
+    // If customer has no name, ask for it first
+    if (needsName) {
       setStep('name');
       return;
     }
@@ -136,16 +136,6 @@ export function CustomerLoginPage() {
               style={{ background: 'var(--a)', color: 'var(--s)', fontSize: '15px' }}
             >
               {loading ? 'Sending...' : 'Continue'}
-            </button>
-          </div>
-          <div className="text-center">
-            <p className="text-xs" style={{ color: 'var(--t3)' }}>or sign in with</p>
-            <button
-              type="button"
-              className="w-full min-h-[52px] mt-3 rounded-xl font-medium transition"
-              style={{ background: 'var(--s)', border: '1.5px solid var(--bd)', color: 'var(--t2)', fontSize: '15px' }}
-            >
-              Use email instead
             </button>
           </div>
         </form>
