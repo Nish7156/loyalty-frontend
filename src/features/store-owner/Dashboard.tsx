@@ -82,7 +82,7 @@ export function OwnerDashboard() {
       }
       const s = byPhone.get(phone)!;
       s.visitCount += 1;
-      const val = a.value ?? 0;
+      const val = Number(a.value) || 0;
       s.totalPaid += val;
       const monthKey = toMonthKey(new Date(a.createdAt));
       s.monthlyPaid[monthKey] = (s.monthlyPaid[monthKey] ?? 0) + val;
