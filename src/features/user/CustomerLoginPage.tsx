@@ -9,7 +9,9 @@ export function CustomerLoginPage() {
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
   const [otp, setOtp] = useState('');
   const [mpin, setMpin] = useState('');
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [name, setName] = useState('');
+  const [isNew, setIsNew] = useState(false);
+  const [step, setStep] = useState<'phone' | 'otp' | 'name'>('phone');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,6 +32,7 @@ export function CustomerLoginPage() {
       }
 
       setMpin(res.otp ?? '');
+      setIsNew(!!res.isNew);
       setStep('otp');
       setOtp('');
     } catch (e) {
@@ -43,6 +46,13 @@ export function CustomerLoginPage() {
     e.preventDefault();
     if (!phone.trim() || !otp.trim()) return;
     setError('');
+
+    // If new customer, go to name step first
+    if (isNew) {
+      setStep('name');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await authApi.customerLogin(normalizeIndianPhone(phone.trim()), otp.trim());
@@ -50,6 +60,25 @@ export function CustomerLoginPage() {
       navigate('/me', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || name.trim().length < 2) {
+      setError('Please enter your name (at least 2 characters)');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const res = await authApi.customerLogin(normalizeIndianPhone(phone.trim()), otp.trim(), name.trim());
+      setCustomerToken(res.access_token);
+      navigate('/me', { replace: true });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -175,6 +204,56 @@ export function CustomerLoginPage() {
               style={{ color: 'var(--a)' }}
             >
               Wrong number?
+            </button>
+          </div>
+        </form>
+      )}
+
+      {step === 'name' && (
+        <form onSubmit={handleNameSubmit} className="space-y-5 a2">
+          <div className="flex justify-center">
+            <div className="flex items-center justify-center" style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'var(--bdl)' }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '28px', color: 'var(--a)' }}>person</span>
+            </div>
+          </div>
+          <div className="text-center mb-2">
+            <h2 className="text-xl font-bold" style={{ color: 'var(--t)' }}>What's your name?</h2>
+            <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>So stores can greet you properly</p>
+          </div>
+          <div className="rounded-2xl p-5" style={{ background: 'var(--s)', border: '1px solid var(--bdl)', boxShadow: '0 4px 24px rgba(93,64,55,0.07)' }}>
+            <label className="block text-xs font-medium uppercase tracking-[0.02em] mb-2" style={{ color: 'var(--t2)' }}>Your name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+              autoFocus
+              autoComplete="name"
+              className="w-full min-h-[50px] rounded-xl border px-4 outline-none transition text-lg"
+              style={{
+                borderColor: name.trim().length >= 2 ? 'var(--a)' : 'var(--bd)',
+                backgroundColor: 'var(--bg)',
+                color: 'var(--t)',
+                boxShadow: name.trim().length >= 2 ? '0 0 0 3px var(--bdl)' : 'none',
+              }}
+            />
+            {error && <p className="text-sm mt-2" style={{ color: 'var(--re)' }}>{error}</p>}
+            <button
+              type="submit"
+              disabled={loading || name.trim().length < 2}
+              className="w-full min-h-[52px] mt-4 rounded-xl font-semibold transition disabled:opacity-50"
+              style={{ background: 'var(--a)', color: 'var(--s)', fontSize: '15px' }}
+            >
+              {loading ? 'Creating account...' : 'Get Started'}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setStep('otp'); setError(''); }}
+              className="w-full mt-2 min-h-[44px] rounded-xl text-sm font-medium transition"
+              style={{ color: 'var(--a)' }}
+            >
+              Back
             </button>
           </div>
         </form>
