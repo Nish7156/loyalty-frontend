@@ -5,6 +5,7 @@ import {
   customersApi, activityApi, branchesApi, authApi, rewardsApi, referralsApi,
   setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent,
 } from '../../lib/api';
+import { REFERRAL_CODE_KEY } from '../../App';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import type { CustomerProfile, Reward, Branch } from '../../lib/api';
 import { createBranchSocket } from '../../lib/socket';
@@ -103,7 +104,8 @@ export function UserScanPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const branchId = storeId ?? '';
-  const refCode = searchParams.get('ref');
+  // ref can come from the scan URL (?ref=) OR from localStorage (shared via home link)
+  const refCode = searchParams.get('ref') || localStorage.getItem(REFERRAL_CODE_KEY);
 
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
@@ -253,6 +255,7 @@ export function UserScanPage() {
         // Apply referral code if present (non-blocking — never block registration)
         if (refCode) {
           referralsApi.apply(refCode, normalizedPhone).catch(() => {});
+          localStorage.removeItem(REFERRAL_CODE_KEY); // consume once used
         }
       }
     } catch (e) { setError(e instanceof Error ? e.message : otpMode === 'customerLogin' ? 'Invalid code' : 'Registration failed'); }

@@ -3,6 +3,7 @@ import { customersApi, getCustomerTokenIfPresent, clearCustomerToken, referralsA
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { ThemePicker } from '../../components/ThemePicker';
 import { useHaptic } from '../../hooks/useHaptic';
+import { useNotifications } from '../../contexts/NotificationContext';
 import type { CustomerProfile, ReferralEntry } from '../../lib/api';
 
 // ─── Share & Earn card ────────────────────────────────────────────────────────
@@ -20,29 +21,51 @@ function ShareAndEarn() {
   }, []);
 
   const shareLink = () => {
-    // Build share URL using the current branch from URL or just the origin
-    const shareUrl = `${window.location.origin}/scan?ref=${code}`;
-    const shareText = `Join me on Loyalty and earn rewards! Use my code ${code} when you sign up: ${shareUrl}`;
+    if (!code) return;
+    const shareUrl = `${window.location.origin}/?ref=${code}`;
+    const shareText = `Join me on Loyalty and earn bonus points! Use my referral code ${code} when you sign up: ${shareUrl}`;
 
     if (navigator.share) {
       haptic.medium();
-      navigator.share({ title: 'Join me on Loyalty', text: shareText, url: shareUrl }).catch(() => {});
+      navigator.share({ title: 'Join me on Loyalty', text: shareText, url: shareUrl })
+        .catch((err) => {
+          // User cancelled or share failed — fall back to clipboard
+          if (err?.name !== 'AbortError') copyToClipboard(shareText);
+        });
     } else {
-      navigator.clipboard.writeText(shareText).then(() => {
+      copyToClipboard(shareText);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
         setCopied(true);
         haptic.light();
-        setTimeout(() => setCopied(false), 2000);
-      }).catch(() => {});
+        setTimeout(() => setCopied(false), 2500);
+      }).catch(() => {
+        // Clipboard API blocked — use execCommand fallback
+        legacyCopy(text);
+      });
+    } else {
+      legacyCopy(text);
     }
+  };
+
+  const legacyCopy = (text: string) => {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    try { document.execCommand('copy'); setCopied(true); haptic.light(); setTimeout(() => setCopied(false), 2500); } catch { /* silent */ }
+    document.body.removeChild(el);
   };
 
   const copyCode = () => {
     if (!code) return;
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      haptic.light();
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    copyToClipboard(code);
   };
 
   const loadList = () => {
@@ -174,9 +197,26 @@ function ShareAndEarn() {
 
 export function UserAccountPage() {
   const haptic = useHaptic();
+  const { isSupported, permission, isSubscribed, requestPermission, unsubscribe } = useNotifications();
+  const [notifLoading, setNotifLoading] = useState(false);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleNotifToggle = async () => {
+    if (!isSupported) return;
+    haptic.light();
+    setNotifLoading(true);
+    try {
+      if (isSubscribed) {
+        await unsubscribe();
+      } else {
+        await requestPermission();
+      }
+    } finally {
+      setNotifLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!getCustomerTokenIfPresent()) return;
@@ -269,14 +309,52 @@ export function UserAccountPage() {
           <span className="text-[13px] font-medium">Edit Profile</span>
           <span className="material-symbols-rounded ml-auto" style={{ fontSize: '18px', color: 'var(--bdl)' }}>chevron_right</span>
         </button>
-        <button
-          className="w-full flex items-center gap-3 text-left transition-colors"
-          style={{ padding: '14px 18px', color: 'var(--t2)', borderBottom: '1px solid var(--bdl)' }}
+        <div
+          className="w-full flex items-center gap-3"
+          style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdl)' }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: '20px', color: 'var(--t3)' }}>notifications</span>
-          <span className="text-[13px] font-medium">Notifications</span>
-          <span className="material-symbols-rounded ml-auto" style={{ fontSize: '18px', color: 'var(--bdl)' }}>chevron_right</span>
-        </button>
+          <div className="flex-1 min-w-0">
+            <span className="text-[13px] font-medium" style={{ color: 'var(--t2)' }}>Push Notifications</span>
+            {permission === 'denied' && (
+              <p className="text-[11px] mt-0.5" style={{ color: 'var(--re)' }}>Blocked in browser — enable in Settings</p>
+            )}
+          </div>
+          {isSupported && permission !== 'denied' ? (
+            <button
+              type="button"
+              onClick={handleNotifToggle}
+              disabled={notifLoading}
+              aria-label={isSubscribed ? 'Turn off notifications' : 'Turn on notifications'}
+              className="relative shrink-0 transition-all disabled:opacity-50"
+              style={{
+                width: 44,
+                height: 26,
+                borderRadius: 13,
+                background: isSubscribed ? 'var(--a)' : 'var(--bdl)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <span
+                className="absolute top-[3px] transition-all"
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: '#fff',
+                  left: isSubscribed ? 21 : 3,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                  display: 'block',
+                }}
+              />
+            </button>
+          ) : (
+            <span className="material-symbols-rounded shrink-0" style={{ fontSize: '18px', color: 'var(--bdl)' }}>
+              block
+            </span>
+          )}
+        </div>
         <button
           className="w-full flex items-center gap-3 text-left transition-colors"
           style={{ padding: '14px 18px', color: 'var(--t2)', borderBottom: '1px solid var(--bdl)' }}
