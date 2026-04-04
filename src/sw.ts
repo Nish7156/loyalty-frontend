@@ -15,7 +15,13 @@ self.addEventListener('push', (event: PushEvent) => {
     body?: string;
     icon?: string;
     badge?: string;
+    image?: string;
     tag?: string;
+    renotify?: boolean;
+    timestamp?: number;
+    vibrate?: number[];
+    requireInteraction?: boolean;
+    actions?: { action: string; title: string }[];
     data?: { url?: string; type?: string; partnerId?: string };
   };
 
@@ -28,12 +34,19 @@ self.addEventListener('push', (event: PushEvent) => {
   const title = payload.title ?? 'Loyalty';
   const options: NotificationOptions = {
     body: payload.body ?? '',
-    icon: payload.icon ?? '/icons/icon-192x192.png',
-    badge: payload.badge ?? '/icons/badge-72x72.png',
+    icon: payload.icon ?? '/icon-192.png',
+    badge: payload.badge ?? '/badge-72.png',
     tag: payload.tag ?? 'loyalty',
     data: payload.data ?? { url: '/' },
-    // vibrate for mobile (cast needed — TS lib types lag behind the spec)
-    ...(({ vibrate: [100, 50, 100] } as unknown) as NotificationOptions),
+    requireInteraction: payload.requireInteraction ?? false,
+    // Fields not in TS NotificationOptions types yet — cast through unknown
+    ...(({
+      image: payload.image,
+      vibrate: payload.vibrate ?? [100, 50, 100],
+      renotify: payload.renotify ?? true,
+      timestamp: payload.timestamp ?? Date.now(),
+      actions: payload.actions ?? [],
+    } as unknown) as NotificationOptions),
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
@@ -42,20 +55,26 @@ self.addEventListener('push', (event: PushEvent) => {
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
 
-  const url: string = (event.notification.data as { url?: string })?.url ?? '/';
+  const data = event.notification.data as { url?: string; type?: string } | undefined;
+  const action = event.action;
+
+  // Map action buttons to specific URLs
+  let url = data?.url ?? '/';
+  if (action === 'redeem') url = '/rewards';
+  else if (action === 'wallet') url = '/me';
+  else if (action === 'view') url = data?.url ?? '/requests';
+  else if (action === 'dismiss' || action === 'later') return; // just close
 
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
-        // Focus existing tab if open
         for (const client of clientList) {
           if ('focus' in client) {
             void (client as WindowClient).navigate(url);
             return (client as WindowClient).focus();
           }
         }
-        // Open new tab
         if (self.clients.openWindow) {
           return self.clients.openWindow(url);
         }

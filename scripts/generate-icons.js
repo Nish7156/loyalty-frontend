@@ -35,6 +35,15 @@ async function generate() {
       .toFile(out);
     console.log(`Generated ${name} (${width}x${height})`);
   }
+
+  // Badge: 72x72 monochrome (white on transparent) — shown in Android status bar
+  const badgeOut = join(PUBLIC, 'badge-72.png');
+  await sharp(SRC)
+    .resize(72, 72, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .greyscale()
+    .png()
+    .toFile(badgeOut);
+  console.log('Generated badge-72.png (72x72 monochrome)');
 }
 
 generate().catch((err) => {
