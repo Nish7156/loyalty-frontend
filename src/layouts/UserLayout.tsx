@@ -5,6 +5,8 @@ import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, fee
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { PWAInstallButton } from '../components/PWAInstallButton';
+import { NotificationPermissionBanner } from '../components/NotificationPermissionBanner';
+import { PushToastContainer, showPushToast } from '../components/PushToast';
 
 const CHECKIN_UPDATED_EVENT = 'loyalty_checkin_updated';
 const MAX_FEEDBACK_LENGTH = 2000;
@@ -66,9 +68,15 @@ export function UserLayout() {
   useEffect(() => {
     if (!customerPhone) return;
     const socket = createCustomerSocket(customerPhone);
-    const handler = (payload: { id: string; status: string }) => {
+    const handler = (payload: { id: string; status: string; branchName?: string; partnerName?: string }) => {
       window.dispatchEvent(new CustomEvent(CHECKIN_UPDATED_EVENT, { detail: payload }));
       if (payload.status === 'APPROVED') {
+        showPushToast({
+          title: 'Check-in approved!',
+          body: payload.branchName ? `Your visit at ${payload.branchName} was approved.` : 'Your visit was approved. Keep going!',
+          type: 'CHECKIN_APPROVED',
+          url: '/history',
+        });
         if (celebrationEndRef.current) clearTimeout(celebrationEndRef.current);
         setShowApprovalCelebration(true);
         const duration = 2500;
@@ -249,6 +257,8 @@ export function UserLayout() {
       )}
 
       <PWAInstallPrompt />
+      <PushToastContainer />
+      <NotificationPermissionBanner />
 
       {/* Bottom Navigation - matching wireframe 03 exactly */}
       <nav

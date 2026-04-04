@@ -448,3 +448,34 @@ export const walletApi = {
       body: JSON.stringify({ partnerId, branchId }),
     }, true),
 };
+
+export const pushApi = {
+  getVapidPublicKey: () =>
+    api<{ publicKey: string }>('/push/vapid-public-key'),
+
+  subscribe: (subscription: PushSubscriptionJSON) =>
+    api<void>('/push/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({
+        endpoint: subscription.endpoint,
+        keys: subscription.keys,
+      }),
+    }, true),
+
+  unsubscribe: (endpoint: string) =>
+    api<void>('/push/unsubscribe', {
+      method: 'DELETE',
+      body: JSON.stringify({ endpoint }),
+    }, true),
+
+  sendPromotion: (payload: { title: string; body: string; partnerId?: string; url?: string }) =>
+    api<{ sent: number; failed: number; subscribers: number }>('/push/send', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  getSubscriberCount: (partnerId?: string) => {
+    const qs = partnerId ? `?partnerId=${partnerId}` : '';
+    return api<{ count: number }>(`/push/subscribers${qs}`);
+  },
+};

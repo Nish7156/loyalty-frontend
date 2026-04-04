@@ -1,10 +1,352 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { partnersApi, branchesApi, activityApi, rewardsApi } from '../../lib/api';
+import { partnersApi, branchesApi, activityApi, rewardsApi, pushApi } from '../../lib/api';
 import type { Partner } from '../../lib/api';
 import type { Branch } from '../../lib/api';
 import type { Activity } from '../../lib/api';
 import type { Reward } from '../../lib/api';
+
+// ---------- Notification Sender ----------
+interface NotifDraft {
+  partnerId: string; // 'all' or a specific partner id
+  title: string;
+  body: string;
+  url: string;
+}
+
+const NOTIF_TITLE_MAX = 100;
+const NOTIF_BODY_MAX = 300;
+
+const QUICK_TEMPLATES = [
+  { label: 'Special offer', title: '🎉 Special Offer!', body: "Don't miss our limited-time deal. Visit us today and enjoy exclusive rewards!" },
+  { label: 'Double points', title: '⚡ Double Points Today!', body: 'Earn 2× points on every visit today only. Come in and make the most of it!' },
+  { label: 'New reward', title: '🎁 New Reward Available', body: 'We\'ve added a new reward just for you. Check your app to see what\'s waiting!' },
+  { label: 'Miss you', title: "We Miss You!", body: "It's been a while! Come back and earn your next reward. We'd love to see you again." },
+];
+
+function NotificationSender({ partners }: { partners: Partner[] }) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<NotifDraft>({ partnerId: partners[0]?.id ?? 'all', title: '', body: '', url: '/rewards' });
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<{ sent: number; failed: number; subscribers: number } | null>(null);
+  const [error, setError] = useState('');
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+  const [loadingCount, setLoadingCount] = useState(false);
+
+  // Fetch subscriber count whenever audience changes or panel opens
+  useEffect(() => {
+    if (!open) return;
+    setLoadingCount(true);
+    setSubscriberCount(null);
+    pushApi
+      .getSubscriberCount(draft.partnerId !== 'all' ? draft.partnerId : undefined)
+      .then((r) => setSubscriberCount(r.count))
+      .catch(() => setSubscriberCount(0))
+      .finally(() => setLoadingCount(false));
+  }, [open, draft.partnerId]);
+
+  const handleSend = async () => {
+    if (!draft.title.trim() || !draft.body.trim()) return;
+    setSending(true);
+    setError('');
+    setResult(null);
+    try {
+      const res = await pushApi.sendPromotion({
+        title: draft.title.trim(),
+        body: draft.body.trim(),
+        url: draft.url || '/rewards',
+        ...(draft.partnerId !== 'all' ? { partnerId: draft.partnerId } : {}),
+      });
+      setResult(res);
+      setDraft((d) => ({ ...d, title: '', body: '' }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to send. Try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const applyTemplate = (t: (typeof QUICK_TEMPLATES)[0]) => {
+    setDraft((d) => ({ ...d, title: t.title, body: t.body }));
+    setResult(null);
+  };
+
+  const selectedPartner = partners.find((p) => p.id === draft.partnerId);
+  const audienceLabel = draft.partnerId === 'all'
+    ? 'all your customers'
+    : `all customers of ${selectedPartner?.businessName ?? ''}`;
+
+  return (
+    <div
+      className="rounded-2xl mb-6 sm:mb-8 overflow-hidden"
+      style={{ background: 'var(--s)', border: '1.5px solid var(--abd)', boxShadow: '0 2px 12px rgba(216,90,48,0.08)' }}
+    >
+      {/* Header row — always visible */}
+      <button
+        type="button"
+        className="w-full flex items-center gap-3 p-4 sm:p-6 text-left"
+        onClick={() => { setOpen((v) => !v); setResult(null); setError(''); }}
+      >
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: 'var(--abg)' }}
+        >
+          <span className="material-symbols-rounded" style={{ color: 'var(--a)', fontSize: '22px' }}>campaign</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-base" style={{ color: 'var(--t)' }}>Send Notification</p>
+          <p className="text-sm" style={{ color: 'var(--t3)' }}>
+            Push a custom message to {audienceLabel}
+            {subscriberCount !== null && (
+              <span
+                className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                style={{ background: subscriberCount > 0 ? 'var(--grbg)' : 'var(--s2)', color: subscriberCount > 0 ? 'var(--gr)' : 'var(--t3)' }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 11 }}>notifications_active</span>
+                {subscriberCount} subscribed
+              </span>
+            )}
+          </p>
+        </div>
+        <span
+          className="material-symbols-rounded transition-transform shrink-0"
+          style={{ color: 'var(--t3)', fontSize: '20px', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          expand_more
+        </span>
+      </button>
+
+      {/* Expanded form */}
+      {open && (
+        <div style={{ borderTop: '1px solid var(--bdl)', padding: '20px 24px 24px' }}>
+
+          {/* Audience selector */}
+          {partners.length > 1 && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--t2)' }}>
+                Send to
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, partnerId: 'all' }))}
+                  className="px-3 py-1.5 rounded-xl text-sm font-medium border transition"
+                  style={{
+                    background: draft.partnerId === 'all' ? 'var(--a)' : 'var(--bg)',
+                    color: draft.partnerId === 'all' ? '#fff' : 'var(--t2)',
+                    borderColor: draft.partnerId === 'all' ? 'var(--a)' : 'var(--bd)',
+                  }}
+                >
+                  All stores
+                </button>
+                {partners.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setDraft((d) => ({ ...d, partnerId: p.id }))}
+                    className="px-3 py-1.5 rounded-xl text-sm font-medium border transition"
+                    style={{
+                      background: draft.partnerId === p.id ? 'var(--a)' : 'var(--bg)',
+                      color: draft.partnerId === p.id ? '#fff' : 'var(--t2)',
+                      borderColor: draft.partnerId === p.id ? 'var(--a)' : 'var(--bd)',
+                    }}
+                  >
+                    {p.businessName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick templates */}
+          <div className="mb-4">
+            <p className="text-xs font-medium mb-2" style={{ color: 'var(--t3)' }}>QUICK TEMPLATES</p>
+            <div className="flex flex-wrap gap-2">
+              {QUICK_TEMPLATES.map((t) => (
+                <button
+                  key={t.label}
+                  type="button"
+                  onClick={() => applyTemplate(t)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-medium border transition"
+                  style={{ background: 'var(--bg)', color: 'var(--t2)', borderColor: 'var(--bd)' }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="mb-3">
+            <div className="flex justify-between mb-1">
+              <label className="text-sm font-medium" style={{ color: 'var(--t2)' }}>Title</label>
+              <span className="text-xs" style={{ color: draft.title.length > NOTIF_TITLE_MAX * 0.85 ? 'var(--am)' : 'var(--t3)' }}>
+                {draft.title.length}/{NOTIF_TITLE_MAX}
+              </span>
+            </div>
+            <input
+              type="text"
+              value={draft.title}
+              onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value.slice(0, NOTIF_TITLE_MAX) }))}
+              placeholder="e.g. 🎉 Special offer just for you!"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition"
+              style={{ background: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--t)' }}
+              disabled={sending}
+            />
+          </div>
+
+          {/* Message */}
+          <div className="mb-3">
+            <div className="flex justify-between mb-1">
+              <label className="text-sm font-medium" style={{ color: 'var(--t2)' }}>Message</label>
+              <span className="text-xs" style={{ color: draft.body.length > NOTIF_BODY_MAX * 0.85 ? 'var(--am)' : 'var(--t3)' }}>
+                {draft.body.length}/{NOTIF_BODY_MAX}
+              </span>
+            </div>
+            <textarea
+              value={draft.body}
+              onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value.slice(0, NOTIF_BODY_MAX) }))}
+              placeholder="e.g. Visit us today and enjoy exclusive rewards on every check-in!"
+              rows={3}
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition resize-none"
+              style={{ background: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--t)' }}
+              disabled={sending}
+            />
+          </div>
+
+          {/* Tap destination */}
+          <div className="mb-5">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--t2)' }}>
+              Opens when tapped
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { label: 'Rewards', value: '/rewards', icon: 'redeem' },
+                { label: 'Wallet', value: '/wallet', icon: 'generating_tokens' },
+                { label: 'History', value: '/history', icon: 'history' },
+                { label: 'Home', value: '/me', icon: 'home' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, url: opt.value }))}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition"
+                  style={{
+                    background: draft.url === opt.value ? 'var(--abg)' : 'var(--bg)',
+                    color: draft.url === opt.value ? 'var(--a)' : 'var(--t2)',
+                    borderColor: draft.url === opt.value ? 'var(--abd)' : 'var(--bd)',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>{opt.icon}</span>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Preview */}
+          {(draft.title || draft.body) && (
+            <div
+              className="rounded-xl p-3 mb-5 flex items-start gap-3"
+              style={{ background: 'var(--bg)', border: '1px dashed var(--bd)' }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: 'var(--abg)' }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: '18px', color: 'var(--a)' }}>campaign</span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate" style={{ color: 'var(--t)' }}>
+                  {draft.title || <span style={{ color: 'var(--t3)' }}>Title preview</span>}
+                </p>
+                <p className="text-xs mt-0.5 leading-relaxed line-clamp-2" style={{ color: 'var(--t2)' }}>
+                  {draft.body || <span style={{ color: 'var(--t3)' }}>Message preview</span>}
+                </p>
+              </div>
+              <span className="text-xs shrink-0 mt-1" style={{ color: 'var(--t3)' }}>Preview</span>
+            </div>
+          )}
+
+          {/* Error / Result */}
+          {error && (
+            <p className="text-sm mb-4 px-3 py-2 rounded-xl" style={{ color: 'var(--re)', background: 'var(--rebg)' }}>
+              {error}
+            </p>
+          )}
+          {result && (
+            <div
+              className="mb-4 px-4 py-3 rounded-xl"
+              style={{
+                background: result.sent > 0 ? 'var(--grbg)' : 'var(--ambg)',
+                border: `1px solid ${result.sent > 0 ? 'var(--grbd)' : 'rgba(180,83,9,0.2)'}`,
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className="material-symbols-rounded mt-0.5"
+                  style={{ color: result.sent > 0 ? 'var(--gr)' : 'var(--am)', fontSize: '20px' }}
+                >
+                  {result.sent > 0 ? 'check_circle' : 'info'}
+                </span>
+                <div>
+                  {result.sent > 0 ? (
+                    <p className="text-sm font-semibold" style={{ color: 'var(--gr)' }}>
+                      Delivered to {result.sent} device{result.sent !== 1 ? 's' : ''}
+                    </p>
+                  ) : (
+                    <p className="text-sm font-semibold" style={{ color: 'var(--am)' }}>
+                      No devices reached
+                    </p>
+                  )}
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--t3)' }}>
+                    {result.subscribers} customer{result.subscribers !== 1 ? 's' : ''} had push enabled
+                    {result.failed > 0 && ` · ${result.failed} failed`}
+                    {result.subscribers === 0 && ' — customers need to enable notifications in the app'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* No subscribers warning */}
+          {!loadingCount && subscriberCount === 0 && !result && (
+            <div
+              className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-xl text-sm"
+              style={{ background: 'var(--ambg)', color: 'var(--am)', border: '1px solid rgba(180,83,9,0.2)' }}
+            >
+              <span className="material-symbols-rounded shrink-0" style={{ fontSize: '18px' }}>warning</span>
+              <span>
+                No customers have enabled push notifications yet. You can still send — it will reach them once they opt in.
+              </span>
+            </div>
+          )}
+
+          {/* Send button */}
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={sending || !draft.title.trim() || !draft.body.trim()}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition disabled:opacity-50 disabled:pointer-events-none"
+            style={{ background: 'var(--a)', color: '#fff', boxShadow: '0 2px 8px rgba(216,90,48,0.3)' }}
+          >
+            {sending ? (
+              <>
+                <span className="material-symbols-rounded animate-spin" style={{ fontSize: '18px' }}>progress_activity</span>
+                Sending…
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>send</span>
+                Send to {audienceLabel}
+              </>
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Format currency: compact for large values (1.2K, 3.5L, 1.2Cr), full for small */
 function formatCurrencyCompact(n: number): string {
@@ -181,6 +523,9 @@ export function OwnerDashboard() {
           <p className="text-sm" style={{ color: 'var(--t2)' }}>Pending redemptions</p>
         </div>
       </div>
+
+      {/* Notification Sender */}
+      {myPartners.length > 0 && <NotificationSender partners={myPartners} />}
 
       {/* Business Overview */}
       <div className="grid gap-3 sm:gap-5 lg:grid-cols-2 lg:gap-6 mb-6 sm:mb-8">
