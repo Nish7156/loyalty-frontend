@@ -479,3 +479,28 @@ export const pushApi = {
     return api<{ count: number }>(`/push/subscribers${qs}`);
   },
 };
+
+export interface ReferralEntry {
+  id: string;
+  referredId: string; // masked
+  status: 'PENDING' | 'COMPLETED' | 'EXPIRED';
+  bonusAwarded: number;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export const referralsApi = {
+  getMyCode: () => api<{ code: string }>('/referrals/my-code', {}, true),
+  getMyStats: () =>
+    api<{ pending: number; completed: number; total: number; totalBonus: number }>(
+      '/referrals/my-stats',
+      {},
+      true,
+    ),
+  getMyList: () => api<ReferralEntry[]>('/referrals/my-list', {}, true),
+  apply: (code: string, phone: string) =>
+    api<{ success: boolean }>('/referrals/apply', {
+      method: 'POST',
+      body: JSON.stringify({ code, phone }),
+    }),
+};

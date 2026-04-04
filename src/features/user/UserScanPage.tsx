@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
-  customersApi, activityApi, branchesApi, authApi, rewardsApi,
+  customersApi, activityApi, branchesApi, authApi, rewardsApi, referralsApi,
   setCustomerToken, clearCustomerToken, getCustomerTokenIfPresent,
 } from '../../lib/api';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
@@ -101,7 +101,9 @@ function StreakRing({ current, threshold }: { current: number; threshold: number
 export function UserScanPage() {
   const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const branchId = storeId ?? '';
+  const refCode = searchParams.get('ref');
 
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
@@ -160,7 +162,7 @@ export function UserScanPage() {
     }
   }, [branchId]);
 
-  const isLoggedIn = !!getCustomerTokenIfPresent();
+  // isLoggedIn intentionally removed — "stay logged in" button no longer shown
   const displayPhone = profile?.customer?.phoneNumber ?? phone;
   const displayName = profile?.customer?.name?.trim() || customerName.trim() || displayPhone;
 
@@ -186,19 +188,18 @@ export function UserScanPage() {
     const normalized = normalizeIndianPhone(phone.trim());
     setError(''); setLoading(true);
     try {
-      await customersApi.getByPhone(normalized);
-      setPhone(normalized); setStep('checkin');
-    } catch {
-      try {
-        const res = await authApi.sendOtp(normalized);
-        setPhone(normalized);
-        if (res.skipOtp) {
-          await doAutoLogin(normalized);
-          return;
-        }
-        setMpin(res.otp ?? ''); setOtpMode('register'); setStep('otp'); setOtp(''); setRegisterName(''); setResendCooldownUntil(Date.now() + 60000);
-      } catch (err) { setError(err instanceof Error ? err.message : 'Could not send verification code.'); }
-    } finally { setLoading(false); }
+      // Try sending OTP — backend returns skipOtp=true for verified customers
+      const res = await authApi.sendOtp(normalized);
+      setPhone(normalized);
+      if (res.skipOtp) {
+        // Existing verified user → auto-login immediately, no button click needed
+        await doAutoLogin(normalized);
+        return;
+      }
+      // New user → needs OTP + name
+      setMpin(res.otp ?? ''); setOtpMode('register'); setStep('otp'); setOtp(''); setRegisterName(''); setResendCooldownUntil(Date.now() + 60000);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not continue.'); }
+    finally { setLoading(false); }
   };
 
   const doAutoLogin = async (normalized: string) => {
@@ -211,18 +212,6 @@ export function UserScanPage() {
     const store = p.storesVisited?.find((s) => s.branchId === branchId);
     if (store?.partnerId) setCurrentPartnerId(store.partnerId);
     setProfileLoading(false); setStep('checkin');
-  };
-
-  const handleStayLoggedIn = async () => {
-    if (!phone.trim()) return;
-    setError(''); setLoading(true);
-    try {
-      const normalized = normalizeIndianPhone(phone.trim());
-      const res = await authApi.sendOtp(normalized);
-      if (res.skipOtp) { await doAutoLogin(normalized); return; }
-      setMpin(res.otp ?? ''); setOtpMode('customerLogin'); setStep('otp'); setOtp(''); setResendCooldownUntil(Date.now() + 60000);
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not send verification code.'); }
-    finally { setLoading(false); }
   };
 
   const handleResendOtp = async () => {
@@ -258,8 +247,13 @@ export function UserScanPage() {
         setProfileLoading(false);
       } else {
         const nameToSave = registerName.trim().slice(0, 200);
-        const res = await customersApi.register({ branchId, phoneNumber: normalizeIndianPhone(phone.trim()), name: nameToSave, otp: otp.trim() });
+        const normalizedPhone = normalizeIndianPhone(phone.trim());
+        const res = await customersApi.register({ branchId, phoneNumber: normalizedPhone, name: nameToSave, otp: otp.trim() });
         setCustomerToken(res.access_token); setPhone(res.customer.phone); setCustomerName(nameToSave); setStep('checkin');
+        // Apply referral code if present (non-blocking — never block registration)
+        if (refCode) {
+          referralsApi.apply(refCode, normalizedPhone).catch(() => {});
+        }
       }
     } catch (e) { setError(e instanceof Error ? e.message : otpMode === 'customerLogin' ? 'Invalid code' : 'Registration failed'); }
     finally { setLoading(false); }
@@ -305,6 +299,13 @@ export function UserScanPage() {
     socket.on('checkin_updated', handler);
     return () => { socket.off('checkin_updated', handler); socket.disconnect(); socketRef.current = null; };
   }, [step, branchId, lastActivityId]);
+
+  // Auto-redirect to home 3s after PENDING (staff will approve later)
+  useEffect(() => {
+    if (step !== 'done' || checkinStatus !== null) return;
+    const t = setTimeout(() => navigate('/requests', { replace: true }), 3000);
+    return () => clearTimeout(t);
+  }, [step, checkinStatus, navigate]);
 
   // Confetti + redirect on approval
   useEffect(() => {
@@ -398,6 +399,16 @@ export function UserScanPage() {
                 <p className="text-xs" style={{ color: 'var(--t3)' }}>We'll look up your loyalty account</p>
               </div>
             </div>
+
+            {refCode && (
+              <div
+                className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-2xl text-sm"
+                style={{ background: 'var(--abg)', border: '1.5px solid var(--abd)', color: 'var(--a)' }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>card_giftcard</span>
+                <span className="font-medium">You were referred by a friend — sign up and both of you earn bonus points!</span>
+              </div>
+            )}
 
             <PhoneInput label="Phone number" value={phone} onChange={setPhone} placeholder="98765 43210" required autoComplete="tel" variant="dark" />
 
@@ -679,17 +690,6 @@ export function UserScanPage() {
             </div>
           </form>
 
-          {!isLoggedIn && (
-            <button
-              type="button"
-              onClick={handleStayLoggedIn}
-              className="w-full text-sm font-medium py-3 rounded-2xl transition-all flex items-center justify-center gap-2"
-              style={{ color: 'var(--a)', background: 'var(--abg)', border: '1.5px solid var(--abd)' }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 16 }}>lock</span>
-              Stay logged in for next time
-            </button>
-          )}
         </div>
       )}
 
@@ -704,10 +704,10 @@ export function UserScanPage() {
               >
                 <span className="material-symbols-rounded" style={{ fontSize: 36, color: 'var(--a)' }}>hourglass_top</span>
               </div>
-              <p className="text-xl font-bold mb-2" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>Waiting for approval</p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--t3)' }}>The staff will verify your visit shortly. This usually takes a few seconds.</p>
+              <p className="text-xl font-bold mb-2" style={{ color: 'var(--t)', letterSpacing: '-0.02em' }}>Check-in submitted!</p>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--t3)' }}>Staff will approve your visit shortly. You'll be notified when it's done.</p>
 
-              <div className="flex items-center justify-center gap-1.5 mt-6">
+              <div className="flex items-center justify-center gap-1.5 mt-6 mb-4">
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
@@ -716,6 +716,7 @@ export function UserScanPage() {
                   />
                 ))}
               </div>
+              <p className="text-xs" style={{ color: 'var(--t3)' }}>Taking you to requests…</p>
             </div>
           )}
 

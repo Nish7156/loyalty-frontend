@@ -17,9 +17,9 @@ export function UserLayout() {
   const pathname = location.pathname;
   const hasToken = !!getCustomerTokenIfPresent();
   const isMe = pathname === '/me';
-  const isHistory = pathname === '/history';
   const isRewards = pathname === '/rewards';
-  const isScan = pathname === '/scan' || pathname === '/requests';
+  const isScan = pathname === '/scan' || pathname.startsWith('/scan/');
+  const isRequests = pathname === '/requests';
   const isProfile = pathname === '/profile' || pathname === '/account';
   const [customerPhone, setCustomerPhone] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
@@ -324,20 +324,20 @@ export function UserLayout() {
                 <span className="text-[10px] font-semibold" style={navItemStyle(isScan)}>Scan</span>
               </Link>
 
-              {/* History */}
-              <Link to="/history" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation" title="History">
+              {/* Requests */}
+              <Link to="/requests" className="nav-tab flex flex-col items-center gap-0.5 touch-manipulation relative" title="Requests">
                 <span
                   className="flex items-center justify-center transition-all"
                   style={{
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    background: isHistory ? 'rgba(216,90,48,0.12)' : 'transparent',
+                    background: isRequests ? 'rgba(216,90,48,0.12)' : 'transparent',
                   }}
                 >
-                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isHistory) }}>history</span>
+                  <span className="material-symbols-rounded" style={{ fontSize: '22px', ...navItemStyle(isRequests) }}>receipt_long</span>
                 </span>
-                <span className="text-[10px] font-semibold" style={navItemStyle(isHistory)}>History</span>
+                <span className="text-[10px] font-semibold" style={navItemStyle(isRequests)}>Requests</span>
               </Link>
 
               {/* Profile */}
@@ -358,8 +358,8 @@ export function UserLayout() {
             </>
           ) : (
             <>
-              {['loyalty', 'account_balance_wallet', 'qr_code_scanner', 'history', 'person'].map((icon, i) => {
-                const labels = ['Cards', 'Wallet', 'Scan', 'History', 'Profile'];
+              {['loyalty', 'account_balance_wallet', 'qr_code_scanner', 'receipt_long', 'person'].map((icon, i) => {
+                const labels = ['Cards', 'Wallet', 'Scan', 'Requests', 'Profile'];
                 const isScan = icon === 'qr_code_scanner';
                 return (
                   <span key={icon} className="flex flex-col items-center gap-0.5 cursor-not-allowed pointer-events-none select-none opacity-50">
