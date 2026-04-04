@@ -489,14 +489,14 @@ body {
 
 /* Primary button (warm) */
 .btn-premium {
-  background: #D85A30;
+  background: var(--a);
   color: #FFF;
-  box-shadow: 0 4px 12px rgba(216, 90, 48, 0.3);
+  box-shadow: 0 4px 12px var(--abd);
   transition: all 0.2s ease;
 }
 .btn-premium:hover {
-  background: #C04E28;
-  box-shadow: 0 6px 18px rgba(216, 90, 48, 0.36);
+  opacity: 0.9;
+  box-shadow: 0 6px 18px var(--abd);
   transform: translateY(-1px);
 }
 .btn-premium:active {
