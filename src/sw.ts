@@ -63,7 +63,17 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   );
 });
 
-// Skip waiting so new SW activates immediately on update
+// New SW activates immediately — no waiting for tabs to close
+self.addEventListener('install', () => {
+  void self.skipWaiting();
+});
+
+// Take control of all open pages instantly
+self.addEventListener('activate', (event: ExtendableEvent) => {
+  event.waitUntil(self.clients.claim());
+});
+
+// Also handle explicit SKIP_WAITING message (belt-and-suspenders)
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
   if (event.data?.type === 'SKIP_WAITING') {
     void self.skipWaiting();
