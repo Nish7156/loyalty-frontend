@@ -104,7 +104,7 @@ function ProfileCard3D({ name, phone }: { name?: string; phone: string }) {
 // ── Share & Earn ─────────────────────────────────────────────────────────────
 function ShareAndEarn() {
   const [code, setCode] = useState<string | null>(null);
-  const [stats, setStats] = useState<{ pending: number; completed: number; total: number; totalBonus: number } | null>(null);
+  const [stats, setStats] = useState<{ pending: number; completed: number; total: number; totalBonus: number; platformBalance?: number } | null>(null);
   const [list, setList] = useState<ReferralEntry[]>([]);
   const [showList, setShowList] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -180,6 +180,29 @@ function ShareAndEarn() {
         </div>
       ) : (
         <div style={{ height: 56, borderRadius: 14, background: 'var(--bdl)', marginBottom: 12, animation: 'pulse 1.5s ease-in-out infinite' }} />
+      )}
+
+      {/* Platform balance pill */}
+      {stats !== null && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: `linear-gradient(135deg, var(--a) 0%, color-mix(in srgb, var(--a) 60%, #000) 100%)`,
+          borderRadius: 14, padding: '12px 16px', marginBottom: 10,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="material-symbols-rounded" style={{ fontSize: 20, color: '#fff' }}>stars</span>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Your Platform Credits</p>
+              <p style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                {stats.platformBalance ?? 0}
+                <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4, color: 'rgba(255,255,255,0.65)' }}>coins</span>
+              </p>
+            </div>
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'right' }}>
+            Earned from<br />referrals
+          </p>
+        </div>
       )}
 
       {/* Stats */}

@@ -17,15 +17,25 @@ function formatDate(s: string): string {
   }
 }
 
-// ── 3D Wallet Summary Card ──────────────────────────────────────────────────
-function WalletCard3D({ totalPoints, onRedeem }: { totalPoints: number; onRedeem: () => void }) {
+// ── 3D Flip Wallet Card ──────────────────────────────────────────────────────
+function WalletCard3D({
+  totalPoints,
+  platformWallet,
+  onRedeem,
+}: {
+  totalPoints: number;
+  platformWallet?: { balance: number; lifetimeEarned: number };
+  onRedeem: () => void;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glow, setGlow] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
+  const [flipped, setFlipped] = useState(false);
 
   const applyTilt = useCallback((clientX: number, clientY: number) => {
+    if (flipped) return; // no tilt on back face
     const el = wrapRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -38,7 +48,7 @@ function WalletCard3D({ totalPoints, onRedeem }: { totalPoints: number; onRedeem
       setTilt({ x: rx, y: ry });
       setGlow({ x: gx, y: gy });
     });
-  }, []);
+  }, [flipped]);
 
   const reset = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
@@ -49,85 +59,147 @@ function WalletCard3D({ totalPoints, onRedeem }: { totalPoints: number; onRedeem
     });
   }, []);
 
+  const handleFlip = () => {
+    reset();
+    setFlipped(f => !f);
+  };
+
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  const cardH = 150;
+  const tiltTransform = flipped
+    ? `rotateX(0deg) rotateY(180deg)`
+    : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.012 : 1})`;
 
   return (
     <div
       ref={wrapRef}
-      style={{ perspective: '900px', width: '100%' }}
+      style={{ perspective: '900px', width: '100%', height: cardH }}
       onMouseMove={(e) => { setHovered(true); applyTilt(e.clientX, e.clientY); }}
       onMouseLeave={reset}
       onTouchStart={() => setHovered(true)}
       onTouchMove={(e) => { applyTilt(e.touches[0].clientX, e.touches[0].clientY); }}
       onTouchEnd={reset}
     >
-      <div
-        style={{
-          position: 'relative',
-          borderRadius: 24,
-          overflow: 'hidden',
-          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.012 : 1})`,
-          transition: hovered ? 'transform 0.08s linear' : 'transform 0.55s cubic-bezier(.23,1,.32,1)',
-          transformStyle: 'preserve-3d',
-          willChange: 'transform',
+      {/* Flip container */}
+      <div style={{
+        position: 'relative', width: '100%', height: '100%',
+        transformStyle: 'preserve-3d',
+        transform: tiltTransform,
+        transition: flipped
+          ? 'transform 0.55s cubic-bezier(.23,1,.32,1)'
+          : hovered ? 'transform 0.08s linear' : 'transform 0.55s cubic-bezier(.23,1,.32,1)',
+        willChange: 'transform',
+      }}>
+
+        {/* ── FRONT: Shop coins ── */}
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: 24, overflow: 'hidden',
+          backfaceVisibility: 'hidden',
           background: `linear-gradient(135deg, var(--a) 0%, color-mix(in srgb, var(--a) 58%, #000) 100%)`,
-          boxShadow: hovered
+          boxShadow: hovered && !flipped
             ? '0 24px 50px -8px rgba(0,0,0,0.36), 0 8px 20px -4px rgba(0,0,0,0.2)'
             : '0 10px 32px -6px rgba(0,0,0,0.22), 0 3px 10px -2px rgba(0,0,0,0.12)',
           padding: '24px 22px 22px',
-          minHeight: 150,
-        }}
-      >
-        {/* Shine */}
-        <div style={{
-          position: 'absolute', inset: 0, borderRadius: 24, pointerEvents: 'none',
-          opacity: hovered ? 0.18 : 0, transition: 'opacity 0.2s',
-          background: `radial-gradient(circle at ${glow.x}% ${glow.y}%, #fff 0%, transparent 65%)`,
-        }} />
-        {/* Decorative circles */}
-        <div style={{
-          position: 'absolute', top: -30, right: -30,
-          width: 130, height: 130, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.08)', pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: -40, left: -24,
-          width: 150, height: 150, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.06)', pointerEvents: 'none',
-        }} />
+        }}>
+          {/* Shine */}
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: 24, pointerEvents: 'none',
+            opacity: hovered && !flipped ? 0.18 : 0, transition: 'opacity 0.2s',
+            background: `radial-gradient(circle at ${glow.x}% ${glow.y}%, #fff 0%, transparent 65%)`,
+          }} />
+          {/* Decorative circles */}
+          <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -40, left: -24, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
 
-        {/* Content */}
-        <div style={{ position: 'relative', transform: 'translateZ(20px)', transformStyle: 'preserve-3d' }}>
-          <p style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', marginBottom: 6,
-          }}>
-            Total Coins
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{
-                fontSize: 52, fontWeight: 800, color: '#fff',
-                letterSpacing: '-0.04em', lineHeight: 1,
-              }}>
-                {formatPoints(totalPoints)}
-              </span>
-              <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>coins</span>
+          <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)' }}>
+              Total Coins
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontSize: 52, fontWeight: 800, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                  {formatPoints(totalPoints)}
+                </span>
+                <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>coins</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onRedeem(); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: 50, padding: '8px 16px', color: '#fff',
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 16 }}>redeem</span>
+                  Redeem
+                </button>
+                {platformWallet !== undefined && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleFlip(); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      background: 'rgba(255,255,255,0.12)', border: 'none',
+                      borderRadius: 50, padding: '5px 12px', color: 'rgba(255,255,255,0.75)',
+                      fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    }}
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: 14 }}>stars</span>
+                    {formatPoints(platformWallet.balance)} credits
+                    <span className="material-symbols-rounded" style={{ fontSize: 13 }}>flip</span>
+                  </button>
+                )}
+              </div>
             </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); onRedeem(); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: 'rgba(255,255,255,0.2)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: 50, padding: '10px 18px',
-                color: '#fff', fontSize: 14, fontWeight: 600,
-                cursor: 'pointer', backdropFilter: 'blur(4px)',
-              }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>redeem</span>
-              Redeem
-            </button>
+          </div>
+        </div>
+
+        {/* ── BACK: Platform credits ── */}
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: 24, overflow: 'hidden',
+          backfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          background: `linear-gradient(135deg, color-mix(in srgb, var(--a) 80%, #000) 0%, color-mix(in srgb, var(--a) 45%, #000) 100%)`,
+          boxShadow: '0 10px 32px -6px rgba(0,0,0,0.22)',
+          padding: '24px 22px 22px',
+        }}>
+          <div style={{ position: 'absolute', top: -30, left: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -40, right: -24, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+
+          <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="material-symbols-rounded" style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>stars</span>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)' }}>
+                Platform Credits
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <span style={{ fontSize: 52, fontWeight: 800, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                    {formatPoints(platformWallet?.balance ?? 0)}
+                  </span>
+                  <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>coins</span>
+                </div>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                  {formatPoints(platformWallet?.lifetimeEarned ?? 0)} earned from referrals
+                </p>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleFlip(); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  background: 'rgba(255,255,255,0.15)', border: 'none',
+                  borderRadius: 50, padding: '8px 14px', color: 'rgba(255,255,255,0.8)',
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 14 }}>flip</span>
+                Back
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -357,17 +429,29 @@ export function UserWalletPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
+  const fetchData = useCallback(() => {
     Promise.all([walletApi.getAllBalances(), customersApi.getMyProfile()])
       .then(([walletData, profileData]) => {
         setWallets(walletData);
         setProfile(profileData);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load'))
-      .finally(() => setLoading(false));
+      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load'));
   }, []);
+
+  // Initial load
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    fetchData();
+    setLoading(false);
+  }, [fetchData]);
+
+  // Real-time refresh when staff approves/rejects a check-in
+  useEffect(() => {
+    const handler = () => fetchData();
+    window.addEventListener('loyalty_checkin_updated', handler);
+    return () => window.removeEventListener('loyalty_checkin_updated', handler);
+  }, [fetchData]);
 
   if (loading) {
     return <div className="max-w-md mx-auto w-full min-w-0"><HistorySkeleton /></div>;
@@ -390,45 +474,12 @@ export function UserWalletPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0, paddingTop: 16 }}>
 
-      {/* ── 3D Wallet Card ─────────────────────────────────────────── */}
-      <WalletCard3D totalPoints={totalPoints} onRedeem={() => navigate('/rewards')} />
-
-      {/* ── Platform Credits Card ──────────────────────────────────── */}
-      {platformWallet && platformWallet.balance > 0 && (
-        <div style={{
-          marginTop: 12,
-          borderRadius: 18,
-          padding: '14px 18px',
-          background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          boxShadow: '0 4px 16px -4px rgba(124,58,237,0.35)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
-              width: 38, height: 38, borderRadius: 10,
-              background: 'rgba(255,255,255,0.18)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span className="material-symbols-rounded" style={{ fontSize: 20, color: '#fff' }}>stars</span>
-            </div>
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)' }}>
-                Platform Credits
-              </p>
-              <p style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                {formatPoints(platformWallet.balance)}
-                <span style={{ fontSize: 13, fontWeight: 500, marginLeft: 5, color: 'rgba(255,255,255,0.65)' }}>coins</span>
-              </p>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}>Referral rewards</p>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 600, marginTop: 2 }}>
-              Earned {formatPoints(platformWallet.lifetimeEarned)} total
-            </p>
-          </div>
-        </div>
-      )}
+      {/* ── 3D Flip Wallet Card ────────────────────────────────────── */}
+      <WalletCard3D
+        totalPoints={totalPoints}
+        platformWallet={platformWallet}
+        onRedeem={() => navigate('/rewards')}
+      />
 
       {/* ── Quick actions ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
