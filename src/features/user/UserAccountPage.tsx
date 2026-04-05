@@ -110,10 +110,20 @@ function ShareAndEarn() {
   const [copied, setCopied] = useState(false);
   const haptic = useHaptic();
 
-  useEffect(() => {
-    referralsApi.getMyCode().then(({ code }) => setCode(code)).catch(() => {});
+  const fetchReferralStats = useCallback(() => {
     referralsApi.getMyStats().then(setStats).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    referralsApi.getMyCode().then(({ code }) => setCode(code)).catch(() => {});
+    fetchReferralStats();
+  }, [fetchReferralStats]);
+
+  // Real-time refresh when referral bonus is awarded
+  useEffect(() => {
+    window.addEventListener('loyalty_platform_updated', fetchReferralStats);
+    return () => window.removeEventListener('loyalty_platform_updated', fetchReferralStats);
+  }, [fetchReferralStats]);
 
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard?.writeText) {

@@ -446,11 +446,15 @@ export function UserWalletPage() {
     setLoading(false);
   }, [fetchData]);
 
-  // Real-time refresh when staff approves/rejects a check-in
+  // Real-time refresh on check-in approval or referral bonus
   useEffect(() => {
     const handler = () => fetchData();
     window.addEventListener('loyalty_checkin_updated', handler);
-    return () => window.removeEventListener('loyalty_checkin_updated', handler);
+    window.addEventListener('loyalty_platform_updated', handler);
+    return () => {
+      window.removeEventListener('loyalty_checkin_updated', handler);
+      window.removeEventListener('loyalty_platform_updated', handler);
+    };
   }, [fetchData]);
 
   if (loading) {

@@ -104,8 +104,12 @@ export function UserLayout() {
       }
     };
     socket.on('checkin_updated', handler);
+    socket.on('platform_wallet_updated', (payload: { balance: number; reason: string }) => {
+      window.dispatchEvent(new CustomEvent('loyalty_platform_updated', { detail: payload }));
+    });
     return () => {
       socket.off('checkin_updated', handler);
+      socket.off('platform_wallet_updated');
       socket.disconnect();
       if (celebrationEndRef.current) clearTimeout(celebrationEndRef.current);
     };
