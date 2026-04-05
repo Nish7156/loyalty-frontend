@@ -16,6 +16,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Capture ?ref= before React mounts or router redirects strip it from the URL -->
+    <script>
+      (function() {
+        var r = new URLSearchParams(window.location.search).get('ref');
+        if (r && /^[A-Z0-9]{4,10}$/.test(r)) {
+          localStorage.setItem('loyalty_ref', r);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

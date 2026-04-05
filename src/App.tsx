@@ -9,16 +9,8 @@ import { AppRouter } from './routes/AppRouter';
 const REFERRAL_CODE_KEY = 'loyalty_ref';
 const REFERRAL_CODE_REGEX = /^[A-Z0-9]{4,10}$/;
 
-// Capture ?ref= immediately at module load — before React renders or Router redirects.
-// useEffect fires too late: Navigate replace runs during render and strips the param before effects run.
-(function captureRefOnLoad() {
-  const ref = new URLSearchParams(window.location.search).get('ref');
-  if (ref && REFERRAL_CODE_REGEX.test(ref.trim())) {
-    localStorage.setItem(REFERRAL_CODE_KEY, ref.trim());
-  }
-})();
-
-// No-op component kept for future use (e.g. SPA navigations that add ?ref=)
+// ?ref= is captured in index.html <script> before React loads.
+// This component handles SPA navigations that add ?ref= without a page reload.
 function ReferralCapture() {
   const [searchParams] = useSearchParams();
   useEffect(() => {
