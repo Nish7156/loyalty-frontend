@@ -136,8 +136,11 @@ function ShareAndEarn() {
     if (navigator.share) {
       haptic.medium();
       navigator.share({ title: 'Join me on Loyalty', text: shareText, url: shareUrl })
-        .catch((err) => { if (err?.name !== 'AbortError') copyToClipboard(shareText); });
-    } else copyToClipboard(shareText);
+        .catch((err) => { if (err?.name !== 'AbortError') copyToClipboard(shareUrl); });
+    } else {
+      // Desktop: copy just the URL so pasting it in a browser works correctly
+      copyToClipboard(shareUrl);
+    }
   };
 
   const loadList = () => {
