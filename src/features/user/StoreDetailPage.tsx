@@ -112,7 +112,7 @@ export function StoreDetailPage() {
 
   return (
     <div className="max-w-md mx-auto w-full min-w-0 pb-8">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 mt-4">
         <button
           type="button"
           onClick={() => navigate('/me')}
