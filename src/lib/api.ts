@@ -85,6 +85,12 @@ export interface StoreVisit {
   streakPeriodStartedAt?: string | null;
 }
 
+export interface PlatformWalletBalance {
+  balance: number;
+  lifetimeEarned: number;
+  lifetimeSpent: number;
+}
+
 export interface CustomerProfile {
   customer: Customer & {
     streaks?: { currentCount: number; partnerId: string; partner?: Partner; periodStartedAt?: string | null }[];
@@ -92,6 +98,7 @@ export interface CustomerProfile {
   };
   storesVisited: StoreVisit[];
   wallets?: WalletBalance[];
+  platformWallet?: PlatformWalletBalance;
 }
 
 export interface Activity {

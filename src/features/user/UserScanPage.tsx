@@ -106,6 +106,8 @@ export function UserScanPage() {
   const branchId = storeId ?? '';
   // ref can come from the scan URL (?ref=) OR from localStorage (shared via home link)
   const refCode = searchParams.get('ref') || localStorage.getItem(REFERRAL_CODE_KEY);
+  // Only show the referral banner when ref is in the URL — not from stale localStorage
+  const showReferralBanner = !!searchParams.get('ref');
 
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState(DEFAULT_PHONE_PREFIX);
@@ -403,7 +405,7 @@ export function UserScanPage() {
               </div>
             </div>
 
-            {refCode && (
+            {showReferralBanner && (
               <div
                 className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-2xl text-sm"
                 style={{ background: 'var(--abg)', border: '1.5px solid var(--abd)', color: 'var(--a)' }}

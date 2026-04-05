@@ -384,6 +384,7 @@ export function UserWalletPage() {
   }
 
   const totalPoints = wallets.reduce((sum, w) => sum + w.balance, 0);
+  const platformWallet = profile?.platformWallet;
   const stores = profile?.storesVisited ?? [];
 
   return (
@@ -391,6 +392,43 @@ export function UserWalletPage() {
 
       {/* ── 3D Wallet Card ─────────────────────────────────────────── */}
       <WalletCard3D totalPoints={totalPoints} onRedeem={() => navigate('/rewards')} />
+
+      {/* ── Platform Credits Card ──────────────────────────────────── */}
+      {platformWallet && platformWallet.balance > 0 && (
+        <div style={{
+          marginTop: 12,
+          borderRadius: 18,
+          padding: '14px 18px',
+          background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          boxShadow: '0 4px 16px -4px rgba(124,58,237,0.35)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 10,
+              background: 'rgba(255,255,255,0.18)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span className="material-symbols-rounded" style={{ fontSize: 20, color: '#fff' }}>stars</span>
+            </div>
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)' }}>
+                Platform Credits
+              </p>
+              <p style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                {formatPoints(platformWallet.balance)}
+                <span style={{ fontSize: 13, fontWeight: 500, marginLeft: 5, color: 'rgba(255,255,255,0.65)' }}>coins</span>
+              </p>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}>Referral rewards</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 600, marginTop: 2 }}>
+              Earned {formatPoints(platformWallet.lifetimeEarned)} total
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Quick actions ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
