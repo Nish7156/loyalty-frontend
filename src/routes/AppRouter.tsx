@@ -9,12 +9,11 @@ import { Loader } from '../components/Loader';
 import { LoginPage } from '../features/auth/LoginPage';
 import { CustomerLoginPage } from '../features/user/CustomerLoginPage';
 import { UserScanPage } from '../features/user/UserScanPage';
-import { UserProfilePage } from '../features/user/UserProfilePage';
 import { UserAccountPage } from '../features/user/UserAccountPage';
 import { UserHistoryPage } from '../features/user/UserHistoryPage';
 import { UserRewardsPage } from '../features/user/UserRewardsPage';
 import { UserRequestsPage } from '../features/user/UserRequestsPage';
-import { UserWalletPage } from '../features/user/UserWalletPage';
+import { UserWalletPage, AllCardsPage } from '../features/user/UserWalletPage';
 import { StoreDetailPage } from '../features/user/StoreDetailPage';
 import { UserFeedbackPage } from '../features/user/UserFeedbackPage';
 import { ScanQRPage } from '../features/user/ScanQRPage';
@@ -59,7 +58,7 @@ export function AppRouter() {
           <Route path="feedback" element={<UserFeedbackPage />} />
           <Route path="me" element={<UserWalletPage />} />
           <Route path="me/store/:branchId" element={<StoreDetailPage />} />
-          <Route path="loyalty-cards" element={<UserProfilePage />} />
+          <Route path="loyalty-cards" element={<AllCardsPage />} />
         </Route>
 
         <Route element={<RoleGate allowedRoles={['STAFF']} />}>

@@ -563,6 +563,51 @@ body {
   animation: lgBreath 2.5s ease-in-out infinite;
 }
 
+/* Store card: Active badge pulse dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* Store card: progress bar shimmer sweep */
+@keyframes bar-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Loyalty type badge gentle float */
+@keyframes badge-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2.5px); }
+}
+
+/* Bottom sheet slide-up */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* Streak pip pop-in */
+@keyframes pip-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  70%  { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Number soft glow pulse */
+@keyframes num-glow {
+  0%, 100% { text-shadow: none; }
+  50%       { text-shadow: 0 0 16px var(--abd); }
+}
+
+/* Floating particles rise and fade */
+@keyframes particle-rise {
+  0%   { transform: translateY(0) scale(1);   opacity: 0; }
+  20%  { opacity: 0.7; }
+  80%  { opacity: 0.3; }
+  100% { transform: translateY(-18px) scale(0.5); opacity: 0; }
+}
+
 /* Loyale loyalty card colored stripes */
 .lcard-stripe-orange { border-top: 2.5px solid #D85A30; }
 .lcard-stripe-gray { border-top: 2.5px solid #7A6C5C; }
