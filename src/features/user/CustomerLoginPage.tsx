@@ -1,8 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { authApi, referralsApi, customersApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { REFERRAL_CODE_KEY } from '../../App';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { PhoneInput } from '../../components/PhoneInput';
+
+function applyPendingReferral(normalizedPhone: string) {
+  const ref = localStorage.getItem(REFERRAL_CODE_KEY);
+  if (ref) {
+    referralsApi.apply(ref, normalizedPhone).catch(() => {});
+    localStorage.removeItem(REFERRAL_CODE_KEY);
+  }
+}
 
 export function CustomerLoginPage() {
   const navigate = useNavigate();
@@ -14,6 +23,15 @@ export function CustomerLoginPage() {
   const [step, setStep] = useState<'phone' | 'otp' | 'name'>('phone');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // If already logged in, apply any pending referral immediately
+  useEffect(() => {
+    if (getCustomerTokenIfPresent()) {
+      customersApi.getMyProfile()
+        .then((p) => applyPendingReferral(p.customer.phoneNumber))
+        .catch(() => {});
+    }
+  }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +45,7 @@ export function CustomerLoginPage() {
       if (res.skipOtp) {
         const loginRes = await authApi.customerLogin(normalized);
         setCustomerToken(loginRes.access_token);
+        applyPendingReferral(normalized);
         navigate('/me', { replace: true });
         return;
       }
@@ -55,8 +74,10 @@ export function CustomerLoginPage() {
 
     setLoading(true);
     try {
-      const res = await authApi.customerLogin(normalizeIndianPhone(phone.trim()), otp.trim());
+      const normalized = normalizeIndianPhone(phone.trim());
+      const res = await authApi.customerLogin(normalized, otp.trim());
       setCustomerToken(res.access_token);
+      applyPendingReferral(normalized);
       navigate('/me', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid OTP');
@@ -74,8 +95,10 @@ export function CustomerLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await authApi.customerLogin(normalizeIndianPhone(phone.trim()), otp.trim(), name.trim());
+      const normalized = normalizeIndianPhone(phone.trim());
+      const res = await authApi.customerLogin(normalized, otp.trim(), name.trim());
       setCustomerToken(res.access_token);
+      applyPendingReferral(normalized);
       navigate('/me', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Registration failed');
