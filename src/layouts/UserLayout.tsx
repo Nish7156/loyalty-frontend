@@ -213,42 +213,210 @@ export function UserLayout() {
 
       {/* Feedback Modal */}
       {feedbackOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Feedback">
-          <div className="absolute inset-0 backdrop-blur-sm" style={{ backgroundColor: 'var(--user-overlay)' }} aria-hidden="true" onClick={closeFeedbackModal} />
-          <div className="relative w-full max-w-sm rounded-2xl border p-4 sm:p-5 shadow-xl animate-scale-in max-h-[90vh] overflow-auto safe-area-x min-w-0" style={{ backgroundColor: 'var(--s)', borderColor: 'var(--bdl)' }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--t)' }}>Feedback</h2>
-              <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="p-2 -m-2 rounded-lg disabled:opacity-50" style={{ color: 'var(--t3)' }} aria-label="Close">
-                <span className="material-symbols-rounded">close</span>
-              </button>
+        <div
+          className="fixed inset-0 z-40 flex items-end sm:items-center justify-center sm:p-4"
+          role="dialog" aria-modal="true" aria-label="Feedback"
+          style={{ animation: 'feedback-backdrop-in 0.22s ease both' }}
+        >
+          <style>{`
+            @keyframes feedback-backdrop-in {
+              from { opacity: 0 }
+              to   { opacity: 1 }
+            }
+            @keyframes feedback-sheet-in {
+              from { opacity: 0; transform: translateY(32px) scale(0.97) }
+              to   { opacity: 1; transform: translateY(0)    scale(1)    }
+            }
+            @keyframes feedback-success-pop {
+              0%   { opacity: 0; transform: scale(0.6) }
+              65%  { transform: scale(1.12) }
+              100% { opacity: 1; transform: scale(1) }
+            }
+            @keyframes feedback-check-draw {
+              from { stroke-dashoffset: 40 }
+              to   { stroke-dashoffset: 0  }
+            }
+            @keyframes feedback-text-up {
+              from { opacity: 0; transform: translateY(10px) }
+              to   { opacity: 1; transform: translateY(0) }
+            }
+            @keyframes feedback-bar-fill {
+              from { width: 0% }
+            }
+            @keyframes feedback-send-pulse {
+              0%   { box-shadow: 0 0 0 0   rgba(216,90,48,0.5) }
+              70%  { box-shadow: 0 0 0 10px rgba(216,90,48,0)   }
+              100% { box-shadow: 0 0 0 0   rgba(216,90,48,0)   }
+            }
+          `}</style>
+
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ backgroundColor: 'var(--user-overlay)' }}
+            aria-hidden="true"
+            onClick={closeFeedbackModal}
+          />
+
+          {/* Sheet */}
+          <div
+            className="relative w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl border p-5 shadow-2xl max-h-[92vh] overflow-auto safe-area-x min-w-0"
+            style={{
+              backgroundColor: 'var(--s)',
+              borderColor: 'var(--bdl)',
+              animation: 'feedback-sheet-in 0.28s cubic-bezier(.16,1,.3,1) both',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drag handle (mobile) */}
+            <div className="flex justify-center mb-4 sm:hidden">
+              <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--bdl)' }} />
             </div>
+
             {feedbackSent ? (
-              <div className="py-2">
-                <p className="font-medium" style={{ color: 'var(--gr)' }}>Thank you!</p>
-                <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>Your feedback has been sent.</p>
-                <button type="button" onClick={() => setFeedbackSent(false)} className="mt-3 text-sm font-medium" style={{ color: 'var(--a)' }}>Send another</button>
-                <button type="button" onClick={closeFeedbackModal} className="block mt-2 text-sm" style={{ color: 'var(--t3)' }}>Close</button>
+              /* ── Success state ── */
+              <div className="flex flex-col items-center py-4 gap-3" style={{ animation: 'feedback-text-up 0.35s ease both' }}>
+                {/* Animated check circle */}
+                <div
+                  style={{
+                    width: 64, height: 64, borderRadius: '50%',
+                    background: 'var(--grbg)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    animation: 'feedback-success-pop 0.45s cubic-bezier(.16,1,.3,1) both',
+                  }}
+                >
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <polyline
+                      points="7,16 13,22 25,10"
+                      stroke="var(--gr)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"
+                      strokeDasharray="40" strokeDashoffset="40"
+                      style={{ animation: 'feedback-check-draw 0.4s ease 0.2s both' }}
+                    />
+                  </svg>
+                </div>
+
+                <div className="text-center" style={{ animation: 'feedback-text-up 0.35s ease 0.15s both', opacity: 0 }}>
+                  <p className="text-lg font-bold" style={{ color: 'var(--t)' }}>Thank you!</p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--t3)' }}>Your feedback helps us improve.</p>
+                </div>
+
+                <div className="flex gap-2 w-full mt-2" style={{ animation: 'feedback-text-up 0.35s ease 0.25s both', opacity: 0 }}>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackSent(false)}
+                    className="flex-1 min-h-[44px] rounded-xl border text-sm font-medium transition-all active:scale-95"
+                    style={{ borderColor: 'var(--bd)', color: 'var(--t2)' }}
+                  >
+                    Send another
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeFeedbackModal}
+                    className="flex-1 min-h-[44px] rounded-xl text-sm font-semibold transition-all active:scale-95"
+                    style={{ background: 'var(--a)', color: '#fff' }}
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             ) : (
+              /* ── Form state ── */
               <form onSubmit={handleFeedbackSubmit}>
-                <label htmlFor="feedback-modal-message" className="block text-sm font-medium mb-2" style={{ color: 'var(--t2)' }}>What we can improve</label>
-                <textarea
-                  id="feedback-modal-message"
-                  value={feedbackMessage}
-                  onChange={(e) => setFeedbackMessage(e.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
-                  placeholder="e.g. Faster check-in, better rewards..."
-                  className="w-full min-h-[100px] rounded-xl border px-4 py-3 outline-none transition resize-y"
-                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--t)' }}
-                  maxLength={MAX_FEEDBACK_LENGTH}
-                  rows={3}
-                  disabled={feedbackSending}
-                />
-                <p className="text-xs mt-1" style={{ color: 'var(--t3)' }}>{feedbackMessage.length}/{MAX_FEEDBACK_LENGTH}</p>
-                {feedbackError && <p className="text-sm mt-2" style={{ color: 'var(--re)' }}>{feedbackError}</p>}
-                <div className="flex gap-2 mt-4">
-                  <button type="button" onClick={closeFeedbackModal} disabled={feedbackSending} className="flex-1 min-h-[44px] rounded-xl border text-sm font-medium disabled:opacity-50" style={{ borderColor: 'var(--bd)', color: 'var(--t2)' }}>Cancel</button>
-                  <button type="submit" disabled={feedbackSending || !feedbackMessage.trim()} className="flex-1 min-h-[52px] rounded-xl text-white text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none" style={{ background: 'var(--a)' }}>
-                    {feedbackSending ? 'Sending...' : 'Send'}
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4" style={{ animation: 'feedback-text-up 0.3s ease 0.05s both', opacity: 0 }}>
+                  <div>
+                    <h2 className="text-lg font-bold leading-tight" style={{ color: 'var(--t)' }}>Share feedback</h2>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--t3)' }}>We read every message</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeFeedbackModal}
+                    disabled={feedbackSending}
+                    className="p-2 -mt-1 -mr-1 rounded-xl transition-all active:scale-90 disabled:opacity-40"
+                    style={{ color: 'var(--t3)', background: 'var(--bdl)' }}
+                    aria-label="Close"
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: 18 }}>close</span>
+                  </button>
+                </div>
+
+                {/* Textarea */}
+                <div style={{ animation: 'feedback-text-up 0.3s ease 0.12s both', opacity: 0 }}>
+                  <textarea
+                    id="feedback-modal-message"
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
+                    placeholder="What could be better? Any ideas welcome…"
+                    className="w-full min-h-[120px] rounded-2xl border-2 px-4 py-3 outline-none transition-all resize-none text-sm"
+                    style={{
+                      backgroundColor: 'var(--bg)',
+                      borderColor: feedbackMessage ? 'var(--a)' : 'var(--bd)',
+                      color: 'var(--t)',
+                      boxShadow: feedbackMessage ? '0 0 0 3px var(--abg)' : 'none',
+                    }}
+                    maxLength={MAX_FEEDBACK_LENGTH}
+                    rows={4}
+                    disabled={feedbackSending}
+                    autoFocus
+                  />
+
+                  {/* Character bar */}
+                  <div style={{ marginTop: 6, height: 3, borderRadius: 99, background: 'var(--bdl)', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: '100%', borderRadius: 99,
+                        width: `${(feedbackMessage.length / MAX_FEEDBACK_LENGTH) * 100}%`,
+                        background: feedbackMessage.length > MAX_FEEDBACK_LENGTH * 0.9 ? 'var(--re)' : 'var(--a)',
+                        transition: 'width 0.15s ease, background 0.3s ease',
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs mt-1 text-right" style={{ color: 'var(--t3)' }}>
+                    {feedbackMessage.length}/{MAX_FEEDBACK_LENGTH}
+                  </p>
+                </div>
+
+                {feedbackError && (
+                  <div
+                    className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-sm"
+                    style={{ background: 'var(--rebg)', color: 'var(--re)', animation: 'feedback-text-up 0.2s ease both' }}
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>error</span>
+                    {feedbackError}
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div className="flex gap-2 mt-4" style={{ animation: 'feedback-text-up 0.3s ease 0.18s both', opacity: 0 }}>
+                  <button
+                    type="button"
+                    onClick={closeFeedbackModal}
+                    disabled={feedbackSending}
+                    className="flex-1 min-h-[44px] rounded-xl border text-sm font-medium transition-all active:scale-95 disabled:opacity-40"
+                    style={{ borderColor: 'var(--bd)', color: 'var(--t2)' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={feedbackSending || !feedbackMessage.trim()}
+                    className="flex-1 min-h-[50px] rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2"
+                    style={{
+                      background: 'var(--a)', color: '#fff',
+                      animation: feedbackMessage.trim() && !feedbackSending ? 'feedback-send-pulse 1.8s ease 0.6s infinite' : 'none',
+                    }}
+                  >
+                    {feedbackSending ? (
+                      <>
+                        <span className="material-symbols-rounded animate-spin" style={{ fontSize: 17 }}>progress_activity</span>
+                        Sending…
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-rounded" style={{ fontSize: 17 }}>send</span>
+                        Send
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
