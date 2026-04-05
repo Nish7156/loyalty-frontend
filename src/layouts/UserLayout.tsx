@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi } from '../lib/api';
+import { getCustomerTokenIfPresent, getCustomerPhoneFromToken, customersApi, feedbackApi, referralsApi } from '../lib/api';
+import { REFERRAL_CODE_KEY } from '../App';
 import { createCustomerSocket } from '../lib/socket';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { PWAInstallButton } from '../components/PWAInstallButton';
@@ -61,7 +62,16 @@ export function UserLayout() {
     const phone = getCustomerPhoneFromToken();
     if (phone) setCustomerPhone(phone);
     customersApi.getMyProfile()
-      .then((p) => { setCustomerPhone(p.customer.phoneNumber); if (p.customer.name) setCustomerName(p.customer.name); })
+      .then((p) => {
+        setCustomerPhone(p.customer.phoneNumber);
+        if (p.customer.name) setCustomerName(p.customer.name);
+        // Apply any pending referral code (stored by index.html IIFE before React mounted)
+        const ref = localStorage.getItem(REFERRAL_CODE_KEY);
+        if (ref) {
+          referralsApi.apply(ref, p.customer.phoneNumber).catch(() => {});
+          localStorage.removeItem(REFERRAL_CODE_KEY);
+        }
+      })
       .catch(() => {});
   }, [hasToken]);
 

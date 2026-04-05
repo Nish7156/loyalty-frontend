@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi, referralsApi, customersApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
+import { authApi, referralsApi, setCustomerToken, getCustomerTokenIfPresent } from '../../lib/api';
 import { REFERRAL_CODE_KEY } from '../../App';
 import { normalizeIndianPhone, DEFAULT_PHONE_PREFIX } from '../../lib/phone';
 import { PhoneInput } from '../../components/PhoneInput';
@@ -23,15 +23,6 @@ export function CustomerLoginPage() {
   const [step, setStep] = useState<'phone' | 'otp' | 'name'>('phone');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // If already logged in, apply any pending referral immediately
-  useEffect(() => {
-    if (getCustomerTokenIfPresent()) {
-      customersApi.getMyProfile()
-        .then((p) => applyPendingReferral(p.customer.phoneNumber))
-        .catch(() => {});
-    }
-  }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
