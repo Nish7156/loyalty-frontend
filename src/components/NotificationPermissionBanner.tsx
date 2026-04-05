@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
+import { getCustomerTokenIfPresent } from '../lib/api';
 
 const DISMISSED_KEY = 'notif_banner_dismissed';
 
@@ -9,6 +10,9 @@ export function NotificationPermissionBanner() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Only show to logged-in customers
+    if (!getCustomerTokenIfPresent()) return;
+
     if (
       !isSupported ||
       permission === 'denied' ||
