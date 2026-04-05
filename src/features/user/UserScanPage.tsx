@@ -209,6 +209,11 @@ export function UserScanPage() {
   const doAutoLogin = async (normalized: string) => {
     const loginRes = await authApi.customerLogin(normalized);
     setCustomerToken(loginRes.access_token);
+    // Apply referral for existing users too — backend is idempotent (skips if already referred)
+    if (refCode) {
+      referralsApi.apply(refCode, normalized).catch(() => {});
+      localStorage.removeItem(REFERRAL_CODE_KEY);
+    }
     setProfileLoading(true);
     const p = await customersApi.getMyProfile();
     setProfile(p);
