@@ -160,6 +160,12 @@ export function UserScanPage() {
           if (p.customer.name?.trim() && !customerName.trim()) setCustomerName(p.customer.name.trim());
           const store = p.storesVisited?.find((s) => s.branchId === branchId);
           if (store?.partnerId) setCurrentPartnerId(store.partnerId);
+          // Apply referral if one is pending — backend is idempotent (skips if already referred)
+          const ref = searchParams.get('ref') || localStorage.getItem(REFERRAL_CODE_KEY);
+          if (ref) {
+            referralsApi.apply(ref, p.customer.phoneNumber).catch(() => {});
+            localStorage.removeItem(REFERRAL_CODE_KEY);
+          }
         })
         .catch(() => { clearCustomerToken(); setStep('phone'); })
         .finally(() => setProfileLoading(false));
