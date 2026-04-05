@@ -255,6 +255,7 @@ body {
   position: relative;
   overflow: hidden;
   transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
 }
 .glass-card:hover {
   border-color: var(--bd);
@@ -427,7 +428,7 @@ body {
 
 /* Interactive utilities */
 .tap-scale:active { transform: scale(0.98); }
-.card-interactive { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.card-interactive { transition: transform 0.2s ease, box-shadow 0.2s ease; user-select: none; }
 .card-interactive:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(93, 64, 55, 0.1); }
 .card-interactive:active { transform: translateY(0) scale(0.995); }
 .btn-interactive { transition: transform 0.15s ease, background-color 0.2s ease; }
@@ -506,6 +507,7 @@ body {
 /* Card styles */
 .card-premium {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
 }
 .card-premium:hover {
   transform: translateY(-2px);

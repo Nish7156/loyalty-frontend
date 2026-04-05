@@ -74,7 +74,7 @@ function WalletCard3D({
   return (
     <div
       ref={wrapRef}
-      style={{ perspective: '900px', width: '100%', height: cardH }}
+      style={{ perspective: '900px', width: '100%', height: cardH, userSelect: 'none' }}
       onMouseMove={(e) => { setHovered(true); applyTilt(e.clientX, e.clientY); }}
       onMouseLeave={reset}
       onTouchStart={() => setHovered(true)}

@@ -45,7 +45,7 @@ function ProfileCard3D({ name, phone }: { name?: string; phone: string }) {
   return (
     <div
       ref={wrapRef}
-      style={{ perspective: '900px', width: '100%' }}
+      style={{ perspective: '900px', width: '100%', userSelect: 'none' }}
       onMouseMove={(e) => { setHovered(true); applyTilt(e.clientX, e.clientY); }}
       onMouseLeave={reset}
       onTouchStart={() => setHovered(true)}
