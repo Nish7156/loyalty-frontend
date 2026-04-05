@@ -79,6 +79,7 @@ export interface StoreVisit {
   rewardWindowDays?: number;
   rewardDescription?: string;
   minimumRedemptionPoints?: number;
+  pointsToRewardRatio?: number;
   amountPerCoin?: number;
   streakCurrentCount?: number;
   streakPeriodStartedAt?: string | null;

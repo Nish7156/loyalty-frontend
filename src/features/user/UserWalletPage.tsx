@@ -4,11 +4,6 @@ import { walletApi, customersApi } from '../../lib/api';
 import { HistorySkeleton } from '../../components/Skeleton';
 import type { WalletBalance, CustomerProfile, StoreVisit } from '../../lib/api';
 
-const DEFAULT_MIN_REDEEM_PTS = 50;
-
-function getStoreMinRedeem(store: StoreVisit): number {
-  return store.minimumRedemptionPoints ?? DEFAULT_MIN_REDEEM_PTS;
-}
 
 function formatPoints(n: number): string {
   return n.toLocaleString('en-IN', { maximumFractionDigits: 0 });
@@ -163,12 +158,18 @@ function StoreCard({
   const balance = wallet?.balance ?? 0;
   const isPoints = loyaltyType === 'POINTS' || loyaltyType === 'HYBRID';
 
+  // For POINTS/HYBRID: progress towards next reward uses pointsToRewardRatio
+  // (how many coins = 1 reward), NOT minimumRedemptionPoints
+  const pointsTarget = store.pointsToRewardRatio ?? store.minimumRedemptionPoints ?? 100;
+  const pointsInCycle = balance % pointsTarget; // coins earned towards next reward
   const progress = isPoints
-    ? Math.min(100, getStoreMinRedeem(store) > 0 ? (balance / getStoreMinRedeem(store)) * 100 : 0)
+    ? Math.min(100, pointsTarget > 0 ? (pointsInCycle / pointsTarget) * 100 : 0)
     : Math.min(100, threshold > 0 ? (current / threshold) * 100 : 0);
   const pct = Math.round(progress);
   const targetNum = isPoints ? Math.round(balance) : current;
-  const subLabel = isPoints ? 'coins earned' : `${current} / ${threshold} visits`;
+  const subLabel = isPoints
+    ? `${Math.round(pointsInCycle)} / ${pointsTarget} coins`
+    : `${current} / ${threshold} visits`;
 
   // Staggered entrance: progress bar + count-up
   useEffect(() => {

@@ -306,7 +306,7 @@ export function UserScanPage() {
   // Auto-redirect to home 3s after PENDING (staff will approve later)
   useEffect(() => {
     if (step !== 'done' || checkinStatus !== null) return;
-    const t = setTimeout(() => navigate('/requests', { replace: true }), 3000);
+    const t = setTimeout(() => navigate('/me', { replace: true }), 3000);
     return () => clearTimeout(t);
   }, [step, checkinStatus, navigate]);
 
