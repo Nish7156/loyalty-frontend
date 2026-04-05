@@ -303,9 +303,9 @@ export function UserScanPage() {
     return () => { socket.off('checkin_updated', handler); socket.disconnect(); socketRef.current = null; };
   }, [step, branchId, lastActivityId]);
 
-  // Auto-redirect to home 3s after PENDING (staff will approve later)
+  // Auto-redirect to /me 3s after PENDING (staff will approve later)
   useEffect(() => {
-    if (step !== 'done' || checkinStatus !== null) return;
+    if (step !== 'done' || checkinStatus !== 'PENDING') return;
     const t = setTimeout(() => navigate('/me', { replace: true }), 3000);
     return () => clearTimeout(t);
   }, [step, checkinStatus, navigate]);
@@ -719,7 +719,7 @@ export function UserScanPage() {
                   />
                 ))}
               </div>
-              <p className="text-xs" style={{ color: 'var(--t3)' }}>Taking you to requests…</p>
+              <p className="text-xs" style={{ color: 'var(--t3)' }}>Taking you to home…</p>
             </div>
           )}
 
