@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const WS_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const WS_URL = 'https://api.loyalty.webtriggers.online';
 
 export function createBranchSocket(branchId: string): Socket {
   return io(WS_URL, {
